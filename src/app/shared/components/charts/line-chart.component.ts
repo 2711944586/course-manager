@@ -27,7 +27,7 @@ import { ChartDataItem } from './chart.model';
             <rect
               [attr.x]="pt.x - 32" [attr.y]="pt.y - 30"
               width="64" height="20" rx="5"
-              fill="var(--bg-elevated, #333)" opacity="0.9" />
+              fill="var(--bg-tooltip, #1E293B)" opacity="0.9" />
             <text [attr.x]="pt.x" [attr.y]="pt.y - 16" text-anchor="middle" class="tooltip-text">
               {{ pt.value }}{{ suffix }}
             </text>
@@ -58,7 +58,7 @@ import { ChartDataItem } from './chart.model';
     .tooltip-text {
       font-size: 10px;
       font-weight: 700;
-      fill: var(--text-on-accent, #fff);
+      fill: var(--text-tooltip, #fff);
     }
     .dot-label {
       font-size: 10px;

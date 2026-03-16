@@ -43,6 +43,8 @@ body.app-theme-light {
   --bg-hover: rgba(0, 0, 0, 0.035);
   --bg-active: rgba(0, 0, 0, 0.06);
   --bg-elevated: #ffffff;
+  --bg-tooltip: #1E293B;
+  --text-tooltip: #F8FAFC;
   --bg-tint: rgba(79, 70, 229, 0.035);
   --bg-glass: rgba(255, 255, 255, 0.72);
   --bg-glass-hover: rgba(255, 255, 255, 0.85);
@@ -155,6 +157,8 @@ body.app-theme-dark {
   --bg-hover: rgba(255, 255, 255, 0.06);
   --bg-active: rgba(255, 255, 255, 0.1);
   --bg-elevated: #334155;
+  --bg-tooltip: #F8FAFC;
+  --text-tooltip: #0F172A;
   --bg-tint: rgba(129, 140, 248, 0.06);
   --bg-glass: rgba(30, 41, 59, 0.7);
   --bg-glass-hover: rgba(51, 65, 85, 0.8);

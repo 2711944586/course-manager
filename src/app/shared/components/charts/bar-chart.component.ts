@@ -87,14 +87,14 @@ import { ChartDataItem } from './chart.model';
       fill: var(--text-secondary, #64748b);
     }
     .tooltip-bg {
-      fill: var(--bg-elevated, #334155);
+      fill: var(--bg-tooltip, #1E293B);
       opacity: 0.92;
       animation: fade-in 0.15s ease;
     }
     .tooltip-text {
       font-size: 10px;
       font-weight: 600;
-      fill: var(--text-on-accent, #fff);
+      fill: var(--text-tooltip, #fff);
       animation: fade-in 0.15s ease;
     }
     @keyframes fade-in {
