@@ -56,12 +56,12 @@ import { ChartDataItem } from './chart.model';
       cursor: pointer;
     }
     .tooltip-text {
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 700;
       fill: var(--text-tooltip, #fff);
     }
     .dot-label {
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 500;
       fill: var(--text-secondary, #64748b);
     }
@@ -75,7 +75,7 @@ export class LineChartComponent {
   @Input() areaColor = 'var(--chart-indigo, #4F46E5)';
 
   hoveredPoint = -1;
-  readonly width = 400;
+  readonly width = 600;
   readonly padding = 35;
   readonly bottomPadding = 20;
 
