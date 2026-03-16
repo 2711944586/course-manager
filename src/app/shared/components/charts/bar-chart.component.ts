@@ -117,42 +117,46 @@ export class BarChartComponent {
     'var(--chart-pink, #ec4899)',
     'var(--chart-blue, #3b82f6)',
   ];
-  readonly width = 600;
   private readonly padding = 30;
 
-  get needsRotation(): boolean {
-    return this.data.length >= 6;
+  /** ViewBox width scales with bar count to keep proportions consistent */
+  get width(): number {
+    const count = this.data.length || 1;
+    return Math.max(300, count * 60 + this.padding * 2);
   }
 
-  /** Adaptive font sizes based on bar count */
+  get needsRotation(): boolean {
+    return this.data.length >= 8;
+  }
+
   get valueFontSize(): number {
     const count = this.data.length;
-    if (count <= 4) return 12;
-    if (count <= 6) return 10;
+    if (count <= 5) return 11;
+    if (count <= 8) return 9;
     return 8;
   }
 
   get labelFontSize(): number {
     const count = this.data.length;
-    if (count <= 4) return 10;
-    if (count <= 6) return 9;
+    if (count <= 5) return 9;
+    if (count <= 8) return 8;
     return 7;
   }
 
   get tooltipW(): number {
-    return this.data.length <= 4 ? 90 : 80;
+    return this.data.length <= 5 ? 80 : 70;
   }
 
   get tooltipH(): number {
-    return this.data.length <= 4 ? 20 : 16;
+    return 16;
   }
 
   private get bottomPadding(): number {
-    return this.needsRotation ? 60 : 20;
+    return this.needsRotation ? 50 : 18;
   }
 
   get totalHeight(): number {
-    return this.height + (this.needsRotation ? 40 : 0);
+    return this.height + (this.needsRotation ? 30 : 0);
   }
 
   get chartBottom(): number {
@@ -169,12 +173,13 @@ export class BarChartComponent {
 
   get barWidth(): number {
     const count = this.data.length || 1;
-    return Math.min(40, (this.width - this.padding * 2) / count * 0.7);
+    const step = (this.width - this.padding * 2) / count;
+    return Math.min(44, step * 0.65);
   }
 
   truncateLabel(label: string): string {
-    const maxLen = this.needsRotation ? 6 : 8;
-    return label.length > maxLen ? label.slice(0, maxLen) + '…' : label;
+    if (!this.needsRotation) return label;
+    return label.length > 5 ? label.slice(0, 5) + '…' : label;
   }
 
   barX(index: number): number {
