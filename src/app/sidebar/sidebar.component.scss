@@ -46,7 +46,7 @@
   transition: background 0.35s var(--easing-smooth);
 
   mat-icon {
-    color: var(--text-on-accent);
+    color: var(--sidebar-logo-text, #ffffff);
     font-size: 18px;
     width: 18px;
     height: 18px;
