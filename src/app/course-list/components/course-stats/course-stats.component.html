@@ -1,0 +1,37 @@
+<section class="stats-grid">
+  <article class="stat-card">
+    <span class="label">课程总数</span>
+    <span class="value">{{ stats().totalCourses }}</span>
+    <span class="hint">
+      <mat-icon>menu_book</mat-icon>
+      全部课程
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">进行中</span>
+    <span class="value">{{ stats().activeCourses }}</span>
+    <span class="hint">
+      <mat-icon>play_circle</mat-icon>
+      当前教学
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">未开始 / 已结课</span>
+    <span class="value">{{ stats().plannedCourses }} / {{ stats().completedCourses }}</span>
+    <span class="hint">
+      <mat-icon>fact_check</mat-icon>
+      生命周期管理
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">平均进度</span>
+    <span class="value">{{ stats().averageProgress }}%</span>
+    <span class="hint">
+      <mat-icon>trending_up</mat-icon>
+      覆盖 {{ stats().totalStudents }} 名学生
+    </span>
+  </article>
+</section>

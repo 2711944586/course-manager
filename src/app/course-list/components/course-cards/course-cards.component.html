@@ -1,0 +1,55 @@
+@if (courses.length === 0) {
+  <section class="empty-state">
+    <mat-icon>inbox</mat-icon>
+    <h3>没有匹配到课程</h3>
+    <p>请尝试调整筛选条件{{ keyword ? '，或清空关键词“' + keyword + '”' : '' }}。</p>
+  </section>
+}
+@else {
+  <section class="card-grid">
+    @for (course of courses; track course.id) {
+      <article class="course-card" (click)="requestView(course.id)">
+        <div class="card-top">
+          <div class="title-group">
+            <span class="icon-wrap">
+              <mat-icon>{{ course.icon }}</mat-icon>
+            </span>
+            <div>
+              <h3>{{ course.name }}</h3>
+              <p>{{ course.instructor }} · {{ course.schedule }}</p>
+            </div>
+          </div>
+          <span class="status-badge" [class]="'status-' + course.status">{{ statusLabels[course.status] }}</span>
+        </div>
+
+        <p class="description">{{ course.description }}</p>
+
+        <div class="progress-row">
+          <span>进度 {{ course.progress }}%</span>
+          <span>{{ course.students }} 名学生</span>
+        </div>
+        <div class="progress-track">
+          <span class="progress-fill" [style.width.%]="course.progress"></span>
+        </div>
+
+        <div class="card-footer">
+          <span>更新于 {{ formatUpdateTime(course.updatedAt) }}</span>
+          <div class="actions">
+            <button mat-stroked-button type="button" class="action-button" (click)="requestEdit($event, course.id)">
+              <mat-icon>edit</mat-icon>
+              编辑
+            </button>
+            <button mat-stroked-button type="button" class="action-button danger-action" (click)="requestDelete($event, course.id)">
+              <mat-icon>delete</mat-icon>
+              删除
+            </button>
+            <button mat-flat-button color="primary" type="button" class="action-button" (click)="requestView(course.id)">
+              <mat-icon>visibility</mat-icon>
+              查看详情
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </section>
+}

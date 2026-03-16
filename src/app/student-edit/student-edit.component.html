@@ -1,0 +1,134 @@
+<div class="edit-page">
+  <app-page-hero
+    icon="person"
+    [badge]="isCreateMode ? 'NEW STUDENT' : 'EDIT STUDENT'"
+    [title]="pageTitle()"
+    subtitle="填写学生基本信息和成绩，提交后将保存到系统中。"
+  />
+
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
+  <div class="edit-layout animate-fade-up delay-2">
+    <!-- 左: 表单 -->
+    <section class="edit-card">
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>badge</mat-icon>
+          <h3>基本信息</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>姓名 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">person</mat-icon>
+              <input type="text" placeholder="输入学生姓名"
+                [ngModel]="draft().name"
+                (ngModelChange)="updateField('name', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>学号 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">tag</mat-icon>
+              <input type="text" placeholder="8-12位数字"
+                [ngModel]="draft().studentNo"
+                (ngModelChange)="updateField('studentNo', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>性别</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">wc</mat-icon>
+              <select [ngModel]="draft().gender" (ngModelChange)="updateField('gender', $event)">
+                @for (opt of genderOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>出生日期 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">calendar_today</mat-icon>
+              <input type="date"
+                [ngModel]="draft().birthDate"
+                (ngModelChange)="updateField('birthDate', $event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>school</mat-icon>
+          <h3>学业成绩</h3>
+        </div>
+        <div class="score-section">
+          <div class="score-header">
+            <span class="score-label">分数</span>
+            <span class="score-display" [attr.data-grade]="draftGrade()">
+              {{ draft().score }} 分 · {{ draftGrade() }} {{ gradeLabels[draftGrade()] }}
+            </span>
+          </div>
+          <input type="range" min="0" max="100" class="score-range"
+            [ngModel]="draft().score"
+            (ngModelChange)="updateField('score', $event)" />
+          <div class="score-ticks">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a mat-stroked-button routerLink="/students">
+          <mat-icon>arrow_back</mat-icon> 取消
+        </a>
+        <button mat-flat-button color="primary" (click)="save()">
+          <mat-icon>save</mat-icon> {{ isCreateMode ? '创建学生' : '保存修改' }}
+        </button>
+      </div>
+    </section>
+
+    <!-- 右: 实时预览 -->
+    <aside class="preview-panel animate-fade-up delay-4">
+      <div class="preview-header">
+        <mat-icon>visibility</mat-icon>
+        <span>实时预览</span>
+      </div>
+      <div class="preview-card">
+        <div class="preview-avatar" [attr.data-grade]="draftGrade()">
+          {{ draft().name ? draft().name[0] : '?' }}
+        </div>
+        <h4 class="preview-name">{{ draft().name || '学生姓名' }}</h4>
+        <span class="preview-no">{{ draft().studentNo || '--------' }}</span>
+
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <mat-icon>wc</mat-icon>
+            <span>{{ draftGenderLabel() }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>cake</mat-icon>
+            <span>{{ draftAge() }} 岁</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>school</mat-icon>
+            <span>{{ draft().score }} 分</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>grade</mat-icon>
+            <span class="preview-grade" [attr.data-grade]="draftGrade()">{{ draftGrade() }} 等级</span>
+          </div>
+        </div>
+
+        <div class="preview-score-bar">
+          <div class="preview-score-fill" [style.width.%]="draft().score" [attr.data-grade]="draftGrade()"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

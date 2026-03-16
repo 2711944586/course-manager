@@ -1,0 +1,73 @@
+<section class="stats-grid">
+  <article class="stat-card">
+    <span class="label">学生总数</span>
+    <span class="value">{{ stats().totalStudents }}</span>
+    <span class="hint">
+      <mat-icon>groups</mat-icon>
+      在册人数
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">平均成绩</span>
+    <span class="value">{{ stats().averageScore }} 分</span>
+    <span class="hint">
+      <mat-icon>insights</mat-icon>
+      全员平均
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">及格率</span>
+    <span class="value">{{ stats().passRate }}%</span>
+    <span class="hint">
+      <mat-icon>verified</mat-icon>
+      ≥ 60 分占比
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">优秀率</span>
+    <span class="value">{{ stats().excellentRate }}%</span>
+    <span class="hint">
+      <mat-icon>emoji_events</mat-icon>
+      ≥ 90 分占比
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">性别分布</span>
+    <span class="value">男 {{ stats().maleStudents }} · 女 {{ stats().femaleStudents }}</span>
+    <span class="hint">
+      <mat-icon>wc</mat-icon>
+      性别统计
+    </span>
+  </article>
+
+  <article class="stat-card">
+    <span class="label">平均年龄</span>
+    <span class="value">{{ stats().averageAge }} 岁</span>
+    <span class="hint">
+      <mat-icon>query_builder</mat-icon>
+      年龄结构
+    </span>
+  </article>
+</section>
+
+<section class="grade-bar">
+  <h4 class="grade-bar-title">等级分布</h4>
+  <div class="grade-segments">
+    @for (grade of ['A', 'B', 'C', 'D', 'E', 'F']; track grade) {
+      @if (stats().gradeDistribution[grade] > 0) {
+        <div
+          class="grade-segment"
+          [attr.data-grade]="grade"
+          [style.flex]="stats().gradeDistribution[grade]"
+          [title]="grade + ': ' + stats().gradeDistribution[grade] + ' 人'"
+        >
+          {{ grade }}
+        </div>
+      }
+    }
+  </div>
+</section>

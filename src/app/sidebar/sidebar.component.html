@@ -1,0 +1,71 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <!-- Logo Area -->
+  <div class="sidebar-header">
+    <div class="logo-icon">
+      <mat-icon>school</mat-icon>
+    </div>
+    @if (!collapsed()) {
+      <span class="logo-text">课程管理</span>
+    }
+    <button class="toggle-btn" matRipple (click)="toggleCollapse()"
+            [matTooltip]="collapsed() ? '展开' : '收起'">
+      <mat-icon>{{ collapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.route) {
+      <a class="nav-item"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+         matRipple
+         [matTooltip]="collapsed() ? item.label + ' · ' + item.description : ''"
+         matTooltipPosition="right">
+        <div class="nav-icon">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </div>
+        @if (!collapsed()) {
+          <div class="nav-copy">
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="nav-description">{{ item.description }}</span>
+          </div>
+        }
+      </a>
+    }
+  </nav>
+
+  <!-- User Area -->
+  <div class="sidebar-footer">
+    <div class="data-actions">
+      <button class="data-btn" matRipple (click)="exportData()"
+              [matTooltip]="collapsed() ? '导出备份' : ''"
+              matTooltipPosition="right">
+        <mat-icon>download</mat-icon>
+        @if (!collapsed()) { <span>导出备份</span> }
+      </button>
+      <button class="data-btn" matRipple (click)="triggerImport()"
+              [matTooltip]="collapsed() ? '恢复数据' : ''"
+              matTooltipPosition="right">
+        <mat-icon>upload</mat-icon>
+        @if (!collapsed()) { <span>恢复数据</span> }
+      </button>
+      <input #fileInput type="file" accept=".json" hidden (change)="onFileSelected($event)" />
+    </div>
+    @if (restoreMessage()) {
+      <div class="restore-toast">{{ restoreMessage() }}</div>
+    }
+    <div class="user-card" matRipple>
+      <div class="user-avatar">
+        <span>管</span>
+      </div>
+      @if (!collapsed()) {
+        <div class="user-info">
+          <span class="user-name">管理员</span>
+          <span class="user-role">教务主任</span>
+        </div>
+      }
+    </div>
+  </div>
+</aside>

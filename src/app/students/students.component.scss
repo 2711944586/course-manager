@@ -1,0 +1,100 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 28px 40px;
+  scroll-behavior: smooth;
+}
+
+.student-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.batch-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--accent-primary-container);
+  border: 1px solid var(--accent-primary);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--accent-primary);
+}
+
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+
+  button {
+    color: var(--text-tertiary) !important;
+    border-radius: var(--radius-sm) !important;
+
+    &.active {
+      color: var(--accent-primary) !important;
+      background: var(--accent-primary-container) !important;
+    }
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.card-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.page-jump-input {
+  width: 48px;
+  height: 30px;
+  text-align: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+
+  &:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.1);
+  }
+}
+
+@media (max-width: 1200px) {
+  :host {
+    padding: 18px 18px 32px;
+  }
+}

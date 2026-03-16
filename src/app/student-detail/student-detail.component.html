@@ -1,0 +1,74 @@
+@if (student(); as s) {
+  <app-page-hero
+    icon="person"
+    badge="STUDENT PROFILE"
+    [title]="s.name"
+    [subtitle]="'学号 ' + s.studentNo + ' · ' + genderLabel() + ' · ' + age() + '岁'"
+  />
+
+  <div class="mode-toggle animate-fade-up delay-1">
+    <a mat-stroked-button [routerLink]="['/students/edit', s.id]">
+      <mat-icon>edit</mat-icon> 编辑学生
+    </a>
+  </div>
+
+  <div class="detail-grid animate-fade-up delay-2">
+    <section class="surface-card info-section">
+      <h3><mat-icon>badge</mat-icon> 基本信息</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>姓名</dt>
+          <dd>{{ s.name }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>学号</dt>
+          <dd>{{ s.studentNo }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>性别</dt>
+          <dd>{{ genderLabel() }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>出生日期</dt>
+          <dd>{{ s.birthDate }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>年龄</dt>
+          <dd>{{ age() }} 岁</dd>
+        </div>
+        <div class="info-row">
+          <dt>最近更新</dt>
+          <dd>{{ s.updatedAt | date:'yyyy-MM-dd HH:mm' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="surface-card score-section">
+      <h3><mat-icon>school</mat-icon> 成绩信息</h3>
+      <div class="score-display">
+        <div class="score-big">{{ s.score }}</div>
+        <div class="grade-badge" [attr.data-grade]="grade()">{{ grade() }}</div>
+      </div>
+      <div class="grade-hint">{{ s.score >= 90 ? '优秀' : s.score >= 80 ? '良好' : s.score >= 70 ? '中等' : s.score >= 60 ? '及格' : s.score >= 50 ? '不及格' : '极差' }}</div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" [style.width.%]="s.score"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="action-bar animate-fade-up delay-3">
+    <a mat-stroked-button routerLink="/students">
+      <mat-icon>arrow_back</mat-icon> 返回列表
+    </a>
+    <button mat-stroked-button color="warn" (click)="deleteStudent()">
+      <mat-icon>delete</mat-icon> 删除学生
+    </button>
+  </div>
+} @else {
+  <div class="not-found">
+    <mat-icon>person_off</mat-icon>
+    <h2>学生不存在</h2>
+    <p>该学生可能已被删除。</p>
+    <a mat-flat-button color="primary" routerLink="/students">返回学生列表</a>
+  </div>
+}

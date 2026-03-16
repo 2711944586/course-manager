@@ -1,0 +1,86 @@
+<div class="page-shell">
+  <app-page-hero
+    title="活动日志"
+    subtitle="系统操作记录与审计追踪"
+    icon="history"
+    [badge]="stats().total + ' 条记录'"
+  />
+
+  <!-- Stats Row -->
+  <div class="stats-row animate-fade-up delay-1">
+    <div class="stat-card">
+      <div class="stat-icon create"><mat-icon>add_circle</mat-icon></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ stats().creates }}</span>
+        <span class="stat-label">创建操作</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon update"><mat-icon>edit</mat-icon></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ stats().updates }}</span>
+        <span class="stat-label">更新操作</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon delete"><mat-icon>delete</mat-icon></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ stats().deletes }}</span>
+        <span class="stat-label">删除操作</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon total"><mat-icon>receipt_long</mat-icon></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ stats().total }}</span>
+        <span class="stat-label">总记录</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar surface-card animate-fade-up delay-2">
+    <div class="filter-chips">
+      @for (opt of filterOptions; track opt.value) {
+        <button class="filter-chip" [class.active]="activeFilter() === opt.value"
+                (click)="setFilter(opt.value)" matRipple>
+          <mat-icon>{{ opt.icon }}</mat-icon>
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+    <button mat-stroked-button class="clear-btn" (click)="clearLog()">
+      <mat-icon>delete_sweep</mat-icon>
+      清除日志
+    </button>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-container surface-card animate-fade-up delay-3">
+    @if (filteredEntries().length === 0) {
+      <div class="empty-state">
+        <mat-icon>event_note</mat-icon>
+        <p>暂无活动记录</p>
+      </div>
+    } @else {
+      <div class="timeline">
+        @for (entry of filteredEntries(); track entry.id; let i = $index) {
+          <div class="timeline-item" [class]="'action-' + entry.action">
+            <div class="timeline-dot">
+              <mat-icon>{{ getActionIcon(entry.action) }}</mat-icon>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <span class="action-badge" [class]="entry.action">{{ getActionLabel(entry.action) }}</span>
+                <span class="entity-badge">{{ getEntityLabel(entry.entity) }}</span>
+                <span class="timeline-name">{{ entry.entityName }}</span>
+                <time class="timeline-time">{{ entry.timestamp | date:'MM/dd HH:mm' }}</time>
+              </div>
+              <p class="timeline-detail">{{ entry.detail }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

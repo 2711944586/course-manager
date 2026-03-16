@@ -1,0 +1,85 @@
+<section class="editor-card">
+  <header class="editor-header">
+    <h2>{{ mode === 'create' ? '新建课程' : '编辑课程' }}</h2>
+    <button mat-icon-button type="button" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>课程名称</mat-label>
+        <input matInput formControlName="name" />
+        @if (isInvalid('name')) {
+          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>授课教师</mat-label>
+        <input matInput formControlName="instructor" />
+        @if (isInvalid('instructor')) {
+          <mat-error>{{ getErrorMessage('instructor') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>上课时间</mat-label>
+        <input matInput formControlName="schedule" />
+        @if (isInvalid('schedule')) {
+          <mat-error>{{ getErrorMessage('schedule') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>状态</mat-label>
+        <mat-select formControlName="status">
+          @for (statusOption of statusOptions; track statusOption.value) {
+            <mat-option [value]="statusOption.value">{{ statusOption.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>课程进度(%)</mat-label>
+        <input matInput type="number" formControlName="progress" />
+        @if (isInvalid('progress')) {
+          <mat-error>{{ getErrorMessage('progress') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>学生人数</mat-label>
+        <input matInput type="number" formControlName="students" />
+        @if (isInvalid('students')) {
+          <mat-error>{{ getErrorMessage('students') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>课程图标</mat-label>
+        <mat-select formControlName="icon">
+          @for (iconOption of iconOptions; track iconOption.value) {
+            <mat-option [value]="iconOption.value">{{ iconOption.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="description-field">
+        <mat-label>课程简介</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+        @if (isInvalid('description')) {
+          <mat-error>{{ getErrorMessage('description') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="cancel()">取消</button>
+      <button mat-flat-button color="primary" type="submit">
+        {{ mode === 'create' ? '创建课程' : '保存修改' }}
+      </button>
+    </div>
+  </form>
+</section>

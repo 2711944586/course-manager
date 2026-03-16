@@ -1,0 +1,70 @@
+<div class="page-shell schedule-page">
+  <app-page-hero
+    title="教务日程总览"
+    subtitle="按工作周查看课程分布、重点排课日和待处理提醒，减少侧栏跳转不清晰的问题。"
+    badge="Academic Schedule"
+    icon="calendar_month"
+  />
+
+  <section class="schedule-layout animate-fade-up delay-1">
+    <article class="surface-card reminder-panel">
+      <div class="section-heading">
+        <div>
+          <h2>排课提醒</h2>
+          <p>基于现有课程数据自动生成。</p>
+        </div>
+        <a mat-stroked-button routerLink="/courses">
+          <mat-icon>open_in_new</mat-icon>
+          前往课程管理
+        </a>
+      </div>
+
+      <div class="reminder-list">
+        @for (reminder of reminders(); track reminder.title) {
+          <article class="reminder-card">
+            <mat-icon>{{ reminder.icon }}</mat-icon>
+            <div>
+              <strong>{{ reminder.title }}</strong>
+              <p>{{ reminder.text }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+
+    <article class="surface-card calendar-panel animate-fade-up delay-2">
+      <div class="section-heading">
+        <div>
+          <h2>周课表视图</h2>
+          <p>课程按周一到周日自动分组，便于快速巡检。</p>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        @for (column of calendarColumns(); track column.day) {
+          <section class="calendar-column">
+            <header>
+              <strong>{{ column.day }}</strong>
+              <span>{{ column.courses.length }} 门</span>
+            </header>
+
+            @if (column.courses.length > 0) {
+              <div class="calendar-items">
+                @for (course of column.courses; track course.id) {
+                  <a class="calendar-item" [routerLink]="['/courses/detail', course.id]">
+                    <strong>{{ course.name }}</strong>
+                    <span>{{ course.schedule }}</span>
+                    <small>{{ course.instructor }} · {{ course.students }} 人</small>
+                  </a>
+                }
+              </div>
+            }
+            @else {
+              <div class="calendar-empty">暂无课程安排</div>
+            }
+          </section>
+        }
+      </div>
+    </article>
+  </section>
+</div>

@@ -1,0 +1,227 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 28px 34px;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+
+  button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &.active {
+      background: var(--accent-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 112, 243, 0.2);
+    }
+
+    &:not(.active):hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+  }
+}
+
+.summary-grid,
+.report-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.summary-card,
+.report-card {
+  padding: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.25s var(--easing-smooth);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+  }
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.summary-card mat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-primary-container);
+  color: var(--accent-primary);
+}
+
+.summary-card span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.report-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bar-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.bar-item {
+  display: grid;
+  gap: 6px;
+}
+
+.bar-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bar-copy strong {
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.bar-copy span {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.bar-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: width 0.6s var(--easing-decel);
+  animation: progress-fill 0.8s var(--easing-decel) both;
+}
+
+.accent-teal {
+  background: linear-gradient(90deg, var(--accent-secondary), var(--accent-success));
+}
+
+.accent-rose {
+  background: linear-gradient(90deg, var(--accent-error), var(--accent-grade-f));
+}
+
+.accent-grade {
+  background: linear-gradient(90deg, var(--accent-info), var(--accent-primary));
+}
+
+.accent-amber {
+  background: linear-gradient(90deg, var(--accent-warning), var(--accent-grade-d));
+}
+
+.lower-grid {
+  align-items: start;
+}
+
+.chip-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.chip-card {
+  padding: 22px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  text-align: center;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.2s var(--easing-smooth);
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.chip-card strong {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--accent-primary);
+}
+
+.chip-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1200px) {
+  :host {
+    padding: 0 18px 28px;
+  }
+
+  .summary-grid,
+  .report-grid,
+  .chip-list {
+    grid-template-columns: 1fr;
+  }
+}

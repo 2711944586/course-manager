@@ -1,0 +1,223 @@
+<div class="page-shell reports-page">
+  <app-page-hero
+    title="数据分析中心"
+    subtitle="多维度交互式图表与报表，从课程进度到学生成绩一目了然。"
+    badge="Analytics Center"
+    icon="insights"
+  />
+
+  <!-- Tab 切换 -->
+  <nav class="tab-bar animate-fade-up delay-1">
+    <button [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+      <mat-icon>dashboard</mat-icon> 综合总览
+    </button>
+    <button [class.active]="activeTab() === 'courses'" (click)="activeTab.set('courses')">
+      <mat-icon>menu_book</mat-icon> 课程分析
+    </button>
+    <button [class.active]="activeTab() === 'students'" (click)="activeTab.set('students')">
+      <mat-icon>groups</mat-icon> 学生分析
+    </button>
+  </nav>
+
+  <!-- 汇总指标 -->
+  <section class="summary-grid animate-fade-up delay-2">
+    @for (item of reportSummary(); track item.label) {
+      <article class="summary-card surface-card">
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <div>
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+        </div>
+      </article>
+    }
+  </section>
+
+  <!-- ===== 综合总览 ===== -->
+  @if (activeTab() === 'overview') {
+    <section class="report-grid animate-fade-up delay-3">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>课程状态分布</h2>
+            <p>按状态查看课程整体构成。</p>
+          </div>
+        </div>
+        <app-donut-chart [data]="courseStatusChart()" centerLabel="课程" />
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>等级分布（柱状图）</h2>
+            <p>全员成绩按 A-F 等级柱状展示。</p>
+          </div>
+        </div>
+        <app-bar-chart [data]="gradeChartData()" suffix="人" [height]="220" />
+      </article>
+    </section>
+
+    <section class="report-grid animate-fade-up delay-4">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>分数段趋势</h2>
+            <p>折线图展示各分数区间人数分布。</p>
+          </div>
+        </div>
+        <app-line-chart [data]="scoreLineData()" suffix="人" lineColor="#7c66dc" areaColor="#7c66dc" />
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>性别分布</h2>
+            <p>环形图显示男女比例。</p>
+          </div>
+        </div>
+        <app-donut-chart [data]="genderDonut()" centerLabel="学生" />
+      </article>
+    </section>
+  }
+
+  <!-- ===== 课程分析 ===== -->
+  @if (activeTab() === 'courses') {
+    <section class="report-grid animate-fade-up delay-3">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>课程进度排行</h2>
+            <p>优先展示进度最高的课程（柱状图）。</p>
+          </div>
+        </div>
+        <app-bar-chart [data]="progressBarData()" suffix="%" [height]="240" />
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>教师负载</h2>
+            <p>按授课学生总量排序。</p>
+          </div>
+        </div>
+        <div class="bar-list">
+          @for (item of instructorLoads(); track item.label) {
+            <div class="bar-item">
+              <div class="bar-copy">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.value }}{{ item.suffix }}</span>
+              </div>
+              <div class="bar-track">
+                <span class="bar-fill accent-teal" [style.width]="barWidth(instructorLoads(), item.value)"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="report-grid lower-grid animate-fade-up delay-4">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>课程进度（条形）</h2>
+            <p>横向进度条对比视图。</p>
+          </div>
+        </div>
+        <div class="bar-list">
+          @for (item of topProgressCourses(); track item.label) {
+            <div class="bar-item">
+              <div class="bar-copy">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.value }}{{ item.suffix }}</span>
+              </div>
+              <div class="bar-track">
+                <span class="bar-fill" [style.width]="barWidth(topProgressCourses(), item.value)"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>课程状态（环形）</h2>
+            <p>直观查看进行中/未开始/已结课。</p>
+          </div>
+        </div>
+        <app-donut-chart [data]="courseStatusChart()" centerLabel="课程" />
+      </article>
+    </section>
+  }
+
+  <!-- ===== 学生分析 ===== -->
+  @if (activeTab() === 'students') {
+    <section class="report-grid animate-fade-up delay-3">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>成绩等级分布</h2>
+            <p>柱状图展示各等级人数。</p>
+          </div>
+        </div>
+        <app-bar-chart [data]="gradeChartData()" suffix="人" [height]="220" />
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>分数段统计</h2>
+            <p>按分数区间统计人数。</p>
+          </div>
+        </div>
+        <div class="bar-list">
+          @for (item of scoreRangeDistribution(); track item.label) {
+            <div class="bar-item">
+              <div class="bar-copy">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.value }}{{ item.suffix }}</span>
+              </div>
+              <div class="bar-track">
+                <span class="bar-fill accent-amber" [style.width]="barWidth(scoreRangeDistribution(), item.value)"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="report-grid lower-grid animate-fade-up delay-4">
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>性别分布</h2>
+            <p>环形图展示男女占比。</p>
+          </div>
+        </div>
+        <app-donut-chart [data]="genderDonut()" centerLabel="学生" />
+      </article>
+
+      <article class="surface-card report-card">
+        <div class="section-heading">
+          <div>
+            <h2>年龄分布</h2>
+            <p>帮助快速了解学生年龄结构。</p>
+          </div>
+        </div>
+        <div class="bar-list compact">
+          @for (item of ageDistribution(); track item.label) {
+            <div class="bar-item">
+              <div class="bar-copy">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.value }}{{ item.suffix }}</span>
+              </div>
+              <div class="bar-track">
+                <span class="bar-fill accent-rose" [style.width]="barWidth(ageDistribution(), item.value)"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  }
+</div>

@@ -1,0 +1,110 @@
+<div class="app-layout">
+  <app-sidebar />
+  <main class="main-content">
+    <header class="shell-topbar">
+      <div class="topbar-copy">
+        <span class="eyebrow">课程管理中心</span>
+        <strong>{{ pageTitle() }}</strong>
+      </div>
+      <div class="search-wrap" (focusin)="showSearchResults.set(true)">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          #searchInput
+          class="search-input"
+          type="text"
+          placeholder="搜索课程或学生... (Ctrl+K)"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event); showSearchResults.set(true)"
+          (keydown.escape)="closeSearch()"
+        />
+        @if (searchQuery().length > 0) {
+          <button class="search-clear" (click)="searchQuery.set(''); closeSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+        @if (showSearchResults() && searchResults().length > 0) {
+          <div class="search-dropdown">
+            @for (result of searchResults(); track (result.type + '-' + result.id)) {
+              <button class="search-result-item" (click)="navigateResult(result)">
+                <mat-icon class="result-icon" [class.student]="result.type === 'student'">{{ result.icon }}</mat-icon>
+                <div class="result-body">
+                  <span class="result-title">{{ result.title }}</span>
+                  <span class="result-subtitle">{{ result.subtitle }}</span>
+                </div>
+                <span class="result-type-tag">{{ result.type === 'course' ? '课程' : '学生' }}</span>
+              </button>
+            }
+          </div>
+        }
+        @if (showSearchResults() && searchQuery().length > 0 && searchResults().length === 0) {
+          <div class="search-dropdown search-empty">
+            <mat-icon>search_off</mat-icon>
+            <span>无匹配结果</span>
+          </div>
+        }
+      </div>
+
+      <div class="topbar-actions">
+        <div class="notification-wrap">
+          <button
+            mat-icon-button
+            class="notification-trigger"
+            (click)="toggleNotifications()"
+          >
+            <mat-icon>notifications</mat-icon>
+            @if (unreadCount() > 0) {
+              <span class="notification-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+            }
+          </button>
+          
+          @if (showNotifications()) {
+            <div class="notification-dropdown surface-card animate-fade-up">
+              <div class="notification-header">
+                <h3>消息通知 ({{ unreadCount() }})</h3>
+                <button class="btn-text" (click)="markAllNotificationsRead()">全部已读</button>
+              </div>
+              <div class="notification-list">
+                @for (notice of notifications(); track notice.id) {
+                  <article class="notification-item" [class.unread]="!notice.read" (click)="markNotificationRead(notice.id)">
+                    <div class="notification-icon" [class]="'type-' + notice.type">
+                      <mat-icon>{{ notice.type === 'error' ? 'error' : notice.type === 'warning' ? 'warning' : notice.type === 'success' ? 'check_circle' : 'info' }}</mat-icon>
+                    </div>
+                    <div class="notification-body">
+                      <div class="notification-title-row">
+                        <strong>{{ notice.title }}</strong>
+                        <span class="notification-date">{{ notice.date | date:'MM-dd HH:mm' }}</span>
+                      </div>
+                      <p>{{ notice.message }}</p>
+                    </div>
+                  </article>
+                }
+                @if (notifications().length === 0) {
+                  <div class="notification-empty">
+                    <mat-icon>notifications_paused</mat-icon>
+                    <p>暂无新通知</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <button
+          mat-stroked-button
+          type="button"
+          class="theme-toggle"
+          (click)="toggleTheme()"
+        >
+          <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          {{ isDarkTheme() ? '切换亮色' : '切换暗色' }}
+        </button>
+      </div>
+    </header>
+    <div class="route-content" [@routeTransition]="prepareRoute(outlet)">
+      <router-outlet #outlet="outlet" />
+    </div>
+    @if (showSearchResults() || showNotifications()) {
+      <div class="search-backdrop" (click)="closeSearch(); closeNotifications()"></div>
+    }
+  </main>
+</div>

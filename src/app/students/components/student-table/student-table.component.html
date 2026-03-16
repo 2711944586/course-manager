@@ -1,0 +1,104 @@
+@if (students.length === 0) {
+  <section class="empty-state">
+    <mat-icon>school</mat-icon>
+    <h3>没有匹配到学生</h3>
+    <p>请调整筛选条件{{ keyword ? '，或清空关键词“' + keyword + '”' : '' }}。</p>
+  </section>
+}
+@else {
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="check-col">
+            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll($any($event.target).checked)" />
+          </th>
+          <th>姓名</th>
+          <th>学号</th>
+          <th>性别</th>
+          <th>出生日期</th>
+          <th>年龄</th>
+          <th>成绩</th>
+          <th>等级</th>
+          <th>最近更新</th>
+          <th class="actions-col">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of students; track student.id) {
+          <tr [class.row-selected]="selectedIds.has(student.id)">
+            <td class="check-col">
+              <input type="checkbox" [checked]="selectedIds.has(student.id)" (change)="toggleOne(student.id, $any($event.target).checked)" />
+            </td>
+            <td class="name-cell"><a class="name-link" [routerLink]="'/students/detail/' + student.id">{{ student.name }}</a></td>
+            <td><span class="mono">{{ student.studentNo }}</span></td>
+            <td>
+              <span class="gender-tag" [class.gender-male]="student.gender === 'male'" [class.gender-female]="student.gender === 'female'">
+                {{ genderLabels[student.gender] }}
+              </span>
+            </td>
+            <td><span class="mono">{{ student.birthDate }}</span></td>
+            <td>{{ computeAge(student.birthDate) }}</td>
+            <td><span class="mono score-cell">{{ student.score }}</span></td>
+            <td>
+              <span class="grade-badge" [attr.data-grade]="computeGrade(student.score)">
+                {{ computeGrade(student.score) }}
+              </span>
+            </td>
+            <td class="updated-cell">{{ student.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
+            <td class="actions-col">
+              <button mat-stroked-button type="button" class="action-button" (click)="requestEdit(student.id)">
+                <mat-icon>edit</mat-icon>
+                编辑
+              </button>
+              <button mat-stroked-button type="button" class="action-button danger-action" (click)="requestDelete(student.id)">
+                <mat-icon>delete</mat-icon>
+                删除
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  @if (totalPages > 1) {
+    <nav class="pagination-bar" aria-label="学生列表分页">
+      <span class="page-info">
+        第 {{ startIndex }}–{{ endIndex }} 条，共 {{ totalFiltered }} 条
+      </span>
+      <div class="page-controls">
+        <button mat-icon-button type="button" [disabled]="currentPage <= 1" (click)="goTo(1)" aria-label="第一页">
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button mat-icon-button type="button" [disabled]="currentPage <= 1" (click)="goTo(currentPage - 1)" aria-label="上一页">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        @for (page of pageNumbers; track page) {
+          <button
+            type="button"
+            class="page-number"
+            [class.active]="page === currentPage"
+            (click)="goTo(page)"
+          >{{ page }}</button>
+        }
+
+        <button mat-icon-button type="button" [disabled]="currentPage >= totalPages" (click)="goTo(currentPage + 1)" aria-label="下一页">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button mat-icon-button type="button" [disabled]="currentPage >= totalPages" (click)="goTo(totalPages)" aria-label="最后一页">
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+      <div class="page-jump">
+        <span>跳至</span>
+        <input type="number" min="1" [max]="totalPages" class="page-jump-input"
+          [value]="currentPage"
+          (keydown.enter)="goTo(+$any($event.target).value)"
+          (blur)="goTo(+$any($event.target).value)" />
+        <span>页</span>
+      </div>
+    </nav>
+  }
+}

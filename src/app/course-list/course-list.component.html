@@ -1,0 +1,46 @@
+<div class="course-page">
+  <app-page-hero
+    title="课程管理中心"
+    subtitle="支持课程的创建、维护、筛选与状态跟踪，满足基础教务管理使用。"
+    badge="Course Operations"
+    icon="menu_book"
+  />
+
+  <app-course-stats class="animate-fade-up delay-1" [stats]="stats()" />
+
+  <app-course-toolbar
+    class="animate-fade-up delay-2"
+    [searchKeyword]="searchKeyword()"
+    [selectedStatus]="selectedStatus()"
+    [selectedSort]="selectedSort()"
+    (searchChange)="handleSearchChange($event)"
+    (statusChange)="handleStatusChange($event)"
+    (sortChange)="handleSortChange($event)"
+    (createRequested)="startCreate()"
+    (exportRequested)="exportCourses()"
+  />
+
+  @if (notice(); as message) {
+    <app-inline-notice class="animate-fade-up delay-3" [notice]="message" (closeRequested)="closeNotice()" />
+  }
+
+  @if (showEditor()) {
+    <app-course-editor
+      class="animate-fade-up delay-4"
+      [mode]="creating() ? 'create' : 'edit'"
+      [course]="editingCourse()"
+      (saveRequested)="saveCourse($event)"
+      (cancelRequested)="cancelEdit()"
+    />
+  }
+
+  <app-course-cards
+    class="animate-fade-up delay-5"
+    [courses]="filteredCourses()"
+    [keyword]="searchKeyword()"
+    (viewRequested)="viewDetail($event)"
+    (editRequested)="startEdit($event)"
+    (deleteRequested)="deleteCourse($event)"
+  />
+</div>
+

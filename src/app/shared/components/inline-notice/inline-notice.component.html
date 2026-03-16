@@ -1,0 +1,7 @@
+<section class="notice-card" [class.notice-error]="notice().type === 'error'" [class.notice-info]="notice().type === 'info'">
+  <div class="notice-content">
+    <mat-icon>{{ iconName() }}</mat-icon>
+    <span>{{ notice().text }}</span>
+  </div>
+  <button type="button" (click)="close()">{{ closeText() }}</button>
+</section>

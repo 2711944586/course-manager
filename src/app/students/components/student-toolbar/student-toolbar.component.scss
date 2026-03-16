@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+.toolbar-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: end;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-xs);
+}
+
+.field-group {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(320px, 1.8fr) repeat(2, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.control-label {
+  font-size: 0.73rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.search-field {
+  .mat-icon {
+    margin-right: 4px;
+  }
+}
+
+.toolbar-actions button {
+  min-width: 140px;
+  min-height: 44px;
+}
+
+@media (max-width: 1200px) {
+  .toolbar-card {
+    grid-template-columns: 1fr;
+  }
+
+  .field-group {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .toolbar-card {
+    padding: 14px;
+  }
+
+  .field-group {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .toolbar-actions button {
+    width: 100%;
+  }
+}

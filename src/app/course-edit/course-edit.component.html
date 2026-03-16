@@ -1,0 +1,168 @@
+<div class="edit-page">
+  <app-page-hero
+    icon="menu_book"
+    [badge]="isCreateMode ? 'NEW COURSE' : 'EDIT COURSE'"
+    [title]="pageTitle()"
+    subtitle="填写课程基本信息、进度和学生数，提交后将保存到系统中。"
+  />
+
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
+  <div class="edit-layout animate-fade-up delay-2">
+    <!-- 左: 表单 -->
+    <section class="edit-card">
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>info</mat-icon>
+          <h3>基本信息</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>课程名称 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">menu_book</mat-icon>
+              <input type="text" placeholder="输入课程名称"
+                [ngModel]="draft().name"
+                (ngModelChange)="updateField('name', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>授课教师 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">person</mat-icon>
+              <input type="text" placeholder="教师姓名"
+                [ngModel]="draft().instructor"
+                (ngModelChange)="updateField('instructor', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>上课时间</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">schedule</mat-icon>
+              <input type="text" placeholder="例: 周一 / 周三 09:00 - 10:30"
+                [ngModel]="draft().schedule"
+                (ngModelChange)="updateField('schedule', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>课程状态</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">flag</mat-icon>
+              <select [ngModel]="draft().status" (ngModelChange)="updateField('status', $event)">
+                @for (opt of statusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>课程图标</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">palette</mat-icon>
+              <select [ngModel]="draft().icon" (ngModelChange)="updateField('icon', $event)">
+                @for (opt of iconOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>学生人数</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">groups</mat-icon>
+              <input type="number" min="0" max="500"
+                [ngModel]="draft().students"
+                (ngModelChange)="updateField('students', $event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>description</mat-icon>
+          <h3>课程描述</h3>
+        </div>
+        <div class="form-field">
+          <textarea rows="3" placeholder="至少 10 个字符的课程简介"
+            [ngModel]="draft().description"
+            (ngModelChange)="updateField('description', $event)"></textarea>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>trending_up</mat-icon>
+          <h3>教学进度</h3>
+        </div>
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">进度</span>
+            <span class="progress-value">{{ draft().progress }}%</span>
+          </div>
+          <input type="range" min="0" max="100" class="progress-range"
+            [ngModel]="draft().progress"
+            (ngModelChange)="updateField('progress', $event)" />
+          <div class="progress-ticks">
+            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a mat-stroked-button routerLink="/courses">
+          <mat-icon>arrow_back</mat-icon> 取消
+        </a>
+        <button mat-flat-button color="primary" (click)="save()">
+          <mat-icon>save</mat-icon> {{ isCreateMode ? '创建课程' : '保存修改' }}
+        </button>
+      </div>
+    </section>
+
+    <!-- 右: 实时预览 -->
+    <aside class="preview-panel animate-fade-up delay-4">
+      <div class="preview-header">
+        <mat-icon>visibility</mat-icon>
+        <span>实时预览</span>
+      </div>
+      <div class="preview-card">
+        <div class="preview-icon-wrap">
+          <mat-icon>{{ draft().icon }}</mat-icon>
+        </div>
+        <h4 class="preview-name">{{ draft().name || '课程名称' }}</h4>
+        <span class="preview-sub">{{ draft().instructor || '教师' }} · {{ draftStatusLabel() }}</span>
+
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <mat-icon>groups</mat-icon>
+            <span>{{ draft().students }} 人</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ draft().schedule || '未排课' }}</span>
+          </div>
+        </div>
+
+        <div class="preview-progress-section">
+          <div class="preview-progress-header">
+            <span>教学进度</span>
+            <span>{{ draft().progress }}%</span>
+          </div>
+          <div class="preview-progress-track">
+            <div class="preview-progress-fill" [style.width.%]="draft().progress"></div>
+          </div>
+        </div>
+
+        @if (draft().description) {
+          <p class="preview-desc">{{ draft().description }}</p>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,144 @@
+<div class="detail-page">
+  <button mat-stroked-button type="button" class="back-button animate-fade-up" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    返回课程列表
+  </button>
+
+  @if (course(); as selectedCourse) {
+    <section class="header-card animate-fade-up delay-1">
+      <div class="title-row">
+        <div class="course-title">
+          <mat-icon>{{ selectedCourse.icon }}</mat-icon>
+          <div>
+            <h1>{{ selectedCourse.name }}</h1>
+            <p>{{ selectedCourse.instructor }} · {{ selectedCourse.schedule }}</p>
+          </div>
+        </div>
+        <div class="title-actions">
+          <a mat-stroked-button [routerLink]="['/courses/edit', selectedCourse.id]">
+            <mat-icon>edit</mat-icon> 编辑
+          </a>
+          <mat-chip>{{ statusLabels[selectedCourse.status] }}</mat-chip>
+        </div>
+      </div>
+
+      <p class="description">{{ selectedCourse.description }}</p>
+
+      <div class="meta-grid">
+        <article>
+          <span class="meta-label">当前进度</span>
+          <span class="meta-value">{{ selectedCourse.progress }}%</span>
+        </article>
+        <article>
+          <span class="meta-label">学生人数</span>
+          <span class="meta-value">{{ selectedCourse.students }}</span>
+        </article>
+        <article>
+          <span class="meta-label">最近更新</span>
+          <span class="meta-value">{{ selectedCourse.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</span>
+        </article>
+      </div>
+    </section>
+
+    @if (notice(); as message) {
+      <app-inline-notice class="animate-fade-up delay-2" [notice]="message" (closeRequested)="closeNotice()" />
+    }
+
+    <section class="panel-card animate-fade-up delay-3">
+      <h2>进度维护</h2>
+      <div class="progress-editor">
+        <button mat-stroked-button type="button" (click)="adjustProgress(-10)">
+          <mat-icon>remove</mat-icon>
+          -10%
+        </button>
+
+        <div class="slider-wrapper">
+          <div class="custom-track">
+            <div class="custom-fill" [style.width.%]="progressDraft()"></div>
+          </div>
+          <input
+            class="progress-slider"
+            type="range"
+            min="0"
+            max="100"
+            [value]="progressDraft()"
+            (input)="onProgressInput($event)"
+          />
+        </div>
+
+        <button mat-stroked-button type="button" (click)="adjustProgress(10)">
+          <mat-icon>add</mat-icon>
+          +10%
+        </button>
+
+        <span class="progress-value">{{ progressDraft() }}%</span>
+
+        <button mat-flat-button color="primary" type="button" (click)="saveProgress()">
+          保存进度
+        </button>
+      </div>
+    </section>
+
+    <section class="panel-card animate-fade-up delay-4">
+      <h2>状态维护</h2>
+      <div class="status-actions">
+        <button
+          mat-stroked-button
+          type="button"
+          [class.active]="selectedCourse.status === 'planned'"
+          (click)="changeStatus('planned')"
+        >
+          未开始
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          [class.active]="selectedCourse.status === 'active'"
+          (click)="changeStatus('active')"
+        >
+          进行中
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          [class.active]="selectedCourse.status === 'completed'"
+          (click)="changeStatus('completed')"
+        >
+          已结课
+        </button>
+      </div>
+    </section>
+
+    @if (enrolledStudents().length > 0) {
+      <section class="panel-card animate-fade-up delay-5">
+        <h2>选课学生（{{ enrolledStudents().length }}）</h2>
+        <div class="student-list">
+          @for (s of enrolledStudents(); track s.id) {
+            <a class="student-row" [routerLink]="'/students/detail/' + s.id">
+              <span class="stu-avatar" [class.male]="s.gender === 'male'" [class.female]="s.gender === 'female'">{{ s.name[0] }}</span>
+              <span class="stu-name">{{ s.name }}</span>
+              <span class="stu-no">{{ s.studentNo }}</span>
+              <span class="stu-score">{{ s.score }}</span>
+              <span class="stu-grade" [attr.data-grade]="s.grade">{{ s.grade }}</span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="danger-zone animate-fade-up delay-6">
+      <button mat-stroked-button type="button" class="danger-button" (click)="deleteCourse()">
+        <mat-icon>delete</mat-icon>
+        删除课程
+      </button>
+    </section>
+  }
+  @else {
+    <section class="empty-card animate-fade-up">
+      <mat-icon>error_outline</mat-icon>
+      <h2>课程不存在</h2>
+      <p>该课程可能已被删除，请返回课程列表重新选择。</p>
+      <button mat-flat-button color="primary" type="button" (click)="goBack()">返回列表</button>
+    </section>
+  }
+</div>

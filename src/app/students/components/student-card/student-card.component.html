@@ -1,0 +1,30 @@
+<article class="student-card" [attr.data-grade]="grade">
+  <div class="card-header">
+    <div class="avatar" [class.avatar-male]="student.gender === 'male'" [class.avatar-female]="student.gender === 'female'">
+      {{ student.name[0] }}
+    </div>
+    <div class="card-info">
+      <a class="card-name" [routerLink]="'/students/detail/' + student.id">{{ student.name }}</a>
+      <span class="card-meta">{{ student.studentNo }} · {{ genderLabel }} · {{ age }}岁</span>
+    </div>
+  </div>
+
+  <div class="card-score-row">
+    <div class="score-label">成绩</div>
+    <div class="score-value">{{ student.score }}</div>
+    <span class="grade-pill" [attr.data-grade]="grade">{{ grade }} · {{ gradeLabel }}</span>
+  </div>
+
+  <div class="score-track">
+    <div class="score-fill" [style.width.%]="student.score"></div>
+  </div>
+
+  <div class="card-actions">
+    <button mat-stroked-button class="card-btn" (click)="editRequested.emit(student.id)">
+      <mat-icon>edit</mat-icon> 编辑
+    </button>
+    <button mat-stroked-button class="card-btn danger" (click)="deleteRequested.emit(student.id)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</article>

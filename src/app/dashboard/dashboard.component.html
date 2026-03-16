@@ -1,0 +1,173 @@
+<div class="page-shell dashboard-page">
+  <app-page-hero
+    title="教务运营总览"
+    subtitle="把课程进展、学生规模、待办提醒和高频入口集中到一个页面，便于日常巡检与决策。"
+    badge="Operations Overview"
+    icon="space_dashboard"
+  />
+
+  <section class="metrics-grid animate-fade-up delay-1">
+    @for (metric of metrics(); track metric.label; let idx = $index) {
+      <article class="metric-card surface-card" [class]="'metric-tone-' + (idx % 4) + ' delay-' + (idx + 1)">
+        <div class="metric-icon">
+          <mat-icon>{{ metric.icon }}</mat-icon>
+        </div>
+        <div class="metric-body">
+          <span class="metric-label">{{ metric.label }}</span>
+          <strong class="metric-value">{{ metric.value }}</strong>
+          <p>{{ metric.helper }}</p>
+        </div>
+      </article>
+    }
+  </section>
+
+  <section class="content-grid">
+    <article class="quick-actions surface-card animate-fade-up delay-2">
+      <div class="section-heading">
+        <div>
+          <h2>快捷操作</h2>
+          <p>常用动作直接跳转到目标功能页。</p>
+        </div>
+      </div>
+
+      <div class="action-grid">
+        @for (action of quickActions; track action.label) {
+          <a
+            class="action-card"
+            [class.action-card-primary]="action.tone === 'primary'"
+            [routerLink]="action.route"
+            [queryParams]="action.queryParams"
+            matRipple
+          >
+            <div class="action-card-header">
+              <span class="action-card-icon">
+                <mat-icon>{{ action.icon }}</mat-icon>
+              </span>
+              <mat-icon class="action-card-arrow">arrow_outward</mat-icon>
+            </div>
+            <div class="action-card-copy">
+              <strong>{{ action.label }}</strong>
+              <p>{{ action.description }}</p>
+            </div>
+          </a>
+        }
+      </div>
+    </article>
+
+    <article class="surface-card spotlight-panel animate-fade-up delay-3">
+      <div class="section-heading">
+        <div>
+          <h2>重点课程</h2>
+          <p>按学生规模排序，优先关注影响面最大的课程。</p>
+        </div>
+      </div>
+
+      <div class="spotlight-list">
+        @for (course of highlightedCourses(); track course.id) {
+          <a class="spotlight-item" [routerLink]="['/courses/detail', course.id]">
+            <div class="spotlight-left">
+              <span class="spotlight-icon">
+                <mat-icon>{{ course.icon }}</mat-icon>
+              </span>
+              <div>
+                <strong>{{ course.name }}</strong>
+                <span>{{ course.instructor }} · {{ course.schedule }}</span>
+              </div>
+            </div>
+            <div class="spotlight-meta">
+              <span class="spotlight-chip"><mat-icon>groups</mat-icon> {{ course.students }}</span>
+              <div class="mini-progress-track">
+                <div class="mini-progress-fill" [style.width.%]="course.progress"></div>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid charts-grid">
+    <article class="surface-card info-panel animate-fade-up delay-4">
+      <div class="section-heading">
+        <div>
+          <h2>课程状态分布</h2>
+          <p>通过环形图直观查看课程各状态占比。</p>
+        </div>
+      </div>
+      <app-donut-chart [data]="courseStatusChart()" centerLabel="课程" />
+    </article>
+
+    <article class="surface-card info-panel animate-fade-up delay-5">
+      <div class="section-heading">
+        <div>
+          <h2>成绩等级分布</h2>
+          <p>柱状图显示全体学生的等级人数统计。</p>
+        </div>
+      </div>
+      <app-bar-chart [data]="gradeChart()" suffix="人" [height]="220" />
+    </article>
+
+    <article class="surface-card info-panel animate-fade-up delay-5">
+      <div class="section-heading">
+        <div>
+          <h2>分数段人数</h2>
+          <p>统计各分数段学生人数，快速定位薄弱区间。</p>
+        </div>
+      </div>
+      <app-line-chart [data]="scoreRangeChart()" suffix="人" lineColor="#0070f3" areaColor="#0070f3" [height]="200" />
+    </article>
+  </section>
+
+  <section class="content-grid lower-grid">
+    <article class="surface-card info-panel animate-fade-up delay-6">
+      <div class="section-heading">
+        <div>
+          <h2>系统提醒</h2>
+          <p>自动根据课程状态与规模生成运营提示。</p>
+        </div>
+      </div>
+
+      <div class="alert-list">
+        @for (alert of alerts(); track alert.title) {
+          <article class="alert-card" [class]="'tone-' + alert.tone">
+            <span class="alert-icon-wrap">
+              <mat-icon>{{ alert.icon }}</mat-icon>
+            </span>
+            <div>
+              <strong>{{ alert.title }}</strong>
+              <p>{{ alert.text }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid lower-grid">
+    <article class="surface-card info-panel animate-fade-up delay-7">
+      <div class="section-heading">
+        <div>
+          <h2>最近活动</h2>
+          <p>展示最近被创建或更新的课程与学生记录。</p>
+        </div>
+      </div>
+
+      <div class="activity-list">
+        @for (activity of recentActivities(); track activity.type + activity.title) {
+          <article class="activity-item">
+            <span class="activity-icon">
+              <mat-icon>{{ activity.icon }}</mat-icon>
+            </span>
+            <div class="activity-copy">
+              <div class="activity-header">
+                <strong>{{ activity.title }}</strong>
+                <time>{{ activity.timestamp | date: 'MM-dd HH:mm' }}</time>
+              </div>
+              <p>{{ activity.type }} · {{ activity.description }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+  </section>
+</div>

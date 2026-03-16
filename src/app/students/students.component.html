@@ -1,0 +1,106 @@
+<div class="student-page">
+  <app-page-hero
+    title="学生管理中心"
+    subtitle="基于姓名、学号、性别、出生日期进行学生信息维护，支持批量 fake 数据演示。"
+    badge="Student Operations"
+    icon="groups"
+  />
+
+  <app-student-stats class="animate-fade-up delay-1" [stats]="stats()" />
+
+  <app-student-toolbar
+    class="animate-fade-up delay-2"
+    [searchKeyword]="searchKeyword()"
+    [selectedGender]="selectedGender()"
+    [selectedSort]="selectedSort()"
+    (searchChange)="handleSearchChange($event)"
+    (genderChange)="handleGenderChange($event)"
+    (sortChange)="handleSortChange($event)"
+    (createRequested)="startCreate()"
+    (regenerateRequested)="regenerateFakeData()"
+    (exportRequested)="exportStudents()"
+  />
+
+  @if (notice(); as message) {
+    <app-inline-notice class="animate-fade-up delay-3" [notice]="message" (closeRequested)="closeNotice()" />
+  }
+
+  @if (showEditor()) {
+    <app-student-editor
+      class="animate-fade-up delay-4"
+      [mode]="creating() ? 'create' : 'edit'"
+      [student]="editingStudent()"
+      (saveRequested)="saveStudent($event)"
+      (cancelRequested)="cancelEdit()"
+    />
+  }
+
+  @if (selectedStudentIds().length > 0) {
+    <div class="batch-bar animate-fade-up">
+      <span>已选中 {{ selectedStudentIds().length }} 名学生</span>
+      <button mat-flat-button color="warn" (click)="batchDeleteStudents()">
+        <mat-icon>delete_sweep</mat-icon> 批量删除
+      </button>
+    </div>
+  }
+
+  <!-- 视图切换 -->
+  <div class="view-toggle animate-fade-up delay-4">
+    <button mat-icon-button [class.active]="viewMode() === 'table'" (click)="viewMode.set('table')">
+      <mat-icon>view_list</mat-icon>
+    </button>
+    <button mat-icon-button [class.active]="viewMode() === 'card'" (click)="viewMode.set('card')">
+      <mat-icon>grid_view</mat-icon>
+    </button>
+  </div>
+
+  @if (viewMode() === 'card') {
+    <!-- 卡片视图 -->
+    <div class="card-grid animate-fade-up delay-5">
+      @for (student of paginatedStudents(); track student.id) {
+        <app-student-card
+          [student]="student"
+          (editRequested)="startEdit($event)"
+          (deleteRequested)="deleteStudent($event)"
+        />
+      }
+    </div>
+    @if (totalPages() > 1) {
+      <div class="card-pagination">
+        <span class="page-info">第 {{ (currentPage() - 1) * pageSize() + 1 }}–{{ currentPage() * pageSize() > totalFiltered() ? totalFiltered() : currentPage() * pageSize() }} 条，共 {{ totalFiltered() }} 条</span>
+        <div class="page-controls">
+          <button mat-icon-button [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span>{{ currentPage() }} / {{ totalPages() }}</span>
+          <button mat-icon-button [disabled]="currentPage() >= totalPages()" (click)="goToPage(currentPage() + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+        <div class="page-jump">
+          <span>跳至</span>
+          <input type="number" min="1" [max]="totalPages()" class="page-jump-input"
+            [value]="currentPage()"
+            (keydown.enter)="goToPage(+$any($event.target).value)"
+            (blur)="goToPage(+$any($event.target).value)" />
+          <span>页</span>
+        </div>
+      </div>
+    }
+  } @else {
+    <!-- 表格视图 -->
+    <app-student-table
+      class="animate-fade-up delay-5"
+      [students]="paginatedStudents()"
+      [keyword]="searchKeyword()"
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      [totalFiltered]="totalFiltered()"
+      [pageSize]="pageSize()"
+      (editRequested)="startEdit($event)"
+      (deleteRequested)="deleteStudent($event)"
+      (pageChange)="goToPage($event)"
+      (selectionChange)="handleSelectionChange($event)"
+    />
+  }
+</div>

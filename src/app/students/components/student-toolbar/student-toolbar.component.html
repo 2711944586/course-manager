@@ -1,0 +1,70 @@
+<section class="toolbar-card">
+  <div class="field-group">
+    <div class="control-item control-search">
+      <span class="control-label">搜索学生</span>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          [value]="searchKeyword"
+          placeholder="按姓名或学号搜索"
+          aria-label="搜索学生"
+          (input)="onSearchInput($event)"
+        />
+        @if (searchKeyword) {
+          <button mat-icon-button matSuffix type="button" aria-label="清空搜索关键词" (click)="clearKeyword()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="control-item">
+      <span class="control-label">性别筛选</span>
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>wc</mat-icon>
+        <mat-select
+          [value]="selectedGender"
+          aria-label="学生性别筛选"
+          (selectionChange)="onGenderSelect($event.value)"
+        >
+          <mat-option value="all">全部</mat-option>
+          @for (option of genderOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="control-item">
+      <span class="control-label">排序方式</span>
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>swap_vert</mat-icon>
+        <mat-select
+          [value]="selectedSort"
+          aria-label="学生排序方式"
+          (selectionChange)="onSortSelect($event.value)"
+        >
+          @for (option of sortOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="toolbar-actions">
+    <button mat-stroked-button type="button" (click)="requestExport()">
+      <mat-icon>download</mat-icon>
+      导出 CSV
+    </button>
+    <button mat-stroked-button type="button" (click)="requestRegenerate()">
+      <mat-icon>refresh</mat-icon>
+      重置 Fake 数据
+    </button>
+    <button mat-flat-button color="primary" type="button" (click)="requestCreate()">
+      <mat-icon>person_add</mat-icon>
+      新建学生
+    </button>
+  </div>
+</section>
