@@ -20,18 +20,18 @@ import { ChartDataItem } from './chart.model';
               [attr.rx]="4"
               class="bar-rect"
             />
-            <!-- Tooltip background -->
             @if (hoveredIndex === i) {
               <rect
-                [attr.x]="barX(i) + barWidth / 2 - 40"
-                [attr.y]="barY(bar.value) - 26"
-                width="80" height="18" rx="4"
+                [attr.x]="barX(i) + barWidth / 2 - tooltipW / 2"
+                [attr.y]="barY(bar.value) - tooltipH - 8"
+                [attr.width]="tooltipW" [attr.height]="tooltipH" rx="4"
                 class="tooltip-bg"
               />
               <text
                 [attr.x]="barX(i) + barWidth / 2"
-                [attr.y]="barY(bar.value) - 13"
+                [attr.y]="barY(bar.value) - tooltipH / 2 - 4"
                 text-anchor="middle"
+                [attr.font-size]="labelFontSize"
                 class="tooltip-text"
               >{{ bar.label }}: {{ bar.value }}{{ suffix }}</text>
             }
@@ -40,6 +40,7 @@ import { ChartDataItem } from './chart.model';
                 [attr.x]="barX(i) + barWidth / 2"
                 [attr.y]="barY(bar.value) - 6"
                 text-anchor="middle"
+                [attr.font-size]="valueFontSize"
                 class="bar-value-text"
               >{{ bar.value }}{{ suffix }}</text>
             }
@@ -48,6 +49,7 @@ import { ChartDataItem } from './chart.model';
               [attr.y]="chartBottom + 12"
               [attr.text-anchor]="needsRotation ? 'end' : 'middle'"
               [attr.transform]="needsRotation ? 'rotate(-35,' + (barX(i) + barWidth / 2) + ',' + (chartBottom + 12) + ')' : undefined"
+              [attr.font-size]="labelFontSize"
               class="bar-label-text"
             >{{ truncateLabel(bar.label) }}</text>
           </g>
@@ -76,13 +78,11 @@ import { ChartDataItem } from './chart.model';
       filter: saturate(1.15) brightness(1.05);
     }
     .bar-value-text {
-      font-size: 9px;
       font-weight: 700;
       fill: var(--text-primary, #1e293b);
       transition: opacity 0.15s;
     }
     .bar-label-text {
-      font-size: 8px;
       font-weight: 500;
       fill: var(--text-secondary, #64748b);
     }
@@ -92,7 +92,6 @@ import { ChartDataItem } from './chart.model';
       animation: fade-in 0.15s ease;
     }
     .tooltip-text {
-      font-size: 8px;
       font-weight: 600;
       fill: var(--text-tooltip, #fff);
       animation: fade-in 0.15s ease;
@@ -123,6 +122,29 @@ export class BarChartComponent {
 
   get needsRotation(): boolean {
     return this.data.length >= 6;
+  }
+
+  /** Adaptive font sizes based on bar count */
+  get valueFontSize(): number {
+    const count = this.data.length;
+    if (count <= 4) return 12;
+    if (count <= 6) return 10;
+    return 8;
+  }
+
+  get labelFontSize(): number {
+    const count = this.data.length;
+    if (count <= 4) return 10;
+    if (count <= 6) return 9;
+    return 7;
+  }
+
+  get tooltipW(): number {
+    return this.data.length <= 4 ? 90 : 80;
+  }
+
+  get tooltipH(): number {
+    return this.data.length <= 4 ? 20 : 16;
   }
 
   private get bottomPadding(): number {
