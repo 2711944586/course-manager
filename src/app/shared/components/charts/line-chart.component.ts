@@ -25,8 +25,8 @@ import { ChartDataItem } from './chart.model';
             (mouseenter)="hoveredPoint = i" (mouseleave)="hoveredPoint = -1" />
           @if (hoveredPoint === i) {
             <rect
-              [attr.x]="pt.x - 32" [attr.y]="pt.y - 30"
-              width="64" height="20" rx="5"
+              [attr.x]="pt.x - 36" [attr.y]="pt.y - 32"
+              width="72" height="22" rx="5"
               fill="var(--bg-tooltip, #1E293B)" opacity="0.9" />
             <text [attr.x]="pt.x" [attr.y]="pt.y - 16" text-anchor="middle" class="tooltip-text">
               {{ pt.value }}{{ suffix }}
@@ -56,12 +56,12 @@ import { ChartDataItem } from './chart.model';
       cursor: pointer;
     }
     .tooltip-text {
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 700;
       fill: var(--text-tooltip, #fff);
     }
     .dot-label {
-      font-size: 8px;
+      font-size: 10px;
       font-weight: 500;
       fill: var(--text-secondary, #64748b);
     }
@@ -75,7 +75,7 @@ export class LineChartComponent {
   @Input() areaColor = 'var(--chart-indigo, #4F46E5)';
 
   hoveredPoint = -1;
-  readonly width = 600;
+  readonly width = 400;
   readonly padding = 35;
   readonly bottomPadding = 20;
 
