@@ -108,7 +108,15 @@ export class BarChartComponent {
   @Input() suffix = '';
 
   hoveredIndex = -1;
-  readonly defaultColors = ['#4F46E5', '#7C3AED', '#f59e0b', '#ef4444', '#10b981', '#ec4899', '#3b82f6'];
+  readonly defaultColors = [
+    'var(--chart-indigo, #4F46E5)',
+    'var(--chart-violet, #7C3AED)',
+    'var(--chart-amber, #f59e0b)',
+    'var(--chart-red, #ef4444)',
+    'var(--chart-emerald, #10b981)',
+    'var(--chart-pink, #ec4899)',
+    'var(--chart-blue, #3b82f6)',
+  ];
   readonly width = 400;
   private readonly padding = 30;
   private readonly bottomPadding = 20;

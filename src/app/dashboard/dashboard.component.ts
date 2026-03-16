@@ -227,16 +227,17 @@ export class DashboardComponent {
   readonly courseStatusChart = computed<readonly ChartDataItem[]>(() => {
     const courseList = this.courses();
     return [
-      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#4F46E5' },
-      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: '#f59e0b' },
-      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: '#10b981' },
+      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: 'var(--chart-indigo, #4F46E5)' },
+      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: 'var(--chart-amber, #f59e0b)' },
+      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: 'var(--chart-emerald, #10b981)' },
     ];
   });
 
   readonly gradeChart = computed<readonly ChartDataItem[]>(() => {
     const studentList = this.students();
     const gradeColors: Record<string, string> = {
-      A: '#10b981', B: '#4F46E5', C: '#f59e0b', D: '#f97316', E: '#ef4444', F: '#dc2626',
+      A: 'var(--chart-emerald, #10b981)', B: 'var(--chart-indigo, #4F46E5)', C: 'var(--chart-amber, #f59e0b)',
+      D: 'var(--chart-orange, #f97316)', E: 'var(--chart-red, #ef4444)', F: 'var(--chart-red, #dc2626)',
     };
     const counts: Record<string, number> = {};
     for (const g of GRADE_ORDER) counts[g] = 0;
@@ -247,17 +248,17 @@ export class DashboardComponent {
     return GRADE_ORDER.map(g => ({
       label: `${g} ${GRADE_LABELS[g]}`,
       value: counts[g] ?? 0,
-      color: gradeColors[g] ?? '#94a3b8',
+      color: gradeColors[g] ?? 'var(--text-tertiary, #94a3b8)',
     }));
   });
 
   readonly scoreRangeChart = computed<readonly ChartDataItem[]>(() => {
     const ranges = [
-      { label: '90+', min: 90, max: 100, color: '#10b981' },
-      { label: '80-89', min: 80, max: 89, color: '#4F46E5' },
-      { label: '70-79', min: 70, max: 79, color: '#7C3AED' },
-      { label: '60-69', min: 60, max: 69, color: '#f59e0b' },
-      { label: '<60', min: 0, max: 59, color: '#ef4444' },
+      { label: '90+', min: 90, max: 100, color: 'var(--chart-emerald, #10b981)' },
+      { label: '80-89', min: 80, max: 89, color: 'var(--chart-indigo, #4F46E5)' },
+      { label: '70-79', min: 70, max: 79, color: 'var(--chart-violet, #7C3AED)' },
+      { label: '60-69', min: 60, max: 69, color: 'var(--chart-amber, #f59e0b)' },
+      { label: '<60', min: 0, max: 59, color: 'var(--chart-red, #ef4444)' },
     ];
     const studentList = this.students();
     return ranges.map(r => ({

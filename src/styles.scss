@@ -81,6 +81,17 @@ body.app-theme-light {
   --accent-grade-f: #dc2626;
   --accent-grade-f-container: rgba(220, 38, 38, 0.08);
 
+  // Chart palette — theme-aware
+  --chart-indigo: #4F46E5;
+  --chart-violet: #7C3AED;
+  --chart-amber: #f59e0b;
+  --chart-red: #ef4444;
+  --chart-emerald: #10b981;
+  --chart-pink: #ec4899;
+  --chart-blue: #3b82f6;
+  --chart-lime: #84cc16;
+  --chart-orange: #f97316;
+
   // Aliases
   --accent-indigo: var(--accent-primary);
   --accent-teal: var(--accent-secondary);
@@ -178,6 +189,17 @@ body.app-theme-dark {
   --accent-grade-d-container: rgba(251, 191, 36, 0.1);
   --accent-grade-f: #f87171;
   --accent-grade-f-container: rgba(248, 113, 113, 0.1);
+
+  // Chart palette — brighter for dark backgrounds
+  --chart-indigo: #818cf8;
+  --chart-violet: #a78bfa;
+  --chart-amber: #fbbf24;
+  --chart-red: #f87171;
+  --chart-emerald: #34d399;
+  --chart-pink: #f472b6;
+  --chart-blue: #60a5fa;
+  --chart-lime: #a3e635;
+  --chart-orange: #fb923c;
 
   --accent-indigo: var(--accent-primary);
   --accent-teal: var(--accent-secondary);

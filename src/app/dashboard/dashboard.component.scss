@@ -72,20 +72,20 @@
 
 // 4 tone varieties for left border + icon color
 .metric-tone-0 {
-  &::before { background: #4F46E5; }
-  .metric-icon { background: rgba(79, 70, 229, 0.08); color: #4F46E5; }
+  &::before { background: var(--accent-primary); }
+  .metric-icon { background: var(--accent-primary-container); color: var(--accent-primary); }
 }
 .metric-tone-1 {
-  &::before { background: #7C3AED; }
-  .metric-icon { background: rgba(124, 58, 237, 0.08); color: #7C3AED; }
+  &::before { background: var(--accent-secondary); }
+  .metric-icon { background: var(--accent-secondary-container); color: var(--accent-secondary); }
 }
 .metric-tone-2 {
-  &::before { background: #10b981; }
-  .metric-icon { background: rgba(16, 185, 129, 0.08); color: #10b981; }
+  &::before { background: var(--accent-success); }
+  .metric-icon { background: var(--accent-success-container); color: var(--accent-success); }
 }
 .metric-tone-3 {
-  &::before { background: #f59e0b; }
-  .metric-icon { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+  &::before { background: var(--accent-warning); }
+  .metric-icon { background: var(--accent-warning-container); color: var(--accent-warning); }
 }
 
 .metric-body {
@@ -127,8 +127,8 @@
   gap: 3px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.08);
-  color: #10b981;
+  background: var(--accent-success-container);
+  color: var(--accent-success);
   font-size: 0.7rem;
   font-weight: 600;
   white-space: nowrap;

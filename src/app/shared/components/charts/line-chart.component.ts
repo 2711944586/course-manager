@@ -71,8 +71,8 @@ export class LineChartComponent {
   @Input() data: readonly ChartDataItem[] = [];
   @Input() height = 180;
   @Input() suffix = '';
-  @Input() lineColor = '#4F46E5';
-  @Input() areaColor = '#4F46E5';
+  @Input() lineColor = 'var(--chart-indigo, #4F46E5)';
+  @Input() areaColor = 'var(--chart-indigo, #4F46E5)';
 
   hoveredPoint = -1;
   readonly width = 400;

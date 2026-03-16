@@ -166,7 +166,8 @@ export class ReportsComponent {
 
   readonly gradeChartData = computed<readonly ChartDataItem[]>(() => {
     const gradeColors: Record<string, string> = {
-      A: '#10b981', B: '#4F46E5', C: '#f59e0b', D: '#f97316', E: '#ef4444', F: '#dc2626',
+      A: 'var(--chart-emerald, #10b981)', B: 'var(--chart-indigo, #4F46E5)', C: 'var(--chart-amber, #f59e0b)',
+      D: 'var(--chart-orange, #f97316)', E: 'var(--chart-red, #ef4444)', F: 'var(--chart-red, #dc2626)',
     };
     const studentList = this.students();
     const counts: Record<string, number> = {};
@@ -178,16 +179,16 @@ export class ReportsComponent {
     return GRADE_ORDER.map(g => ({
       label: `${g} ${GRADE_LABELS[g]}`,
       value: counts[g] ?? 0,
-      color: gradeColors[g] ?? '#94a3b8',
+      color: gradeColors[g] ?? 'var(--text-tertiary, #94a3b8)',
     }));
   });
 
   readonly courseStatusChart = computed<readonly ChartDataItem[]>(() => {
     const courseList = this.courses();
     return [
-      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#4F46E5' },
-      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: '#f59e0b' },
-      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: '#10b981' },
+      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: 'var(--chart-indigo, #4F46E5)' },
+      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: 'var(--chart-amber, #f59e0b)' },
+      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: 'var(--chart-emerald, #10b981)' },
     ];
   });
 
@@ -209,8 +210,8 @@ export class ReportsComponent {
   readonly genderDonut = computed<readonly ChartDataItem[]>(() => {
     const studentList = this.students();
     return [
-      { label: '男生', value: studentList.filter(s => s.gender === 'male').length, color: '#4F46E5' },
-      { label: '女生', value: studentList.filter(s => s.gender === 'female').length, color: '#ec4899' },
+      { label: '男生', value: studentList.filter(s => s.gender === 'male').length, color: 'var(--chart-indigo, #4F46E5)' },
+      { label: '女生', value: studentList.filter(s => s.gender === 'female').length, color: 'var(--chart-pink, #ec4899)' },
     ];
   });
 
@@ -218,7 +219,7 @@ export class ReportsComponent {
     [...this.courses()]
       .sort((a, b) => b.progress - a.progress)
       .slice(0, 8)
-      .map(c => ({ label: c.name, value: c.progress, color: '#4F46E5' })),
+      .map(c => ({ label: c.name, value: c.progress, color: 'var(--chart-indigo, #4F46E5)' })),
   );
 
   barWidth(items: readonly ReportBarItem[], itemValue: number): string {
