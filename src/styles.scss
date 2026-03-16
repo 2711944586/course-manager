@@ -64,22 +64,22 @@ body.app-theme-light {
   // Accent — Indigo (modern, deep)
   --accent-primary: #4F46E5;
   --accent-primary-hover: #4338CA;
-  --accent-primary-container: rgba(79, 70, 229, 0.08);
+  --accent-primary-container: rgba(79, 70, 229, 0.12);
   --accent-primary-text: #4F46E5;
-  --accent-success: #10b981;
-  --accent-success-container: rgba(16, 185, 129, 0.08);
-  --accent-warning: #f59e0b;
-  --accent-warning-container: rgba(245, 158, 11, 0.08);
-  --accent-error: #ef4444;
-  --accent-error-container: rgba(239, 68, 68, 0.06);
-  --accent-info: #3b82f6;
-  --accent-info-container: rgba(59, 130, 246, 0.06);
+  --accent-success: #059669;
+  --accent-success-container: rgba(5, 150, 105, 0.12);
+  --accent-warning: #d97706;
+  --accent-warning-container: rgba(217, 119, 6, 0.12);
+  --accent-error: #dc2626;
+  --accent-error-container: rgba(220, 38, 38, 0.1);
+  --accent-info: #2563eb;
+  --accent-info-container: rgba(37, 99, 235, 0.1);
   --accent-secondary: #7C3AED;
-  --accent-secondary-container: rgba(124, 58, 237, 0.06);
-  --accent-grade-d: #d97706;
-  --accent-grade-d-container: rgba(217, 119, 6, 0.08);
+  --accent-secondary-container: rgba(124, 58, 237, 0.1);
+  --accent-grade-d: #b45309;
+  --accent-grade-d-container: rgba(180, 83, 9, 0.12);
   --accent-grade-f: #dc2626;
-  --accent-grade-f-container: rgba(220, 38, 38, 0.08);
+  --accent-grade-f-container: rgba(220, 38, 38, 0.12);
 
   // Chart palette — theme-aware
   --chart-indigo: #4F46E5;
@@ -173,22 +173,22 @@ body.app-theme-dark {
 
   --accent-primary: #818cf8;
   --accent-primary-hover: #a5b4fc;
-  --accent-primary-container: rgba(129, 140, 248, 0.12);
+  --accent-primary-container: rgba(129, 140, 248, 0.16);
   --accent-primary-text: #a5b4fc;
   --accent-success: #34d399;
-  --accent-success-container: rgba(52, 211, 153, 0.12);
+  --accent-success-container: rgba(52, 211, 153, 0.16);
   --accent-warning: #fbbf24;
-  --accent-warning-container: rgba(251, 191, 36, 0.1);
+  --accent-warning-container: rgba(251, 191, 36, 0.14);
   --accent-error: #f87171;
-  --accent-error-container: rgba(248, 113, 113, 0.1);
+  --accent-error-container: rgba(248, 113, 113, 0.14);
   --accent-info: #60a5fa;
-  --accent-info-container: rgba(96, 165, 250, 0.1);
+  --accent-info-container: rgba(96, 165, 250, 0.14);
   --accent-secondary: #a78bfa;
-  --accent-secondary-container: rgba(167, 139, 250, 0.1);
+  --accent-secondary-container: rgba(167, 139, 250, 0.14);
   --accent-grade-d: #fbbf24;
-  --accent-grade-d-container: rgba(251, 191, 36, 0.1);
+  --accent-grade-d-container: rgba(251, 191, 36, 0.14);
   --accent-grade-f: #f87171;
-  --accent-grade-f-container: rgba(248, 113, 113, 0.1);
+  --accent-grade-f-container: rgba(248, 113, 113, 0.14);
 
   // Chart palette — brighter for dark backgrounds
   --chart-indigo: #818cf8;

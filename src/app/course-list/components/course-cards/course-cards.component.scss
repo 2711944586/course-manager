@@ -82,21 +82,24 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   color: var(--text-secondary);
   background: var(--bg-hover);
 
   &.status-planned {
     color: var(--accent-warning);
+    background: var(--accent-warning-container);
   }
 
   &.status-active {
     color: var(--accent-success);
+    background: var(--accent-success-container);
   }
 
   &.status-completed {
     color: var(--accent-primary);
+    background: var(--accent-primary-container);
   }
 }
 

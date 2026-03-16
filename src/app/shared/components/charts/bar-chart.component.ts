@@ -6,7 +6,7 @@ import { ChartDataItem } from './chart.model';
   standalone: true,
   template: `
     <div class="bar-chart-wrap">
-      <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="xMidYMid meet">
+      <svg [attr.viewBox]="'0 0 ' + width + ' ' + totalHeight" preserveAspectRatio="xMidYMid meet">
         @for (bar of bars; track bar.label; let i = $index) {
           <g class="bar-group"
              (mouseenter)="hoveredIndex = i"
@@ -45,10 +45,11 @@ import { ChartDataItem } from './chart.model';
             }
             <text
               [attr.x]="barX(i) + barWidth / 2"
-              [attr.y]="height - 4"
-              text-anchor="middle"
+              [attr.y]="chartBottom + 14"
+              [attr.text-anchor]="needsRotation ? 'end' : 'middle'"
+              [attr.transform]="needsRotation ? 'rotate(-35,' + (barX(i) + barWidth / 2) + ',' + (chartBottom + 14) + ')' : undefined"
               class="bar-label-text"
-            >{{ bar.label }}</text>
+            >{{ truncateLabel(bar.label) }}</text>
           </g>
         }
       </svg>
@@ -119,7 +120,22 @@ export class BarChartComponent {
   ];
   readonly width = 400;
   private readonly padding = 30;
-  private readonly bottomPadding = 20;
+
+  get needsRotation(): boolean {
+    return this.data.length >= 6;
+  }
+
+  private get bottomPadding(): number {
+    return this.needsRotation ? 60 : 20;
+  }
+
+  get totalHeight(): number {
+    return this.height + (this.needsRotation ? 40 : 0);
+  }
+
+  get chartBottom(): number {
+    return this.totalHeight - this.bottomPadding;
+  }
 
   get maxValue(): number {
     return Math.max(...this.data.map(d => d.value), 1);
@@ -134,6 +150,11 @@ export class BarChartComponent {
     return Math.min(40, (this.width - this.padding * 2) / count * 0.7);
   }
 
+  truncateLabel(label: string): string {
+    const maxLen = this.needsRotation ? 6 : 8;
+    return label.length > maxLen ? label.slice(0, maxLen) + '…' : label;
+  }
+
   barX(index: number): number {
     const count = this.data.length || 1;
     const totalWidth = this.width - this.padding * 2;
@@ -142,12 +163,12 @@ export class BarChartComponent {
   }
 
   barY(value: number): number {
-    const chartHeight = this.height - this.padding - this.bottomPadding;
+    const chartHeight = this.totalHeight - this.padding - this.bottomPadding;
     return this.padding + chartHeight * (1 - value / this.maxValue);
   }
 
   barHeight(value: number): number {
-    const chartHeight = this.height - this.padding - this.bottomPadding;
+    const chartHeight = this.totalHeight - this.padding - this.bottomPadding;
     return chartHeight * (value / this.maxValue);
   }
 }

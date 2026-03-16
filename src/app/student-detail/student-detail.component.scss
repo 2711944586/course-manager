@@ -103,20 +103,20 @@
     color: var(--accent-success);
   }
   &[data-grade='B'] {
-    background: var(--accent-primary-container);
-    color: var(--accent-primary);
-  }
-  &[data-grade='C'] {
     background: var(--accent-info-container);
     color: var(--accent-info);
+  }
+  &[data-grade='C'] {
+    background: var(--accent-warning-container);
+    color: var(--accent-warning);
   }
   &[data-grade='D'] {
     background: var(--accent-grade-d-container);
     color: var(--accent-grade-d);
   }
   &[data-grade='E'] {
-    background: var(--accent-grade-f-container);
-    color: var(--accent-grade-f);
+    background: var(--accent-error-container);
+    color: var(--accent-error);
   }
   &[data-grade='F'] {
     background: var(--accent-grade-f-container);
