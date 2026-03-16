@@ -8,7 +8,9 @@ import { ChartDataItem } from './chart.model';
     <div class="bar-chart-wrap">
       <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="xMidYMid meet">
         @for (bar of bars; track bar.label; let i = $index) {
-          <g class="bar-group">
+          <g class="bar-group"
+             (mouseenter)="hoveredIndex = i"
+             (mouseleave)="hoveredIndex = -1">
             <rect
               [attr.x]="barX(i)"
               [attr.y]="barY(bar.value)"
@@ -18,12 +20,29 @@ import { ChartDataItem } from './chart.model';
               [attr.rx]="4"
               class="bar-rect"
             />
-            <text
-              [attr.x]="barX(i) + barWidth / 2"
-              [attr.y]="barY(bar.value) - 8"
-              text-anchor="middle"
-              class="bar-value-text"
-            >{{ bar.value }}{{ suffix }}</text>
+            <!-- Tooltip background -->
+            @if (hoveredIndex === i) {
+              <rect
+                [attr.x]="barX(i) + barWidth / 2 - 36"
+                [attr.y]="barY(bar.value) - 32"
+                width="72" height="22" rx="6"
+                class="tooltip-bg"
+              />
+              <text
+                [attr.x]="barX(i) + barWidth / 2"
+                [attr.y]="barY(bar.value) - 16"
+                text-anchor="middle"
+                class="tooltip-text"
+              >{{ bar.label }}: {{ bar.value }}{{ suffix }}</text>
+            }
+            @if (hoveredIndex !== i) {
+              <text
+                [attr.x]="barX(i) + barWidth / 2"
+                [attr.y]="barY(bar.value) - 8"
+                text-anchor="middle"
+                class="bar-value-text"
+              >{{ bar.value }}{{ suffix }}</text>
+            }
             <text
               [attr.x]="barX(i) + barWidth / 2"
               [attr.y]="height - 4"
@@ -47,23 +66,39 @@ import { ChartDataItem } from './chart.model';
       overflow: visible;
     }
     .bar-rect {
-      transition: opacity 0.25s, filter 0.25s;
+      transition: opacity 0.2s, filter 0.2s, transform 0.2s;
       cursor: pointer;
       filter: saturate(0.9);
     }
     .bar-group:hover .bar-rect {
-      opacity: 0.85;
-      filter: saturate(1.2) brightness(1.05);
+      opacity: 0.9;
+      filter: saturate(1.15) brightness(1.05);
     }
     .bar-value-text {
       font-size: 11px;
       font-weight: 700;
       fill: var(--text-primary, #1e293b);
+      transition: opacity 0.15s;
     }
     .bar-label-text {
       font-size: 10px;
       font-weight: 500;
       fill: var(--text-secondary, #64748b);
+    }
+    .tooltip-bg {
+      fill: var(--bg-elevated, #27272a);
+      opacity: 0.92;
+      animation: fade-in 0.15s ease;
+    }
+    .tooltip-text {
+      font-size: 10px;
+      font-weight: 600;
+      fill: var(--text-on-accent, #fff);
+      animation: fade-in 0.15s ease;
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   `],
 })
@@ -72,7 +107,8 @@ export class BarChartComponent {
   @Input() height = 200;
   @Input() suffix = '';
 
-  readonly defaultColors = ['#0070f3', '#7c66dc', '#f5a623', '#e5484d', '#0ea371', '#ec4899', '#0091ff'];
+  hoveredIndex = -1;
+  readonly defaultColors = ['#6366f1', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981', '#ec4899', '#3b82f6'];
   readonly width = 400;
   private readonly padding = 30;
   private readonly bottomPadding = 20;

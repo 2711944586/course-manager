@@ -72,20 +72,20 @@
 
 // 4 tone varieties for left border + icon color
 .metric-tone-0 {
-  &::before { background: #0070f3; }
-  .metric-icon { background: rgba(0, 112, 243, 0.08); color: #0070f3; }
+  &::before { background: #6366f1; }
+  .metric-icon { background: rgba(99, 102, 241, 0.08); color: #6366f1; }
 }
 .metric-tone-1 {
-  &::before { background: #7c66dc; }
-  .metric-icon { background: rgba(124, 102, 220, 0.08); color: #7c66dc; }
+  &::before { background: #8b5cf6; }
+  .metric-icon { background: rgba(139, 92, 246, 0.08); color: #8b5cf6; }
 }
 .metric-tone-2 {
-  &::before { background: #0ea371; }
-  .metric-icon { background: rgba(14, 163, 113, 0.08); color: #0ea371; }
+  &::before { background: #10b981; }
+  .metric-icon { background: rgba(16, 185, 129, 0.08); color: #10b981; }
 }
 .metric-tone-3 {
-  &::before { background: #f5a623; }
-  .metric-icon { background: rgba(245, 166, 35, 0.08); color: #f5a623; }
+  &::before { background: #f59e0b; }
+  .metric-icon { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
 }
 
 .metric-body {

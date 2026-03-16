@@ -36,7 +36,7 @@
       <div class="section-heading">
         <div>
           <h2>周课表视图</h2>
-          <p>课程按周一到周日自动分组，便于快速巡检。</p>
+          <p>课程按周一到周日自动分组，点击课程卡片查看详情。共 {{ totalSlots() }} 个排课，{{ activeCount() }} 门进行中。</p>
         </div>
       </div>
 
@@ -45,26 +45,75 @@
           <section class="calendar-column">
             <header>
               <strong>{{ column.day }}</strong>
-              <span>{{ column.courses.length }} 门</span>
+              <span class="day-count" [class.has-courses]="column.courses.length > 0">{{ column.courses.length }}</span>
             </header>
 
             @if (column.courses.length > 0) {
               <div class="calendar-items">
                 @for (course of column.courses; track course.id) {
-                  <a class="calendar-item" [routerLink]="['/courses/detail', course.id]">
+                  <button class="calendar-item" [class]="'status-' + course.status"
+                    (click)="openCourseDetail(course)">
                     <strong>{{ course.name }}</strong>
                     <span>{{ course.schedule }}</span>
                     <small>{{ course.instructor }} · {{ course.students }} 人</small>
-                  </a>
+                    <div class="item-progress" [style.width.%]="course.progress"></div>
+                  </button>
                 }
               </div>
             }
             @else {
-              <div class="calendar-empty">暂无课程安排</div>
+              <div class="calendar-empty">
+                <mat-icon>event_busy</mat-icon>
+                <span>暂无安排</span>
+              </div>
             }
           </section>
         }
       </div>
     </article>
   </section>
+
+  <!-- Course Detail Popup -->
+  @if (selectedCourse(); as course) {
+    <div class="detail-backdrop" (click)="closeCourseDetail()"></div>
+    <div class="detail-popup animate-scale-in">
+      <div class="popup-header">
+        <div class="popup-icon">
+          <mat-icon>{{ course.icon }}</mat-icon>
+        </div>
+        <div class="popup-title">
+          <h3>{{ course.name }}</h3>
+          <span class="popup-status" [class]="'popup-status-' + course.status">
+            {{ course.status === 'active' ? '进行中' : course.status === 'completed' ? '已结课' : '未开始' }}
+          </span>
+        </div>
+        <button class="popup-close" (click)="closeCourseDetail()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-row"><mat-icon>person</mat-icon><span>{{ course.instructor }}</span></div>
+        <div class="popup-row"><mat-icon>schedule</mat-icon><span>{{ course.schedule }}</span></div>
+        <div class="popup-row"><mat-icon>groups</mat-icon><span>{{ course.students }} 名学生</span></div>
+        <div class="popup-progress-section">
+          <div class="popup-progress-label">
+            <span>教学进度</span>
+            <strong>{{ course.progress }}%</strong>
+          </div>
+          <div class="popup-progress-track">
+            <div class="popup-progress-fill" [style.width.%]="course.progress"></div>
+          </div>
+        </div>
+        @if (course.description) {
+          <p class="popup-desc">{{ course.description }}</p>
+        }
+      </div>
+      <div class="popup-footer">
+        <a mat-flat-button color="primary" [routerLink]="['/courses/detail', course.id]" (click)="closeCourseDetail()">
+          <mat-icon>open_in_new</mat-icon>
+          查看完整详情
+        </a>
+      </div>
+    </div>
+  }
 </div>

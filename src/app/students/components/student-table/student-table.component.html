@@ -13,14 +13,26 @@
           <th class="check-col">
             <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll($any($event.target).checked)" />
           </th>
-          <th>姓名</th>
+          <th class="sortable" (click)="toggleSort('name')">
+            姓名
+            <mat-icon class="sort-icon" [class.active]="sortColumn === 'name'">{{ sortColumn === 'name' ? (sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more' }}</mat-icon>
+          </th>
           <th>学号</th>
           <th>性别</th>
           <th>出生日期</th>
-          <th>年龄</th>
-          <th>成绩</th>
+          <th class="sortable" (click)="toggleSort('age')">
+            年龄
+            <mat-icon class="sort-icon" [class.active]="sortColumn === 'age'">{{ sortColumn === 'age' ? (sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more' }}</mat-icon>
+          </th>
+          <th class="sortable" (click)="toggleSort('score')">
+            成绩
+            <mat-icon class="sort-icon" [class.active]="sortColumn === 'score'">{{ sortColumn === 'score' ? (sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more' }}</mat-icon>
+          </th>
           <th>等级</th>
-          <th>最近更新</th>
+          <th class="sortable" (click)="toggleSort('updatedAt')">
+            最近更新
+            <mat-icon class="sort-icon" [class.active]="sortColumn === 'updatedAt'">{{ sortColumn === 'updatedAt' ? (sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more' }}</mat-icon>
+          </th>
           <th class="actions-col">操作</th>
         </tr>
       </thead>

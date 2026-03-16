@@ -15,11 +15,23 @@ import { ChartDataItem } from './chart.model';
         <path [attr.d]="linePath" fill="none" [attr.stroke]="lineColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round" class="chart-line" />
         @for (pt of points; track pt.label; let i = $index) {
-          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4.5" [attr.fill]="lineColor"
-            stroke="var(--bg-surface, white)" stroke-width="2" class="chart-dot" />
-          <text [attr.x]="pt.x" [attr.y]="pt.y - 12" text-anchor="middle" class="dot-value">
-            {{ pt.value }}{{ suffix }}
-          </text>
+          <!-- Hover crosshair -->
+          @if (hoveredPoint === i) {
+            <line [attr.x1]="pt.x" [attr.y1]="padding" [attr.x2]="pt.x" [attr.y2]="height - bottomPadding"
+              stroke="var(--border-default, #ccc)" stroke-width="1" stroke-dasharray="3 3" opacity="0.5" />
+          }
+          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" [attr.r]="hoveredPoint === i ? 6 : 4" [attr.fill]="lineColor"
+            stroke="var(--bg-surface, white)" stroke-width="2" class="chart-dot"
+            (mouseenter)="hoveredPoint = i" (mouseleave)="hoveredPoint = -1" />
+          @if (hoveredPoint === i) {
+            <rect
+              [attr.x]="pt.x - 32" [attr.y]="pt.y - 30"
+              width="64" height="20" rx="5"
+              fill="var(--bg-elevated, #333)" opacity="0.9" />
+            <text [attr.x]="pt.x" [attr.y]="pt.y - 16" text-anchor="middle" class="tooltip-text">
+              {{ pt.value }}{{ suffix }}
+            </text>
+          }
           <text [attr.x]="pt.x" [attr.y]="height - 4" text-anchor="middle" class="dot-label">
             {{ pt.label }}
           </text>
@@ -43,11 +55,10 @@ import { ChartDataItem } from './chart.model';
       transition: r 0.2s;
       cursor: pointer;
     }
-    .chart-dot:hover { r: 7; }
-    .dot-value {
+    .tooltip-text {
       font-size: 10px;
       font-weight: 700;
-      fill: var(--text-primary, #1e293b);
+      fill: var(--text-on-accent, #fff);
     }
     .dot-label {
       font-size: 10px;
@@ -60,9 +71,10 @@ export class LineChartComponent {
   @Input() data: readonly ChartDataItem[] = [];
   @Input() height = 180;
   @Input() suffix = '';
-  @Input() lineColor = '#0070f3';
-  @Input() areaColor = '#0070f3';
+  @Input() lineColor = '#6366f1';
+  @Input() areaColor = '#6366f1';
 
+  hoveredPoint = -1;
   readonly width = 400;
   readonly padding = 35;
   readonly bottomPadding = 20;

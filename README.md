@@ -1,21 +1,24 @@
 # Aurora 课程管理中心
 
-> 基于 **Angular 17 + Angular Material** 的企业级教务管理前端系统。
-> 采用 Signals 驱动响应式架构，Geist 风格设计系统，暗色/亮色双主题无缝切换。
-> 内置 SVG 交互式图表库、多维度数据分析、操作审计日志，零后端纯前端运行。
+> 基于 **Angular 17 + Angular Material** 的企业级教务管理系统。
+> Zinc/Slate 色阶设计体系 · Glassmorphism 毛玻璃界面 · Signal 驱动响应式架构 · 零后端纯前端运行。
 
 ---
 
 ## 设计系统
 
-对标 Vercel Geist Design System，打造克制、高对比度、专业化的视觉语言：
+Zinc/Slate 色阶 + Indigo 克制强调色，对标 Linear / Stripe / Vercel 级别的视觉品质：
 
-- **色彩**：Vercel Blue (#0070f3) 主色 + 10级灰度色阶，语义色完整覆盖
-- **主题**：亮/暗双模式，侧边栏随主题自适应（亮色浅底 / 暗色深底）
-- **排版**：Inter + Noto Sans SC 字体链，JetBrains Mono 代码等宽
-- **组件**：精细化 1px 边框 + 无阴影卡片（hover 时浮出微阴影）
-- **动画**：瀑布式入场 + 路由模糊过渡 + hover 微交互
-- **无障碍**：`prefers-reduced-motion` 全局禁用动画，`:focus-visible` 可视焦点环
+| 维度 | 实现 |
+| ------ | ------ |
+| **色彩** | Zinc 灰度色阶 (#fafafa → #09090b) + Indigo (#6366f1) 主色，语义色覆盖 Success / Warning / Error / Info |
+| **表面** | Glassmorphism 毛玻璃卡片 — `backdrop-filter: blur(12px) saturate(1.6)` + 半透明边框 |
+| **主题** | 亮 / 暗双模式无缝切换，60+ CSS Custom Properties 自适应 |
+| **排版** | Inter + Noto Sans SC 字体链，JetBrains Mono 等宽 |
+| **动画** | 瀑布式入场 + 路由模糊过渡 (16 条路由独立配置) + hover 微交互 |
+| **骨架屏** | CSS-only skeleton 加载动画系统 (text / title / avatar / card / chart) |
+| **通知** | 全局 Toast 通知系统 — Signal 驱动，支持 success / error / warning / info 四级别 |
+| **无障碍** | `prefers-reduced-motion` 禁用动画，`:focus-visible` 焦点环 |
 
 ---
 
@@ -23,22 +26,24 @@
 
 ### 仪表盘 `/dashboard`
 
-- 六大核心指标卡片（彩色左边框 + 图标色区分）
-- 快捷操作面板，一键跳转课程/学生/日程/报表
-- 课程状态环形图、成绩等级柱状图、分数段折线图
-- 重点课程排行（Top 5）、系统告警列表、近期活动时间线
+- 六大核心指标卡片（Indigo 色彩映射 + 图标色区分）
+- 快捷操作面板，一键跳转课程 / 学生 / 日程 / 报表
+- **交互式 SVG 图表**：环形图、柱状图、折线图，悬浮显示 Tooltip 详情
+- 重点课程 Top 5 排行、系统告警列表、近期活动时间线
 
 ### 课程管理 `/courses`
 
 - 关键词搜索 + 状态筛选 + 四维排序
+- Glassmorphism 课程卡片 — 毛玻璃背景 + hover 浮起微交互
 - 完整 CRUD，独立编辑页面，排课冲突自动检测
-- CSV 导出（含 BOM，兼容 Excel 中文）
+- CSV 导出（含 BOM，兼容 Excel 中文）+ Toast 操作反馈
 
 ### 学生管理 `/students`
 
-- 双视图切换：卡片视图 & 表格视图（含分页）
+- 双视图切换：卡片视图 & 企业级表格视图
+- **可排序列头**：姓名 / 年龄 / 成绩 / 更新时间，升降序切换
+- 批量选择操作 + 分页组件 + 页码跳转
 - ABCDEF 六级成绩体系，彩色等级徽章
-- 批量操作 + 页码输入跳转
 
 ### 教师管理 `/teachers`
 
@@ -48,12 +53,20 @@
 ### 选课与成绩 `/enrollments`
 
 - 学生-课程关联匹配，成绩录入与等级自动换算
-- 在读/结课/退课状态徽章可视化
+- 严格 TypeScript 类型：`EnrollmentViewModel` / `EnrollmentEditForm` / `EnrollmentStatus`
+- 在读 / 结课 / 退课状态徽章可视化
+
+### 教务日程 `/schedule`
+
+- **网格日历视图**：周一至周日七列布局，响应式折叠 (960px → 4 列, 600px → 2 列)
+- 课程状态边框色标（active 绿 / planned 黄 / completed 蓝）
+- **课程详情弹窗**：点击课程项弹出信息面板，显示教师 / 学分 / 进度条 / 描述
+- 进度指示器 + 活跃课程计数统计
 
 ### 数据报表 `/reports`
 
 - 三维度 Tab 切换：综合总览 / 课程分析 / 学生分析
-- SVG 交互式图表矩阵（环形图、柱状图、折线图）
+- SVG 交互式图表矩阵（环形图悬浮中心数据 + 柱状图 Tooltip + 折线图十字线）
 
 ### 数据分析 `/analytics`
 
@@ -67,15 +80,16 @@
 
 ### 系统设置 `/settings`
 
-- 可视化主题预览卡片，一键切换亮/暗模式
-- 数据管理：导出备份 / 清除日志 / 重置数据
+- 可视化主题预览卡片（Zinc 色阶实时演示），一键切换亮/暗模式
+- 数据管理：导出备份 / 清除日志 / 重置数据，操作结果 Toast 通知
 - 系统元数据展示
 
 ### 全局功能
 
 - **全局搜索** `Ctrl+K`：跨课程 + 学生模糊匹配
 - **消息中心**：顶栏通知气泡 + 下拉面板
-- **数据备份**：侧边栏 JSON 全量导出/导入
+- **Toast 通知**：全局 Signal 驱动通知系统，支持四级别自动消失
+- **数据备份**：侧边栏 JSON 全量导出/导入，操作 Toast 反馈
 - **本地持久化**：所有数据自动存储至 localStorage
 
 ---
@@ -83,11 +97,13 @@
 ## 技术栈
 
 | 层级 | 技术 |
-| --- | --- |
+| ------ | ------ |
 | 框架 | Angular 17.3 (Standalone Components) |
 | UI 库 | Angular Material 17.3 + CDK |
 | 状态 | Angular Signals (`signal` / `computed` / `effect`) |
-| 样式 | SCSS + CSS Custom Properties (50+ design tokens) |
+| 样式 | SCSS + CSS Custom Properties (60+ design tokens) |
+| 图表 | 手写 SVG 交互式图表库（BarChart / DonutChart / LineChart） |
+| 通知 | Signal-based Toast Service + Container Component |
 | 构建 | ESBuild via Angular CLI |
 
 ---
@@ -108,23 +124,26 @@ npm run start:open
 ```text
 src/app/
 ├── core/
-│   ├── models/         # 数据模型
-│   ├── services/       # 状态管理服务
-│   └── utils/          # 工具函数
-├── dashboard/          # 仪表盘
-├── course-list/        # 课程列表
+│   ├── models/         # 数据模型 (Course / Student / Enrollment / Teacher / Notification)
+│   ├── services/       # Signal 状态管理 + Toast 服务
+│   └── utils/          # CSV 导出 / 数据备份 / 排课检测
+├── dashboard/          # 仪表盘 — 指标卡片 + 交互式图表
+├── course-list/        # 课程列表 — Glassmorphism 卡片
 ├── course-detail/      # 课程详情
 ├── course-edit/        # 课程编辑
-├── students/           # 学生管理
+├── students/           # 学生管理 — 可排序企业表格
 ├── student-detail/     # 学生详情
 ├── student-edit/       # 学生编辑
 ├── teachers/           # 教师管理
-├── enrollments/        # 选课管理
-├── schedule/           # 教务排课
+├── enrollments/        # 选课与成绩
+├── schedule/           # 教务日程 — 网格日历 + 详情弹窗
 ├── reports/            # 数据报表
 ├── analytics/          # 数据分析
 ├── activity-log/       # 活动日志
 ├── settings/           # 系统设置
-├── sidebar/            # 侧边栏
-└── shared/             # 共享组件/动画/模型
+├── sidebar/            # 侧边栏 — 导出/导入 + Toast
+└── shared/
+    ├── animations/     # 路由过渡动画
+    ├── components/     # 图表组件 / PageHero / Toast Container
+    └── models/         # 共享类型定义
 ```

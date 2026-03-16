@@ -5,6 +5,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
 import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
+import { ToastService } from '../core/services/toast.service';
 import { exportBackup, readBackupFile } from '../core/utils/data-backup.util';
 
 interface NavItem {
@@ -104,10 +105,12 @@ export class SidebarComponent {
   constructor(
     private readonly courseStore: CourseStoreService,
     private readonly studentStore: StudentStoreService,
+    private readonly toast: ToastService,
   ) {}
 
   exportData(): void {
     exportBackup(this.courseStore.courses(), this.studentStore.students());
+    this.toast.success('导出成功', '备份文件已下载到本地');
   }
 
   triggerImport(): void {
@@ -124,9 +127,12 @@ export class SidebarComponent {
       const courseCount = this.courseStore.importAll(backup.courses);
       const studentCount = this.studentStore.importAll(backup.students);
       this.restoreMessage.set(`已恢复 ${courseCount} 门课程、${studentCount} 名学生`);
+      this.toast.success('数据恢复成功', `已恢复 ${courseCount} 门课程、${studentCount} 名学生`);
       setTimeout(() => this.restoreMessage.set(''), 3000);
     } catch (err) {
-      this.restoreMessage.set(err instanceof Error ? err.message : '恢复失败');
+      const msg = err instanceof Error ? err.message : '恢复失败';
+      this.restoreMessage.set(msg);
+      this.toast.error('恢复失败', msg);
       setTimeout(() => this.restoreMessage.set(''), 3000);
     }
 

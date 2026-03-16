@@ -26,9 +26,12 @@ export class StudentTableComponent implements OnChanges {
   @Output() readonly deleteRequested = new EventEmitter<number>();
   @Output() readonly pageChange = new EventEmitter<number>();
   @Output() readonly selectionChange = new EventEmitter<readonly number[]>();
+  @Output() readonly sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
 
   readonly genderLabels = STUDENT_GENDER_LABELS;
   selectedIds = new Set<number>();
+  sortColumn = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['students'] || changes['currentPage']) {
@@ -88,6 +91,16 @@ export class StudentTableComponent implements OnChanges {
 
   goTo(page: number): void {
     this.pageChange.emit(page);
+  }
+
+  toggleSort(column: string): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.sortChanged.emit({ column: this.sortColumn, direction: this.sortDirection });
   }
 
   get pageNumbers(): readonly number[] {

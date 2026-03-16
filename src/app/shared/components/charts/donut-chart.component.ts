@@ -20,16 +20,23 @@ interface DonutSlice {
     <div class="donut-chart-wrap">
       <div class="donut-svg-container">
         <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
-          @for (slice of slices; track slice.label) {
+          @for (slice of slices; track slice.label; let i = $index) {
             <path
               [attr.d]="slice.path"
               [attr.fill]="slice.color"
               class="donut-slice"
+              (mouseenter)="hoveredSlice = i"
+              (mouseleave)="hoveredSlice = -1"
             />
           }
           <circle cx="100" cy="100" r="40" [attr.fill]="centerFill" />
-          <text x="100" y="96" text-anchor="middle" class="center-value">{{ total }}</text>
-          <text x="100" y="112" text-anchor="middle" class="center-label">{{ centerLabel }}</text>
+          @if (hoveredSlice >= 0 && slices[hoveredSlice]) {
+            <text x="100" y="96" text-anchor="middle" class="center-value">{{ slices[hoveredSlice].value }}</text>
+            <text x="100" y="112" text-anchor="middle" class="center-label">{{ slices[hoveredSlice].label }}</text>
+          } @else {
+            <text x="100" y="96" text-anchor="middle" class="center-value">{{ total }}</text>
+            <text x="100" y="112" text-anchor="middle" class="center-label">{{ centerLabel }}</text>
+          }
         </svg>
       </div>
       <div class="legend">
@@ -119,7 +126,8 @@ export class DonutChartComponent {
   @Input() centerLabel = '总计';
   @Input() centerFill = 'var(--bg-surface, #fff)';
 
-  readonly defaultColors = ['#0070f3', '#7c66dc', '#f5a623', '#e5484d', '#0ea371', '#ec4899', '#0091ff', '#84cc16'];
+  hoveredSlice = -1;
+  readonly defaultColors = ['#6366f1', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981', '#ec4899', '#3b82f6', '#84cc16'];
 
   get total(): number {
     return this.data.reduce((sum, d) => sum + d.value, 0);

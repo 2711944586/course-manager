@@ -9,6 +9,7 @@ import { StudentStoreService } from '../core/services/student-store.service';
 import { TeacherStoreService } from '../core/services/teacher-store.service';
 import { EnrollmentStoreService } from '../core/services/enrollment-store.service';
 import { ActivityLogService } from '../core/services/activity-log.service';
+import { ToastService } from '../core/services/toast.service';
 import { exportBackup } from '../core/utils/data-backup.util';
 
 @Component({
@@ -56,6 +57,7 @@ export class SettingsComponent {
     private readonly teacherStore: TeacherStoreService,
     private readonly enrollmentStore: EnrollmentStoreService,
     private readonly activityLog: ActivityLogService,
+    private readonly toast: ToastService,
   ) {}
 
   setTheme(theme: 'light' | 'dark'): void {
@@ -67,6 +69,7 @@ export class SettingsComponent {
   exportAllData(): void {
     exportBackup(this.courseStore.courses(), this.studentStore.students());
     this.showMessage('数据已导出为 JSON 文件', 'success');
+    this.toast.success('导出成功', '数据备份文件已下载到本地');
     this.activityLog.log('export', 'system', '系统', '导出全部数据备份');
   }
 
@@ -81,6 +84,7 @@ export class SettingsComponent {
     localStorage.removeItem('aurora.course-manager.notifications');
 
     this.showMessage('数据已重置，请刷新页面以加载种子数据', 'success');
+    this.toast.info('数据已重置', '页面将在 1.5 秒后自动刷新');
     setTimeout(() => window.location.reload(), 1500);
   }
 
@@ -88,6 +92,7 @@ export class SettingsComponent {
     if (!confirm('确定清除全部活动日志？')) return;
     this.activityLog.clearAll();
     this.showMessage('活动日志已清除', 'success');
+    this.toast.success('日志已清除', '全部活动日志已清空');
   }
 
   private showMessage(text: string, type: 'success' | 'error'): void {

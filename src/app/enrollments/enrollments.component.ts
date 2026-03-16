@@ -6,7 +6,21 @@ import { MatRippleModule } from '@angular/material/core';
 import { EnrollmentStoreService } from '../core/services/enrollment-store.service';
 import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
-import { Enrollment, EnrollmentUpsertInput } from '../core/models/enrollment.model';
+import { Enrollment, EnrollmentStatus, EnrollmentUpsertInput } from '../core/models/enrollment.model';
+
+interface EnrollmentViewModel extends Enrollment {
+  readonly courseName: string;
+  readonly courseInstructor: string;
+  readonly studentName: string;
+  readonly studentNo: string;
+}
+
+interface EnrollmentEditForm {
+  studentId: number | null;
+  courseId: number | null;
+  score: number | string | null;
+  status: EnrollmentStatus;
+}
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 
 @Component({
@@ -287,7 +301,7 @@ export class EnrollmentsComponent {
 
   readonly showEditor = computed(() => this.creating() || this.editingEnrollmentId() !== null);
 
-  editForm: any = this.getEmptyForm();
+  editForm: EnrollmentEditForm = this.getEmptyForm();
 
   startCreate(): void {
     this.creating.set(true);
@@ -300,7 +314,7 @@ export class EnrollmentsComponent {
     if (courses.length > 0) this.editForm.courseId = courses[0].id;
   }
 
-  startEdit(enr: any): void {
+  startEdit(enr: EnrollmentViewModel): void {
     this.creating.set(false);
     this.editingEnrollmentId.set(enr.id);
     this.enrollmentError.set(null);
@@ -337,8 +351,8 @@ export class EnrollmentsComponent {
         });
       }
       this.cancelEdit();
-    } catch (err: any) {
-      this.enrollmentError.set(err.message || '保存失败');
+    } catch (err: unknown) {
+      this.enrollmentError.set(err instanceof Error ? err.message : '保存失败');
     }
   }
 
@@ -353,7 +367,7 @@ export class EnrollmentsComponent {
     return map[status] || status;
   }
 
-  private getEmptyForm() {
+  private getEmptyForm(): EnrollmentEditForm {
     return { studentId: null, courseId: null, score: null, status: 'enrolled' };
   }
 }

@@ -1,10 +1,11 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CourseStoreService } from '../core/services/course-store.service';
 import { extractCourseScheduleDays, WEEKDAY_LABELS, WeekdayLabel } from '../core/utils/course-schedule.util';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
+import { Course } from '../core/models/course.model';
 
 @Component({
   selector: 'app-schedule',
@@ -15,6 +16,7 @@ import { PageHeroComponent } from '../shared/components/page-hero/page-hero.comp
 })
 export class ScheduleComponent {
   readonly courses = this.courseStore.courses;
+  readonly selectedCourse = signal<Course | null>(null);
 
   readonly calendarColumns = computed(() =>
     WEEKDAY_LABELS.map(day => ({
@@ -23,6 +25,14 @@ export class ScheduleComponent {
         .filter(course => extractCourseScheduleDays(course.schedule).includes(day))
         .sort((firstCourse, secondCourse) => firstCourse.schedule.localeCompare(secondCourse.schedule)),
     })),
+  );
+
+  readonly totalSlots = computed(() =>
+    this.calendarColumns().reduce((sum, col) => sum + col.courses.length, 0),
+  );
+
+  readonly activeCount = computed(() =>
+    this.courses().filter(c => c.status === 'active').length,
   );
 
   readonly reminders = computed(() => {
@@ -54,6 +64,14 @@ export class ScheduleComponent {
   });
 
   constructor(private readonly courseStore: CourseStoreService) {}
+
+  openCourseDetail(course: Course): void {
+    this.selectedCourse.set(course);
+  }
+
+  closeCourseDetail(): void {
+    this.selectedCourse.set(null);
+  }
 
   private resolveBusiestDay(): { readonly day: WeekdayLabel; readonly count: number } {
     return this.calendarColumns().reduce(

@@ -13,6 +13,7 @@ import { CourseStoreService } from './core/services/course-store.service';
 import { StudentStoreService } from './core/services/student-store.service';
 import { NotificationStoreService } from './core/services/notification-store.service';
 import { scoreToGrade } from './core/utils/score-grade.util';
+import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 
 interface SearchResult {
   type: 'course' | 'student';
@@ -26,7 +27,7 @@ interface SearchResult {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, MatButtonModule, MatIconModule, FormsModule, DatePipe],
+  imports: [RouterOutlet, SidebarComponent, MatButtonModule, MatIconModule, FormsModule, DatePipe, ToastContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [routeTransitionAnimation],

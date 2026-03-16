@@ -220,16 +220,16 @@ export class DashboardComponent {
   readonly courseStatusChart = computed<readonly ChartDataItem[]>(() => {
     const courseList = this.courses();
     return [
-      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#0070f3' },
-      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: '#f5a623' },
-      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: '#0ea371' },
+      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#6366f1' },
+      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: '#f59e0b' },
+      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: '#10b981' },
     ];
   });
 
   readonly gradeChart = computed<readonly ChartDataItem[]>(() => {
     const studentList = this.students();
     const gradeColors: Record<string, string> = {
-      A: '#0ea371', B: '#0070f3', C: '#f5a623', D: '#f97316', E: '#ef4444', F: '#dc2626',
+      A: '#10b981', B: '#6366f1', C: '#f59e0b', D: '#f97316', E: '#ef4444', F: '#dc2626',
     };
     const counts: Record<string, number> = {};
     for (const g of GRADE_ORDER) counts[g] = 0;
@@ -246,9 +246,9 @@ export class DashboardComponent {
 
   readonly scoreRangeChart = computed<readonly ChartDataItem[]>(() => {
     const ranges = [
-      { label: '90+', min: 90, max: 100, color: '#0ea371' },
-      { label: '80-89', min: 80, max: 89, color: '#0070f3' },
-      { label: '70-79', min: 70, max: 79, color: '#7c66dc' },
+      { label: '90+', min: 90, max: 100, color: '#10b981' },
+      { label: '80-89', min: 80, max: 89, color: '#6366f1' },
+      { label: '70-79', min: 70, max: 79, color: '#8b5cf6' },
       { label: '60-69', min: 60, max: 69, color: '#f59e0b' },
       { label: '<60', min: 0, max: 59, color: '#ef4444' },
     ];
