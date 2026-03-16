@@ -86,7 +86,7 @@ import { ChartDataItem } from './chart.model';
       fill: var(--text-secondary, #64748b);
     }
     .tooltip-bg {
-      fill: var(--bg-elevated, #27272a);
+      fill: var(--bg-elevated, #334155);
       opacity: 0.92;
       animation: fade-in 0.15s ease;
     }

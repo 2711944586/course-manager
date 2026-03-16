@@ -56,7 +56,15 @@ export class ActivityLogService {
   private loadFromStorage(): readonly ActivityEntry[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : this.generateSeedData();
+      if (!raw) return this.generateSeedData();
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return this.generateSeedData();
+      return parsed.filter(
+        (item): item is ActivityEntry =>
+          typeof item === 'object' && item !== null &&
+          typeof item.id === 'number' && typeof item.action === 'string' &&
+          typeof item.entity === 'string' && typeof item.timestamp === 'string'
+      );
     } catch {
       return this.generateSeedData();
     }

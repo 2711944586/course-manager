@@ -62,9 +62,14 @@ export class TeacherStoreService {
     }
 
     try {
-      const parsedData = JSON.parse(rawData) as Teacher[];
-      if (Array.isArray(parsedData) && parsedData.length > 0) {
-        return parsedData;
+      const parsed: unknown = JSON.parse(rawData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter(
+          (item): item is Teacher =>
+            typeof item === 'object' && item !== null &&
+            typeof item.id === 'number' && typeof item.name === 'string' &&
+            typeof item.department === 'string'
+        );
       }
     } catch {
       return this.generateFakeTeachers(DEFAULT_FAKE_COUNT);

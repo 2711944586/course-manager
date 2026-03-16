@@ -11,6 +11,7 @@ export interface ToastItem {
 export class ToastService {
   private nextId = 0;
   private readonly items = signal<readonly ToastItem[]>([]);
+  private readonly timers = new Map<number, ReturnType<typeof setTimeout>>();
 
   readonly toasts = computed(() => this.items());
 
@@ -19,11 +20,17 @@ export class ToastService {
     const toast: ToastItem = { id, type, title, message };
     this.items.update(list => [...list, toast]);
     if (duration > 0) {
-      setTimeout(() => this.dismiss(id), duration);
+      const timer = setTimeout(() => this.dismiss(id), duration);
+      this.timers.set(id, timer);
     }
   }
 
   dismiss(id: number): void {
+    const timer = this.timers.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      this.timers.delete(id);
+    }
     this.items.update(list => list.filter(t => t.id !== id));
   }
 

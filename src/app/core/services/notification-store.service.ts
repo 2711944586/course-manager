@@ -61,9 +61,14 @@ export class NotificationStoreService {
     }
 
     try {
-      const parsedData = JSON.parse(rawData) as Notification[];
-      if (Array.isArray(parsedData) && parsedData.length > 0) {
-        return parsedData;
+      const parsed: unknown = JSON.parse(rawData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter(
+          (item): item is Notification =>
+            typeof item === 'object' && item !== null &&
+            typeof item.id === 'number' && typeof item.title === 'string' &&
+            typeof item.type === 'string'
+        );
       }
     } catch {
       return this.generateFakeNotifications();

@@ -104,9 +104,14 @@ export class EnrollmentStoreService {
     }
 
     try {
-      const parsedData = JSON.parse(rawData) as Enrollment[];
-      if (Array.isArray(parsedData) && parsedData.length > 0) {
-        return parsedData;
+      const parsed: unknown = JSON.parse(rawData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter(
+          (item): item is Enrollment =>
+            typeof item === 'object' && item !== null &&
+            typeof item.id === 'number' && typeof item.studentId === 'number' &&
+            typeof item.courseId === 'number' && typeof item.status === 'string'
+        );
       }
     } catch {
       return this.generateFakeEnrollments();

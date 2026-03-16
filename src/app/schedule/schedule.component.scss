@@ -62,7 +62,7 @@
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
   gap: 2px;
   margin-top: 20px;
   border-radius: var(--radius-md);
@@ -361,14 +361,26 @@
   justify-content: flex-end;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
   .calendar-grid {
-    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .calendar-column {
+    min-height: 150px;
   }
 }
 
 @media (max-width: 600px) {
   .calendar-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .calendar-column {
+    min-height: 120px;
   }
 }
