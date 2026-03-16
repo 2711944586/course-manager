@@ -92,21 +92,21 @@
 }
 
 .light-preview {
-  background: #f4f4f5;
-  .tp-sidebar { width: 24%; background: #ffffff; border-right: 1px solid #e4e4e7; }
+  background: #F1F5F9;
+  .tp-sidebar { width: 24%; background: #ffffff; border-right: 1px solid #E2E8F0; }
   .tp-content { flex: 1; padding: 8%; display: flex; flex-direction: column; gap: 8%; }
-  .tp-bar { height: 12%; background: #ffffff; border-radius: 3px; border: 1px solid #e4e4e7; }
+  .tp-bar { height: 12%; background: #ffffff; border-radius: 3px; border: 1px solid #E2E8F0; }
   .tp-cards { display: flex; gap: 6%; flex: 1; }
-  .tp-card { flex: 1; background: #ffffff; border-radius: 4px; border: 1px solid #e4e4e7; }
+  .tp-card { flex: 1; background: #ffffff; border-radius: 4px; border: 1px solid #E2E8F0; }
 }
 
 .dark-preview {
-  background: #09090b;
-  .tp-sidebar { width: 24%; background: #1c1c1f; border-right: 1px solid #27272a; }
+  background: #0F172A;
+  .tp-sidebar { width: 24%; background: #1E293B; border-right: 1px solid #334155; }
   .tp-content { flex: 1; padding: 8%; display: flex; flex-direction: column; gap: 8%; }
-  .tp-bar { height: 12%; background: #1c1c1f; border-radius: 3px; border: 1px solid #27272a; }
+  .tp-bar { height: 12%; background: #1E293B; border-radius: 3px; border: 1px solid #334155; }
   .tp-cards { display: flex; gap: 6%; flex: 1; }
-  .tp-card { flex: 1; background: #1c1c1f; border-radius: 4px; border: 1px solid #27272a; }
+  .tp-card { flex: 1; background: #1E293B; border-radius: 4px; border: 1px solid #334155; }
 }
 
 .theme-name {

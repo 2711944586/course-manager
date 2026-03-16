@@ -27,13 +27,15 @@ td {
 
 th {
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--bg-surface);
-  font-size: 0.82rem;
+  background: var(--bg-surface-low);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 
   &.sortable {
     cursor: pointer;

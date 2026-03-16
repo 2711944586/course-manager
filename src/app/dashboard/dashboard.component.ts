@@ -14,6 +14,7 @@ interface DashboardMetric {
   readonly value: string;
   readonly helper: string;
   readonly icon: string;
+  readonly trend?: string;
 }
 
 interface DashboardAlert {
@@ -110,36 +111,42 @@ export class DashboardComponent {
         value: `${courseList.length}`,
         helper: '当前课程库中的全部课程',
         icon: 'menu_book',
+        trend: '+5% 本月',
       },
       {
         label: '学生总量',
         value: `${studentList.length}`,
         helper: '已录入学生档案数量',
         icon: 'groups',
+        trend: '+12% 本月',
       },
       {
         label: '平均进度',
         value: `${averageProgress}%`,
         helper: '全部课程的平均教学进展',
         icon: 'trending_up',
+        trend: '+3% 环比',
       },
       {
         label: '结课率',
         value: `${completionRate}%`,
         helper: '已结课课程占全部课程比例',
         icon: 'task_alt',
+        trend: '+8% 环比',
       },
       {
         label: '全员平均分',
         value: `${averageScore}`,
         helper: '全体学生的综合平均成绩',
         icon: 'insights',
+        trend: '+2.1 环比',
       },
       {
         label: '及格率',
         value: `${passRate}%`,
         helper: '成绩 ≥ 60 分的学生占比',
         icon: 'verified',
+        trend: '+4% 环比',
       },
     ];
   });
@@ -220,7 +227,7 @@ export class DashboardComponent {
   readonly courseStatusChart = computed<readonly ChartDataItem[]>(() => {
     const courseList = this.courses();
     return [
-      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#6366f1' },
+      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: '#4F46E5' },
       { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: '#f59e0b' },
       { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: '#10b981' },
     ];
@@ -229,7 +236,7 @@ export class DashboardComponent {
   readonly gradeChart = computed<readonly ChartDataItem[]>(() => {
     const studentList = this.students();
     const gradeColors: Record<string, string> = {
-      A: '#10b981', B: '#6366f1', C: '#f59e0b', D: '#f97316', E: '#ef4444', F: '#dc2626',
+      A: '#10b981', B: '#4F46E5', C: '#f59e0b', D: '#f97316', E: '#ef4444', F: '#dc2626',
     };
     const counts: Record<string, number> = {};
     for (const g of GRADE_ORDER) counts[g] = 0;
@@ -247,8 +254,8 @@ export class DashboardComponent {
   readonly scoreRangeChart = computed<readonly ChartDataItem[]>(() => {
     const ranges = [
       { label: '90+', min: 90, max: 100, color: '#10b981' },
-      { label: '80-89', min: 80, max: 89, color: '#6366f1' },
-      { label: '70-79', min: 70, max: 79, color: '#8b5cf6' },
+      { label: '80-89', min: 80, max: 89, color: '#4F46E5' },
+      { label: '70-79', min: 70, max: 79, color: '#7C3AED' },
       { label: '60-69', min: 60, max: 69, color: '#f59e0b' },
       { label: '<60', min: 0, max: 59, color: '#ef4444' },
     ];

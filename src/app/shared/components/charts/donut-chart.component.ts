@@ -127,7 +127,7 @@ export class DonutChartComponent {
   @Input() centerFill = 'var(--bg-surface, #fff)';
 
   hoveredSlice = -1;
-  readonly defaultColors = ['#6366f1', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981', '#ec4899', '#3b82f6', '#84cc16'];
+  readonly defaultColors = ['#4F46E5', '#7C3AED', '#f59e0b', '#ef4444', '#10b981', '#ec4899', '#3b82f6', '#84cc16'];
 
   get total(): number {
     return this.data.reduce((sum, d) => sum + d.value, 0);

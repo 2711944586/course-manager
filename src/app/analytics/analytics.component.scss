@@ -10,7 +10,7 @@
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  gap: 24px;
 }
 
 .kpi-card {
@@ -77,17 +77,20 @@
 // Charts
 .charts-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
 }
 
 .chart-panel {
   padding: 20px;
+  min-height: 350px;
+  position: relative;
+  width: 100%;
 
   &.wide {
     grid-column: span 2;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       grid-column: span 1;
     }
   }

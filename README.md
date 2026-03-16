@@ -11,9 +11,11 @@ Zinc/Slate 色阶 + Indigo 克制强调色，对标 Linear / Stripe / Vercel 级
 
 | 维度 | 实现 |
 | ------ | ------ |
-| **色彩** | Zinc 灰度色阶 (#fafafa → #09090b) + Indigo (#6366f1) 主色，语义色覆盖 Success / Warning / Error / Info |
+| **色彩** | Slate 灰度色阶 (bg-body #F1F5F9 / surface #FFFFFF / text #0F172A) + Indigo (#4F46E5) 主色 |
 | **表面** | Glassmorphism 毛玻璃卡片 — `backdrop-filter: blur(12px) saturate(1.6)` + 半透明边框 |
 | **主题** | 亮 / 暗双模式无缝切换，60+ CSS Custom Properties 自适应 |
+| **阴影** | Tailwind 风格阴影系统 (shadow-sm/md/lg/xl) |
+| **布局** | 左侧 260px 固定侧边栏 + 右侧 `--bg-page: #F1F5F9` 内容区 |
 | **排版** | Inter + Noto Sans SC 字体链，JetBrains Mono 等宽 |
 | **动画** | 瀑布式入场 + 路由模糊过渡 (16 条路由独立配置) + hover 微交互 |
 | **骨架屏** | CSS-only skeleton 加载动画系统 (text / title / avatar / card / chart) |
@@ -26,10 +28,11 @@ Zinc/Slate 色阶 + Indigo 克制强调色，对标 Linear / Stripe / Vercel 级
 
 ### 仪表盘 `/dashboard`
 
-- 六大核心指标卡片（Indigo 色彩映射 + 图标色区分）
+- 六大核心指标卡片（Indigo 色彩映射 + 绿色趋势角标）
 - 快捷操作面板，一键跳转课程 / 学生 / 日程 / 报表
 - **交互式 SVG 图表**：环形图、柱状图、折线图，悬浮显示 Tooltip 详情
-- 重点课程 Top 5 排行、系统告警列表、近期活动时间线
+- 双列布局：系统提醒 (2/3) + 最近活动 (1/3)
+- 重点课程 Top 5 排行、系统告警列表
 
 ### 课程管理 `/courses`
 

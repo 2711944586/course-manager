@@ -86,7 +86,7 @@ export class AnalyticsComponent {
     }
     return [
       { label: 'A (90+)', value: grades.A, color: '#10b981' },
-      { label: 'B (80-89)', value: grades.B, color: '#6366f1' },
+      { label: 'B (80-89)', value: grades.B, color: '#4F46E5' },
       { label: 'C (70-79)', value: grades.C, color: '#f59e0b' },
       { label: 'D (60-69)', value: grades.D, color: '#f97316' },
       { label: 'E/F (<60)', value: grades.E + grades.F, color: '#e5484d' },
@@ -100,7 +100,7 @@ export class AnalyticsComponent {
     const notStarted = courses.filter(c => c.status === 'planned').length;
     const completed = courses.filter(c => c.status === 'completed').length;
     return [
-      { label: '进行中', value: active, color: '#6366f1' },
+      { label: '进行中', value: active, color: '#4F46E5' },
       { label: '未开始', value: notStarted, color: '#f59e0b' },
       { label: '已结课', value: completed, color: '#10b981' },
     ];
@@ -145,7 +145,7 @@ export class AnalyticsComponent {
     const male = students.filter(s => s.gender === 'male').length;
     const female = students.filter(s => s.gender === 'female').length;
     return [
-      { label: '男生', value: male, color: '#6366f1' },
+      { label: '男生', value: male, color: '#4F46E5' },
       { label: '女生', value: female, color: '#ec4899' },
     ];
   });
