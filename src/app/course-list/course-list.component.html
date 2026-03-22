@@ -34,13 +34,65 @@
     />
   }
 
-  <app-course-cards
-    class="animate-fade-up delay-5"
-    [courses]="filteredCourses()"
-    [keyword]="searchKeyword()"
-    (viewRequested)="viewDetail($event)"
-    (editRequested)="startEdit($event)"
-    (deleteRequested)="deleteCourse($event)"
-  />
-</div>
+  <section class="course-workbench animate-fade-up delay-5">
+    <div class="workbench-main">
+      <app-course-cards
+        [courses]="filteredCourses()"
+        [keyword]="searchKeyword()"
+        (viewRequested)="viewDetail($event)"
+        (editRequested)="startEdit($event)"
+        (deleteRequested)="deleteCourse($event)"
+        (previewRequested)="updatePreview($event)"
+      />
+    </div>
 
+    <aside class="preview-panel surface-card">
+      @if (previewCourse(); as course) {
+        <div class="preview-shell">
+          <div class="preview-head">
+            <span class="preview-icon"><mat-icon>{{ course.icon }}</mat-icon></span>
+            <div>
+              <span class="preview-kicker">Course Preview</span>
+              <h3>{{ course.name }}</h3>
+              <p>{{ course.instructor }} · {{ course.schedule }}</p>
+            </div>
+          </div>
+
+          <span class="preview-status" [class]="'status-' + course.status">{{ course.status }}</span>
+          <p class="preview-description">{{ course.description }}</p>
+
+          <div class="preview-metrics">
+            <article>
+              <span>进度</span>
+              <strong>{{ course.progress }}%</strong>
+            </article>
+            <article>
+              <span>学生数</span>
+              <strong>{{ course.students }}</strong>
+            </article>
+          </div>
+
+          <div class="preview-progress-track">
+            <span class="preview-progress-fill" [style.width.%]="course.progress"></span>
+          </div>
+
+          <div class="preview-actions">
+            <button mat-stroked-button type="button" (click)="startEdit(course.id)">
+              <mat-icon>edit</mat-icon>
+              编辑
+            </button>
+            <button mat-flat-button color="primary" type="button" (click)="viewDetail(course.id)">
+              <mat-icon>open_in_new</mat-icon>
+              打开详情
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="preview-empty">
+          <mat-icon>menu_book</mat-icon>
+          <p>筛选后若存在课程，这里会展示局部预览。</p>
+        </div>
+      }
+    </aside>
+  </section>
+</div>

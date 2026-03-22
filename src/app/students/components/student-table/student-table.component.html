@@ -38,7 +38,7 @@
       </thead>
       <tbody>
         @for (student of students; track student.id) {
-          <tr [class.row-selected]="selectedIds.has(student.id)">
+          <tr [class.row-selected]="selectedIds.has(student.id)" [attr.data-grade]="computeGrade(student.score)" (mouseenter)="requestPreview(student.id)">
             <td class="check-col">
               <input type="checkbox" [checked]="selectedIds.has(student.id)" (change)="toggleOne(student.id, $any($event.target).checked)" />
             </td>

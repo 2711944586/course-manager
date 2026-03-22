@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -6,7 +7,7 @@ const STORAGE_KEY = 'aurora.course-manager.theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  readonly theme = signal<ThemeMode>('light');
+  readonly theme = signal<ThemeMode>('dark');
 
   constructor() {
     this.initializeTheme();
@@ -18,21 +19,16 @@ export class ThemeService {
 
   setTheme(theme: ThemeMode): void {
     this.theme.set(theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    safeStorageSetItem(STORAGE_KEY, theme);
     this.applyTheme(theme);
   }
 
   private initializeTheme(): void {
-    const persistedTheme = localStorage.getItem(STORAGE_KEY);
-    const prefersDark =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    const persistedTheme = safeStorageGetItem(STORAGE_KEY);
     const initialTheme: ThemeMode =
       persistedTheme === 'light' || persistedTheme === 'dark'
         ? persistedTheme
-        : prefersDark
-          ? 'dark'
-          : 'light';
+        : 'dark';
 
     this.theme.set(initialTheme);
     this.applyTheme(initialTheme);

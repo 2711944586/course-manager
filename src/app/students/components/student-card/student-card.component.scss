@@ -3,19 +3,49 @@
 }
 
 .student-card {
+  position: relative;
+  overflow: hidden;
   padding: 16px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-default);
   background: var(--bg-surface);
-  box-shadow: var(--shadow-xs);
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow:
+    var(--shadow-xs),
+    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 78%, transparent);
+  transition: transform 0.22s var(--easing-smooth), box-shadow 0.22s var(--easing-smooth), border-color 0.22s var(--easing-smooth);
   display: flex;
   flex-direction: column;
   gap: 14px;
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(140deg, color-mix(in srgb, var(--surface-sheen) 68%, transparent), transparent 34%),
+      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-secondary) 14%, transparent), transparent 40%);
+    pointer-events: none;
+    opacity: 0.88;
+  }
+
   &:hover {
     box-shadow: var(--shadow-sm);
     border-color: var(--border-strong, var(--border-default));
+    transform: translateY(-4px);
+  }
+
+  &[data-grade='A'],
+  &[data-grade='B'] {
+    .score-fill {
+      background: linear-gradient(90deg, var(--accent-success), var(--accent-info));
+    }
+  }
+
+  &[data-grade='E'],
+  &[data-grade='F'] {
+    .score-fill {
+      background: linear-gradient(90deg, var(--accent-error), color-mix(in srgb, var(--accent-warning) 45%, var(--accent-error)));
+    }
   }
 }
 
@@ -36,6 +66,7 @@
   font-weight: 600;
   flex-shrink: 0;
   color: #fff;
+  box-shadow: 0 12px 24px color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .avatar-male {
@@ -107,16 +138,16 @@
 }
 
 .score-track {
-  height: 4px;
-  border-radius: 2px;
+  height: 6px;
+  border-radius: 999px;
   background: var(--border-subtle);
   overflow: hidden;
 }
 
 .score-fill {
   height: 100%;
-  border-radius: 2px;
-  background: var(--accent-primary);
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   transition: width 0.4s ease;
 }
 
@@ -124,12 +155,15 @@
   display: flex;
   gap: 8px;
   margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .card-btn {
   flex: 1;
-  min-height: 32px;
+  min-height: 34px;
   font-size: 0.82rem;
+  border-radius: 12px !important;
 
   &.danger {
     color: var(--accent-error) !important;

@@ -1,5 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Notification, NotificationInput, NotificationType } from '../models/notification.model';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.notifications';
 
@@ -51,11 +52,11 @@ export class NotificationStoreService {
 
   private writeNotifications(notifications: readonly Notification[]): void {
     this.notificationState.set(notifications);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(notifications));
   }
 
   private loadNotifications(): readonly Notification[] {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+    const rawData = safeStorageGetItem(STORAGE_KEY);
     if (!rawData) {
       return this.generateFakeNotifications();
     }

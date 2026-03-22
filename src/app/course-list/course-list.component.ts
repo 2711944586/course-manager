@@ -1,6 +1,8 @@
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Component, computed, effect, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { map } from 'rxjs';
 import { Course, CourseSortKey, CourseStatus, CourseUpsertInput } from '../core/models/course.model';
 import { CourseStoreService } from '../core/services/course-store.service';
@@ -24,6 +26,8 @@ import { CourseFilterStatus, CourseToolbarComponent } from './components/course-
     CourseCardsComponent,
     PageHeroComponent,
     InlineNoticeComponent,
+    MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './course-list.component.html',
   styleUrl: './course-list.component.scss',
@@ -35,6 +39,7 @@ export class CourseListComponent {
   readonly editingCourseId = signal<number | null>(null);
   readonly creating = signal(false);
   readonly notice = signal<UiNotice | null>(null);
+  readonly selectedPreviewCourseId = signal<number | null>(null);
 
   readonly courses = this.courseStore.courses;
   readonly filteredCourses = computed(() => {
@@ -92,6 +97,14 @@ export class CourseListComponent {
   });
 
   readonly showEditor = computed(() => this.creating() || this.editingCourseId() !== null);
+  readonly previewCourse = computed(() => {
+    const previewId = this.selectedPreviewCourseId();
+    const matchedCourse = previewId !== null
+      ? this.filteredCourses().find(course => course.id === previewId)
+      : null;
+
+    return matchedCourse ?? this.filteredCourses()[0] ?? null;
+  });
 
   private readonly routeStatus = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('status'))),
@@ -136,6 +149,23 @@ export class CourseListComponent {
       },
       { allowSignalWrites: true },
     );
+
+    effect(
+      () => {
+        const previewCourse = this.previewCourse();
+        if (!previewCourse) {
+          this.selectedPreviewCourseId.set(null);
+          return;
+        }
+
+        if (this.selectedPreviewCourseId() === previewCourse.id) {
+          return;
+        }
+
+        this.selectedPreviewCourseId.set(previewCourse.id);
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   handleSearchChange(keyword: string): void {
@@ -169,6 +199,10 @@ export class CourseListComponent {
 
   viewDetail(courseId: number): void {
     void this.router.navigate(['/courses/detail', courseId]);
+  }
+
+  updatePreview(courseId: number): void {
+    this.selectedPreviewCourseId.set(courseId);
   }
 
   saveCourse(payload: CourseUpsertInput): void {

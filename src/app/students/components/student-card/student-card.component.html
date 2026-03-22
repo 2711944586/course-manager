@@ -1,4 +1,4 @@
-<article class="student-card" [attr.data-grade]="grade">
+<article class="student-card" [attr.data-grade]="grade" (mouseenter)="previewRequested.emit(student.id)" (focusin)="previewRequested.emit(student.id)">
   <div class="card-header">
     <div class="avatar" [class.avatar-male]="student.gender === 'male'" [class.avatar-female]="student.gender === 'female'">
       {{ student.name[0] }}

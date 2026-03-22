@@ -1,296 +1,216 @@
 :host {
   display: block;
-  height: 100%;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  width: var(--sidebar-width);
-  height: 100vh;
-  height: 100dvh;
-  padding: 20px 14px;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  transition: width 0.3s var(--easing-smooth), background 0.35s var(--easing-smooth), padding 0.3s var(--easing-smooth);
-  overflow: hidden;
+.floating-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 1200;
+  pointer-events: none;
+}
+
+.dock-core {
   position: relative;
-  z-index: 100;
-
-  &.collapsed {
-    width: var(--sidebar-collapsed);
-    padding: 20px 10px;
-  }
-}
-
-// ── Header ──
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 2px 8px 20px;
-  border-bottom: 1px solid var(--sidebar-border);
-  margin-bottom: 16px;
-  min-height: 52px;
-}
-
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  background: var(--sidebar-logo-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.35s var(--easing-smooth);
-
-  mat-icon {
-    color: var(--sidebar-logo-text, #ffffff);
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.logo-text {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--sidebar-text-bright);
-  white-space: nowrap;
-}
-
-.toggle-btn {
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--sidebar-text-dim);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s var(--easing-smooth);
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover {
-    background: var(--sidebar-hover);
-    color: var(--sidebar-active-text);
-  }
-}
-
-// ── Navigation ──
-.sidebar-nav {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.nav-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--sidebar-text);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.18s var(--easing-smooth);
-  position: relative;
-  white-space: nowrap;
-
-  &:hover {
-    color: var(--sidebar-text-bright);
-    background: var(--sidebar-hover);
-  }
-
-  &.active {
-    color: var(--sidebar-active-text);
-    background: var(--sidebar-active-bg);
-    font-weight: 500;
-
-    .nav-icon mat-icon {
-      color: var(--sidebar-active-text);
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 8px;
-      bottom: 8px;
-      width: 4px;
-      border-radius: 0 4px 4px 0;
-      background: var(--sidebar-active-indicator);
-    }
-  }
-}
-
-.nav-icon {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.nav-label {
-  font-size: 0.84rem;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.nav-copy {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.nav-description {
-  font-size: 0.7rem;
-  line-height: 1.45;
-  color: var(--sidebar-text-dim);
-  margin-top: 1px;
-}
-
-// ── Footer / User ──
-.sidebar-footer {
-  padding-top: 14px;
-  border-top: 1px solid var(--sidebar-border);
-  margin-top: 8px;
-}
-
-.user-card {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.2s var(--easing-smooth);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--dock-surface);
+  border: 1px solid var(--dock-border);
+  box-shadow: var(--dock-shadow);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  pointer-events: auto;
 
-  &:hover {
-    background: var(--sidebar-hover);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1px 18px auto;
+    height: 1px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface-sheen) 84%, transparent), transparent);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 24px 6px;
+    height: 18px;
+    border-radius: 999px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 72%);
+    filter: blur(18px);
+    pointer-events: none;
   }
 }
 
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  background: var(--gradient-primary);
+.dock-brand,
+.dock-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition:
+    transform 220ms var(--easing-spring),
+    background 220ms var(--easing-smooth),
+    color 220ms var(--easing-smooth),
+    box-shadow 220ms var(--easing-smooth);
+}
+
+.dock-brand {
+  background: var(--dock-brand-bg);
+  color: var(--accent-primary);
+  border: 1px solid var(--dock-brand-border);
+  box-shadow: var(--dock-brand-shadow);
+  animation: pulse-glow 4.2s ease-in-out infinite;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.dock-item {
+  overflow: visible;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+    transition: opacity 180ms var(--easing-smooth), transform 180ms var(--easing-smooth);
+  }
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--dock-hover-bg);
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 12px 28px rgba(10, 18, 34, 0.35);
+  }
+
+  &.active {
+    color: var(--accent-primary);
+    background: var(--dock-active-bg);
+    box-shadow:
+      0 14px 30px rgba(7, 17, 27, 0.42),
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-primary) 24%, transparent);
+
+    &::after {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+  }
+
+  &:focus-visible .dock-label {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.dock-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #ffffff;
-  flex-shrink: 0;
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.user-name {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--sidebar-text-bright);
-  line-height: 1.35;
-}
-
-.user-role {
-  font-size: 0.7rem;
-  color: var(--sidebar-text-dim);
-  line-height: 1.35;
-}
-
-// ─── Data Actions ───
-.data-actions {
-  display: flex;
-  gap: 4px;
-  padding: 0 4px;
-  margin-bottom: 10px;
-
-  .collapsed & {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-.data-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  height: 30px;
-  padding: 0 8px;
-  border: none;
-  border-radius: var(--radius-xs);
-  background: transparent;
-  color: var(--sidebar-text-dim);
-  font-size: 0.7rem;
-  cursor: pointer;
-  transition: all 0.15s var(--easing-smooth);
-  white-space: nowrap;
-  overflow: hidden;
 
   mat-icon {
-    width: 15px;
-    height: 15px;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: var(--sidebar-hover);
-    color: var(--sidebar-text);
-  }
-
-  .collapsed & {
-    flex: none;
-    width: 30px;
-    justify-content: center;
-    padding: 0;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
   }
 }
 
-.restore-toast {
-  padding: 6px 12px;
-  margin: 0 4px 8px;
-  border-radius: var(--radius-xs);
-  background: var(--accent-success-container);
-  color: var(--accent-success);
+.dock-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 14px);
+  transform: translate(-50%, 6px);
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--dock-label-bg);
+  border: 1px solid var(--dock-label-border);
+  color: var(--text-primary);
   font-size: 0.72rem;
-  font-weight: 500;
-  text-align: center;
-  animation: fade-up 0.2s var(--easing-decel) both;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(15, 23, 32, 0.16);
+  transition: opacity 180ms var(--easing-smooth), transform 180ms var(--easing-smooth);
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 2px);
+    width: 10px;
+    height: 10px;
+    transform: translateX(-50%) rotate(45deg);
+    background: inherit;
+    border-right: 1px solid var(--dock-label-border);
+    border-bottom: 1px solid var(--dock-label-border);
+  }
 }
 
-// ── Sidebar scrollbar ──
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background: var(--sidebar-border);
+.dock-item:hover .dock-label,
+.dock-item:focus-visible .dock-label {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+:host-context(body.app-theme-light) {
+  .dock-item:hover {
+    box-shadow: 0 12px 28px rgba(15, 23, 32, 0.12);
+  }
+
+  .dock-item.active {
+    box-shadow:
+      0 14px 30px rgba(15, 23, 32, 0.14),
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+  }
+
+  .dock-label {
+    box-shadow: 0 10px 26px rgba(15, 23, 32, 0.12);
+  }
+}
+
+@media (max-width: 720px) {
+  .floating-dock {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    transform: none;
+  }
+
+  .dock-core {
+    justify-content: space-between;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 28px;
+  }
+
+  .dock-brand,
+  .dock-item {
+    width: 46px;
+    height: 46px;
+  }
+
+  .dock-label {
+    display: none;
+  }
 }

@@ -18,6 +18,7 @@ export class StudentCardComponent {
 
   @Output() readonly editRequested = new EventEmitter<number>();
   @Output() readonly deleteRequested = new EventEmitter<number>();
+  @Output() readonly previewRequested = new EventEmitter<number>();
 
   get age(): number {
     return calculateAgeFromBirthDate(this.student.birthDate);

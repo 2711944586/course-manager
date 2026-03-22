@@ -8,7 +8,7 @@
 @else {
   <section class="card-grid">
     @for (course of courses; track course.id) {
-      <article class="course-card" (click)="requestView(course.id)">
+      <article class="course-card" [attr.data-status]="course.status" (mouseenter)="requestPreview(course.id)" (focusin)="requestPreview(course.id)" (click)="requestView(course.id)">
         <div class="card-top">
           <div class="title-group">
             <span class="icon-wrap">

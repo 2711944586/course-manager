@@ -27,6 +27,7 @@ export class StudentTableComponent implements OnChanges {
   @Output() readonly pageChange = new EventEmitter<number>();
   @Output() readonly selectionChange = new EventEmitter<readonly number[]>();
   @Output() readonly sortChanged = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
+  @Output() readonly previewRequested = new EventEmitter<number>();
 
   readonly genderLabels = STUDENT_GENDER_LABELS;
   selectedIds = new Set<number>();
@@ -79,6 +80,10 @@ export class StudentTableComponent implements OnChanges {
 
   requestDelete(studentId: number): void {
     this.deleteRequested.emit(studentId);
+  }
+
+  requestPreview(studentId: number): void {
+    this.previewRequested.emit(studentId);
   }
 
   computeAge(birthDate: string): number {

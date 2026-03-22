@@ -1,12 +1,22 @@
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Component, computed, effect, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, OnDestroy, OnInit, computed, effect, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs';
-import { Student, StudentSortKey, StudentUpsertInput } from '../core/models/student.model';
+import { Subscription, finalize, map } from 'rxjs';
+import {
+  STUDENT_GENDER_LABELS,
+  Student,
+  StudentSortKey,
+  StudentUpsertInput,
+} from '../core/models/student.model';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { exportCsv } from '../core/utils/csv-export.util';
 import { calculateAgeFromBirthDate } from '../core/utils/date-age.util';
-import { scoreToGrade, GRADE_ORDER, isPassingScore } from '../core/utils/score-grade.util';
+import {
+  GRADE_ORDER,
+  isPassingScore,
+  scoreToGrade,
+} from '../core/utils/score-grade.util';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
@@ -31,11 +41,15 @@ import { StudentCardComponent } from './components/student-card/student-card.com
     InlineNoticeComponent,
     MatButtonModule,
     MatIconModule,
+    DatePipe,
   ],
   templateUrl: './students.component.html',
   styleUrl: './students.component.scss',
 })
-export class StudentsComponent {
+export class StudentsComponent implements OnInit, OnDestroy {
+  readonly genderLabels = STUDENT_GENDER_LABELS;
+  readonly scoreToGrade = scoreToGrade;
+  readonly calculateAgeFromBirthDate = calculateAgeFromBirthDate;
   readonly searchKeyword = signal('');
   readonly selectedGender = signal<StudentFilterGender>('all');
   readonly selectedSort = signal<StudentSortKey>('updatedAt');
@@ -46,6 +60,16 @@ export class StudentsComponent {
   readonly pageSize = signal(15);
   readonly selectedStudentIds = signal<readonly number[]>([]);
   readonly viewMode = signal<'table' | 'card'>('card');
+  readonly isLoading = signal(false);
+  readonly isError = signal(false);
+  readonly loadErrorMessage = signal('');
+  readonly asyncEvents = signal<readonly string[]>([]);
+  readonly requestCount = signal(0);
+  readonly successCount = signal(0);
+  readonly failureCount = signal(0);
+  readonly lastLoadDurationMs = signal<number | null>(null);
+  readonly lastLoadedAt = signal<Date | null>(null);
+  readonly selectedPreviewStudentId = signal<number | null>(null);
 
   readonly students = this.studentStore.students;
   readonly filteredStudents = computed(() => {
@@ -68,12 +92,44 @@ export class StudentsComponent {
   });
 
   readonly totalFiltered = computed(() => this.filteredStudents().length);
+  readonly asyncSuccessRate = computed(() => {
+    const totalRequests = this.requestCount();
+    if (totalRequests === 0) {
+      return 0;
+    }
+
+    return Math.round((this.successCount() / totalRequests) * 100);
+  });
+
+  readonly lastLoadedAtLabel = computed(() => {
+    const loadedAt = this.lastLoadedAt();
+    if (!loadedAt) {
+      return '暂无';
+    }
+
+    return loadedAt.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  });
+
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalFiltered() / this.pageSize())));
   readonly paginatedStudents = computed(() => {
     const page = Math.min(this.currentPage(), this.totalPages());
     const size = this.pageSize();
     const start = (page - 1) * size;
     return this.filteredStudents().slice(start, start + size);
+  });
+  readonly previewStudent = computed(() => {
+    const previewId = this.selectedPreviewStudentId();
+    const matchedStudent =
+      previewId !== null
+        ? this.paginatedStudents().find(student => student.id === previewId)
+        : null;
+
+    return matchedStudent ?? this.paginatedStudents()[0] ?? null;
   });
 
   readonly stats = computed<StudentStatsView>(() => {
@@ -147,6 +203,9 @@ export class StudentsComponent {
 
   readonly showEditor = computed(() => this.creating() || this.editingStudentId() !== null);
 
+  private activeLoadSubscription: Subscription | null = null;
+  private loadRequestToken = 0;
+
   private readonly routeMode = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('mode'))),
     { initialValue: null },
@@ -173,6 +232,90 @@ export class StudentsComponent {
       },
       { allowSignalWrites: true },
     );
+
+    effect(
+      () => {
+        const previewStudent = this.previewStudent();
+        if (!previewStudent) {
+          this.selectedPreviewStudentId.set(null);
+          return;
+        }
+
+        if (this.selectedPreviewStudentId() === previewStudent.id) {
+          return;
+        }
+
+        this.selectedPreviewStudentId.set(previewStudent.id);
+      },
+      { allowSignalWrites: true },
+    );
+  }
+
+  ngOnInit(): void {
+    this.reloadStudents();
+  }
+
+  ngOnDestroy(): void {
+    this.activeLoadSubscription?.unsubscribe();
+  }
+
+  reloadStudents(simulateFailure = false): void {
+    this.activeLoadSubscription?.unsubscribe();
+
+    const currentToken = ++this.loadRequestToken;
+    const startedAt = performance.now();
+
+    this.requestCount.update(count => count + 1);
+    this.isLoading.set(true);
+    this.isError.set(false);
+    this.loadErrorMessage.set('');
+    this.pushAsyncEvent(simulateFailure ? '触发模拟失败请求' : '开始异步加载学生数据');
+
+    this.activeLoadSubscription = this.studentStore
+      .loadStudents$({
+        delayMs: 1000,
+        shouldFail: simulateFailure,
+      })
+      .pipe(
+        finalize(() => {
+          if (currentToken !== this.loadRequestToken) {
+            return;
+          }
+
+          this.isLoading.set(false);
+          this.lastLoadDurationMs.set(Math.round(performance.now() - startedAt));
+        }),
+      )
+      .subscribe({
+        next: students => {
+          if (currentToken !== this.loadRequestToken) {
+            return;
+          }
+
+          this.successCount.update(count => count + 1);
+          this.lastLoadedAt.set(new Date());
+          this.pushAsyncEvent(`加载成功：共 ${students.length} 名学生`);
+        },
+        error: error => {
+          if (currentToken !== this.loadRequestToken) {
+            return;
+          }
+
+          this.failureCount.update(count => count + 1);
+          this.isError.set(true);
+          const message = this.extractErrorMessage(error);
+          this.loadErrorMessage.set(message);
+          this.pushAsyncEvent(`加载失败：${message}`);
+        },
+      });
+  }
+
+  retryAsyncLoad(): void {
+    this.reloadStudents(false);
+  }
+
+  simulateAsyncError(): void {
+    this.reloadStudents(true);
   }
 
   handleSearchChange(keyword: string): void {
@@ -200,6 +343,14 @@ export class StudentsComponent {
 
   startEdit(studentId: number): void {
     void this.router.navigate(['/students/edit', studentId]);
+  }
+
+  viewDetail(studentId: number): void {
+    void this.router.navigate(['/students/detail', studentId]);
+  }
+
+  updatePreview(studentId: number): void {
+    this.selectedPreviewStudentId.set(studentId);
   }
 
   cancelEdit(): void {
@@ -326,5 +477,16 @@ export class StudentsComponent {
     const count = this.studentStore.removeMany(ids);
     this.selectedStudentIds.set([]);
     this.notice.set({ type: 'success', text: `已批量删除 ${count} 名学生。` });
+  }
+
+  private pushAsyncEvent(message: string): void {
+    const time = new Date().toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    this.asyncEvents.update(events => [`[${time}] ${message}`, ...events].slice(0, 8));
   }
 }

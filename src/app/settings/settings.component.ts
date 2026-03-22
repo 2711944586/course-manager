@@ -1,4 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
@@ -11,19 +12,26 @@ import { EnrollmentStoreService } from '../core/services/enrollment-store.servic
 import { ActivityLogService } from '../core/services/activity-log.service';
 import { ToastService } from '../core/services/toast.service';
 import { exportBackup } from '../core/utils/data-backup.util';
+import { AiInsightService } from '../core/services/ai-insight.service';
+import { AiProviderStubConfig } from '../core/models/insight.model';
+import { safeStorageGetItem, safeStorageKeys, safeStorageRemoveItem } from '../core/utils/safe-storage.util';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatRippleModule, PageHeroComponent],
+  imports: [FormsModule, MatIconModule, MatButtonModule, MatRippleModule, PageHeroComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
 })
 export class SettingsComponent {
   readonly message = signal('');
   readonly messageType = signal<'success' | 'error'>('success');
+  readonly aiDraft = signal<AiProviderStubConfig>({ endpoint: '', model: '', apiKey: '' });
 
   readonly currentTheme = computed(() => this.themeService.theme());
+  readonly aiStatus = computed(() => this.aiInsights.status());
+  readonly aiStatusLabel = computed(() => this.aiInsights.statusLabel());
+  readonly aiConfig = computed(() => this.aiInsights.config());
 
   readonly storageStats = computed(() => {
     const courses = this.courseStore.courses().length;
@@ -33,11 +41,8 @@ export class SettingsComponent {
     const activities = this.activityLog.entries().length;
 
     let totalBytes = 0;
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith('aurora.')) {
-        totalBytes += (localStorage.getItem(key) ?? '').length * 2;
-      }
+    for (const key of safeStorageKeys('aurora.')) {
+      totalBytes += (safeStorageGetItem(key) ?? '').length * 2;
     }
 
     return { courses, students, teachers, enrollments, activities, totalBytes };
@@ -58,7 +63,10 @@ export class SettingsComponent {
     private readonly enrollmentStore: EnrollmentStoreService,
     private readonly activityLog: ActivityLogService,
     private readonly toast: ToastService,
-  ) {}
+    private readonly aiInsights: AiInsightService,
+  ) {
+    this.aiDraft.set(this.aiInsights.config());
+  }
 
   setTheme(theme: 'light' | 'dark'): void {
     if (this.currentTheme() !== theme) {
@@ -76,12 +84,20 @@ export class SettingsComponent {
   resetAllData(): void {
     if (!confirm('确定要重置所有数据？此操作将清除课程、学生、教师、选课及活动日志数据，不可撤销。')) return;
 
-    localStorage.removeItem('aurora.course-manager.courses');
-    localStorage.removeItem('aurora.course-manager.students');
-    localStorage.removeItem('aurora.course-manager.teachers');
-    localStorage.removeItem('aurora.course-manager.enrollments');
-    localStorage.removeItem('aurora.course-manager.activity-log');
-    localStorage.removeItem('aurora.course-manager.notifications');
+    const resetKeys = [
+      'aurora.course-manager.courses',
+      'aurora.course-manager.students',
+      'aurora.course-manager.teachers',
+      'aurora.course-manager.enrollments',
+      'aurora.course-manager.activity-log',
+      'aurora.course-manager.notifications',
+      'aurora.course-manager.recent-workspace',
+      'aurora.course-manager.ai-provider-stub',
+    ] as const;
+
+    for (const key of resetKeys) {
+      safeStorageRemoveItem(key);
+    }
 
     this.showMessage('数据已重置，请刷新页面以加载种子数据', 'success');
     this.toast.info('数据已重置', '页面将在 1.5 秒后自动刷新');
@@ -93,6 +109,22 @@ export class SettingsComponent {
     this.activityLog.clearAll();
     this.showMessage('活动日志已清除', 'success');
     this.toast.success('日志已清除', '全部活动日志已清空');
+  }
+
+  updateAiField(field: keyof AiProviderStubConfig, value: string): void {
+    this.aiDraft.update(current => ({ ...current, [field]: value }));
+  }
+
+  saveAiStub(): void {
+    this.aiInsights.saveStubConfig(this.aiDraft());
+    this.showMessage('AI Provider 占位配置已保存', 'success');
+    this.toast.info('AI 占位配置已更新', '当前仅保存前端 stub 配置，不发起真实连接');
+  }
+
+  resetAiStub(): void {
+    this.aiInsights.resetStubConfig();
+    this.aiDraft.set(this.aiInsights.config());
+    this.showMessage('AI Provider 占位配置已重置', 'success');
   }
 
   private showMessage(text: string, type: 'success' | 'error'): void {

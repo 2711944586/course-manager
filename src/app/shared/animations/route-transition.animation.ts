@@ -3,14 +3,15 @@ import { animate, query, style, transition, trigger } from '@angular/animations'
 export const routeTransitionAnimation = trigger('routeTransition', [
   transition('* <=> *', [
     query(
-      ':enter, :leave',
+      ':leave',
       [
         style({
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0,
+          width: '100%',
+          pointerEvents: 'none',
         }),
       ],
       { optional: true },
@@ -19,6 +20,8 @@ export const routeTransitionAnimation = trigger('routeTransition', [
       ':enter',
       [
         style({
+          position: 'relative',
+          display: 'block',
           opacity: 0,
           transform: 'translateY(14px) scale(0.995)',
           filter: 'blur(4px)',

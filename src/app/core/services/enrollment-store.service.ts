@@ -2,6 +2,7 @@ import { Injectable, computed, signal, inject } from '@angular/core';
 import { Enrollment, EnrollmentUpsertInput, EnrollmentStatus } from '../models/enrollment.model';
 import { StudentStoreService } from './student-store.service';
 import { CourseStoreService } from './course-store.service';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.enrollments';
 
@@ -94,11 +95,11 @@ export class EnrollmentStoreService {
 
   private writeEnrollments(enrollments: readonly Enrollment[]): void {
     this.enrollmentState.set(enrollments);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(enrollments));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(enrollments));
   }
 
   private loadEnrollments(): readonly Enrollment[] {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+    const rawData = safeStorageGetItem(STORAGE_KEY);
     if (!rawData) {
       return this.generateFakeEnrollments();
     }

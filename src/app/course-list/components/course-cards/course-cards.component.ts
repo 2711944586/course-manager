@@ -17,11 +17,16 @@ export class CourseCardsComponent {
   @Output() readonly viewRequested = new EventEmitter<number>();
   @Output() readonly editRequested = new EventEmitter<number>();
   @Output() readonly deleteRequested = new EventEmitter<number>();
+  @Output() readonly previewRequested = new EventEmitter<number>();
 
   readonly statusLabels = COURSE_STATUS_LABELS;
 
   requestView(courseId: number): void {
     this.viewRequested.emit(courseId);
+  }
+
+  requestPreview(courseId: number): void {
+    this.previewRequested.emit(courseId);
   }
 
   requestEdit(event: Event, courseId: number): void {

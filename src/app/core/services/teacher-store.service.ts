@@ -1,5 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Teacher, TeacherUpsertInput } from '../models/teacher.model';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.teachers';
 const DEFAULT_FAKE_COUNT = 15;
@@ -52,11 +53,11 @@ export class TeacherStoreService {
 
   private writeTeachers(teachers: readonly Teacher[]): void {
     this.teacherState.set(teachers);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(teachers));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(teachers));
   }
 
   private loadTeachers(): readonly Teacher[] {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+    const rawData = safeStorageGetItem(STORAGE_KEY);
     if (!rawData) {
       return this.generateFakeTeachers(DEFAULT_FAKE_COUNT);
     }

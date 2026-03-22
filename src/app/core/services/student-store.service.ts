@@ -1,5 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { Observable, timer } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Student, StudentGender, StudentUpsertInput } from '../models/student.model';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.students';
 const DEFAULT_FAKE_COUNT = 120;
@@ -7,11 +10,31 @@ const MIN_NAME_LENGTH = 2;
 const STUDENT_NO_REGEX = /^\d{8,12}$/;
 const EARLIEST_BIRTH_DATE = '1980-01-01';
 
+export interface StudentLoadOptions {
+  readonly delayMs?: number;
+  readonly shouldFail?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class StudentStoreService {
   private readonly studentState = signal<readonly Student[]>(this.loadStudents());
 
   readonly students = computed(() => this.studentState());
+
+  loadStudents$(options: StudentLoadOptions = {}): Observable<readonly Student[]> {
+    const normalizedDelay = Math.max(120, Math.min(3000, Math.round(options.delayMs ?? 900)));
+    const shouldFail = options.shouldFail ?? false;
+
+    return timer(normalizedDelay).pipe(
+      map(() => {
+        if (shouldFail) {
+          throw new Error('学生数据加载失败，请检查网络后重试。');
+        }
+
+        return [...this.studentState()];
+      }),
+    );
+  }
 
   getStudentById(studentId: number): Student | undefined {
     return this.studentState().find(student => student.id === studentId);
@@ -87,11 +110,11 @@ export class StudentStoreService {
 
   private writeStudents(students: readonly Student[]): void {
     this.studentState.set(students);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(students));
   }
 
   private loadStudents(): readonly Student[] {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+    const rawData = safeStorageGetItem(STORAGE_KEY);
     if (!rawData) {
       return this.generateFakeStudents(DEFAULT_FAKE_COUNT);
     }

@@ -1,5 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Course, CourseStatus, CourseUpsertInput } from '../models/course.model';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.courses';
 const MIN_NAME_LENGTH = 2;
@@ -230,11 +231,11 @@ export class CourseStoreService {
 
   private writeCourses(courses: readonly Course[]): void {
     this.courseState.set(courses);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(courses));
   }
 
   private loadCourses(): readonly Course[] {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+    const rawData = safeStorageGetItem(STORAGE_KEY);
     if (!rawData) {
       return SEED_COURSES;
     }

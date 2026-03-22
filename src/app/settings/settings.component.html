@@ -111,6 +111,58 @@
       </div>
     </section>
 
+    <section class="settings-section surface-card">
+      <div class="section-header">
+        <div class="section-icon"><mat-icon>auto_awesome</mat-icon></div>
+        <div>
+          <h3>AI Provider 预留</h3>
+          <p>保存 endpoint / model / key 状态位，为未来接口接入预留位置。</p>
+        </div>
+        <span class="status-chip" [class]="'status-' + aiStatus()">{{ aiStatusLabel() }}</span>
+      </div>
+
+      <form class="ai-grid" autocomplete="off" (submit)="$event.preventDefault(); saveAiStub()">
+        <label class="ai-field">
+          <span>Endpoint</span>
+          <input type="text" name="ai-endpoint" autocomplete="url" [ngModel]="aiDraft().endpoint" (ngModelChange)="updateAiField('endpoint', $event)" placeholder="https://api.example.com/v1" />
+        </label>
+        <label class="ai-field">
+          <span>Model</span>
+          <input type="text" name="ai-model" autocomplete="off" [ngModel]="aiDraft().model" (ngModelChange)="updateAiField('model', $event)" placeholder="gpt-5.4-mini" />
+        </label>
+        <label class="ai-field ai-field-wide">
+          <span>API Key</span>
+          <input type="password" name="ai-api-key" autocomplete="new-password" [ngModel]="aiDraft().apiKey" (ngModelChange)="updateAiField('apiKey', $event)" placeholder="sk-..." />
+        </label>
+      </form>
+
+      <div class="ai-meta-grid">
+        <div class="meta-chip">
+          <span>当前 Endpoint</span>
+          <strong>{{ aiConfig().endpoint || '未配置' }}</strong>
+        </div>
+        <div class="meta-chip">
+          <span>当前 Model</span>
+          <strong>{{ aiConfig().model || '未配置' }}</strong>
+        </div>
+        <div class="meta-chip">
+          <span>Key 状态</span>
+          <strong>{{ aiConfig().apiKey ? '已填写' : '未填写' }}</strong>
+        </div>
+      </div>
+
+      <div class="data-actions">
+        <button mat-stroked-button (click)="saveAiStub()">
+          <mat-icon>save</mat-icon>
+          保存占位配置
+        </button>
+        <button mat-stroked-button (click)="resetAiStub()">
+          <mat-icon>restart_alt</mat-icon>
+          重置占位配置
+        </button>
+      </div>
+    </section>
+
     <!-- About -->
     <section class="settings-section surface-card about-section">
       <div class="section-header">

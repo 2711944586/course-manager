@@ -36,6 +36,11 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+.chrome-headless/
+chrome-dom.html
+runtime-dev.log
+runtime-dev.err.log
+.tmp-ng-*.log
 
 # System files
 .DS_Store

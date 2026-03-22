@@ -21,6 +21,93 @@
     (exportRequested)="exportStudents()"
   />
 
+  <section class="async-lab bento-card animate-fade-up delay-3">
+    <header class="async-lab-header">
+      <div>
+        <h3>异步优化与加载状态</h3>
+        <p>演示学生数据的 Observable 请求链路：请求 → loading → 成功/失败 → 重试。</p>
+      </div>
+      <div class="async-actions">
+        <button mat-stroked-button (click)="reloadStudents()" [disabled]="isLoading()">
+          <mat-icon>sync</mat-icon>
+          刷新加载
+        </button>
+        <button mat-stroked-button color="warn" (click)="simulateAsyncError()" [disabled]="isLoading()">
+          <mat-icon>error_outline</mat-icon>
+          模拟失败
+        </button>
+      </div>
+    </header>
+
+    <div class="async-metrics-grid">
+      <article class="async-metric-card">
+        <span>请求次数</span>
+        <strong>{{ requestCount() }}</strong>
+        <small>成功 {{ successCount() }} · 失败 {{ failureCount() }}</small>
+      </article>
+      <article class="async-metric-card">
+        <span>成功率</span>
+        <strong>{{ asyncSuccessRate() }}%</strong>
+        <small>基于当前会话请求统计</small>
+      </article>
+      <article class="async-metric-card">
+        <span>最近耗时</span>
+        <strong>{{ lastLoadDurationMs() ?? 0 }}ms</strong>
+        <small>最近成功时间：{{ lastLoadedAtLabel() }}</small>
+      </article>
+      <article class="async-metric-card" [class.error]="isError()" [class.loading]="isLoading()">
+        <span>当前状态</span>
+        <strong>
+          @if (isLoading()) {
+            加载中
+          } @else if (isError()) {
+            错误
+          } @else {
+            就绪
+          }
+        </strong>
+        <small>
+          @if (isLoading()) {
+            正在等待服务层返回...
+          } @else if (isError()) {
+            {{ loadErrorMessage() }}
+          } @else {
+            数据可交互
+          }
+        </small>
+      </article>
+    </div>
+
+    @if (isLoading()) {
+      <div class="async-loading-bar" role="status" aria-live="polite">
+        <div class="bar"></div>
+        <span>学生数据加载中，请稍候...</span>
+      </div>
+    }
+
+    @if (isError()) {
+      <div class="async-error-banner" role="alert">
+        <div>
+          <strong>加载失败</strong>
+          <p>{{ loadErrorMessage() }}</p>
+        </div>
+        <button mat-flat-button color="primary" (click)="retryAsyncLoad()" [disabled]="isLoading()">
+          <mat-icon>refresh</mat-icon>
+          立即重试
+        </button>
+      </div>
+    }
+
+    <div class="async-timeline">
+      <h4>请求事件时间线</h4>
+      <ul>
+        @for (event of asyncEvents(); track event) {
+          <li>{{ event }}</li>
+        }
+      </ul>
+    </div>
+  </section>
+
   @if (notice(); as message) {
     <app-inline-notice class="animate-fade-up delay-3" [notice]="message" (closeRequested)="closeNotice()" />
   }
@@ -54,53 +141,117 @@
     </button>
   </div>
 
-  @if (viewMode() === 'card') {
-    <!-- 卡片视图 -->
-    <div class="card-grid animate-fade-up delay-5">
-      @for (student of paginatedStudents(); track student.id) {
-        <app-student-card
-          [student]="student"
+  <section class="student-workbench animate-fade-up delay-5">
+    <div class="workbench-main">
+      @if (viewMode() === 'card') {
+        <div class="card-grid">
+          @for (student of paginatedStudents(); track student.id) {
+            <app-student-card
+              [student]="student"
+              (editRequested)="startEdit($event)"
+              (deleteRequested)="deleteStudent($event)"
+              (previewRequested)="updatePreview($event)"
+            />
+          }
+        </div>
+        @if (totalPages() > 1) {
+          <div class="card-pagination">
+            <span class="page-info">第 {{ (currentPage() - 1) * pageSize() + 1 }}–{{ currentPage() * pageSize() > totalFiltered() ? totalFiltered() : currentPage() * pageSize() }} 条，共 {{ totalFiltered() }} 条</span>
+            <div class="page-controls">
+              <button mat-icon-button [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <span>{{ currentPage() }} / {{ totalPages() }}</span>
+              <button mat-icon-button [disabled]="currentPage() >= totalPages()" (click)="goToPage(currentPage() + 1)">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+            <div class="page-jump">
+              <span>跳至</span>
+              <input type="number" min="1" [max]="totalPages()" class="page-jump-input"
+                [value]="currentPage()"
+                (keydown.enter)="goToPage(+$any($event.target).value)"
+                (blur)="goToPage(+$any($event.target).value)" />
+              <span>页</span>
+            </div>
+          </div>
+        }
+      } @else {
+        <app-student-table
+          [students]="paginatedStudents()"
+          [keyword]="searchKeyword()"
+          [currentPage]="currentPage()"
+          [totalPages]="totalPages()"
+          [totalFiltered]="totalFiltered()"
+          [pageSize]="pageSize()"
           (editRequested)="startEdit($event)"
           (deleteRequested)="deleteStudent($event)"
+          (pageChange)="goToPage($event)"
+          (selectionChange)="handleSelectionChange($event)"
+          (previewRequested)="updatePreview($event)"
         />
       }
     </div>
-    @if (totalPages() > 1) {
-      <div class="card-pagination">
-        <span class="page-info">第 {{ (currentPage() - 1) * pageSize() + 1 }}–{{ currentPage() * pageSize() > totalFiltered() ? totalFiltered() : currentPage() * pageSize() }} 条，共 {{ totalFiltered() }} 条</span>
-        <div class="page-controls">
-          <button mat-icon-button [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <span>{{ currentPage() }} / {{ totalPages() }}</span>
-          <button mat-icon-button [disabled]="currentPage() >= totalPages()" (click)="goToPage(currentPage() + 1)">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
+
+    <aside class="preview-panel surface-card">
+      @if (previewStudent(); as student) {
+        <div class="preview-shell">
+          <div class="preview-head">
+            <span class="preview-avatar" [class.avatar-male]="student.gender === 'male'" [class.avatar-female]="student.gender === 'female'">
+              {{ student.name[0] }}
+            </span>
+            <div>
+              <span class="preview-kicker">Student Preview</span>
+              <h3>{{ student.name }}</h3>
+              <p>{{ student.studentNo }} · {{ genderLabels[student.gender] }}</p>
+            </div>
+          </div>
+
+          <div class="preview-score">
+            <strong>{{ student.score }}</strong>
+            <span>综合成绩</span>
+          </div>
+
+          <div class="preview-progress-track">
+            <span class="preview-progress-fill" [style.width.%]="student.score"></span>
+          </div>
+
+          <div class="preview-metrics">
+            <article>
+              <span>等级</span>
+              <strong>{{ scoreToGrade(student.score) }}</strong>
+            </article>
+            <article>
+              <span>年龄</span>
+              <strong>{{ calculateAgeFromBirthDate(student.birthDate) }}岁</strong>
+            </article>
+            <article>
+              <span>出生日期</span>
+              <strong>{{ student.birthDate }}</strong>
+            </article>
+            <article>
+              <span>最近更新</span>
+              <strong>{{ student.updatedAt | date: 'MM-dd HH:mm' }}</strong>
+            </article>
+          </div>
+
+          <div class="preview-actions">
+            <button mat-stroked-button type="button" (click)="startEdit(student.id)">
+              <mat-icon>edit</mat-icon>
+              编辑
+            </button>
+            <button mat-flat-button color="primary" type="button" (click)="viewDetail(student.id)">
+              <mat-icon>open_in_new</mat-icon>
+              打开详情
+            </button>
+          </div>
         </div>
-        <div class="page-jump">
-          <span>跳至</span>
-          <input type="number" min="1" [max]="totalPages()" class="page-jump-input"
-            [value]="currentPage()"
-            (keydown.enter)="goToPage(+$any($event.target).value)"
-            (blur)="goToPage(+$any($event.target).value)" />
-          <span>页</span>
+      } @else {
+        <div class="preview-empty">
+          <mat-icon>groups</mat-icon>
+          <p>筛选后若存在学生，这里会展示局部预览与快捷动作。</p>
         </div>
-      </div>
-    }
-  } @else {
-    <!-- 表格视图 -->
-    <app-student-table
-      class="animate-fade-up delay-5"
-      [students]="paginatedStudents()"
-      [keyword]="searchKeyword()"
-      [currentPage]="currentPage()"
-      [totalPages]="totalPages()"
-      [totalFiltered]="totalFiltered()"
-      [pageSize]="pageSize()"
-      (editRequested)="startEdit($event)"
-      (deleteRequested)="deleteStudent($event)"
-      (pageChange)="goToPage($event)"
-      (selectionChange)="handleSelectionChange($event)"
-    />
-  }
+      }
+    </aside>
+  </section>
 </div>

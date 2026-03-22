@@ -1,44 +1,62 @@
 <div class="page-shell dashboard-page">
   <app-page-hero
-    title="教务运营总览"
-    subtitle="把课程进展、学生规模、待办提醒和高频入口集中到一个页面，便于日常巡检与决策。"
-    badge="Operations Overview"
+    title="Mission Control"
+    subtitle="极夜舰桥视图集中展示课程推进、成绩风险、最近工作区与智能建议，用于每日巡检与决策。"
+    badge="Aurora Night Deck"
     icon="space_dashboard"
   />
 
-  <section class="metrics-grid animate-fade-up delay-1">
-    @for (metric of metrics(); track metric.label; let idx = $index) {
-      <article class="metric-card surface-card" [class]="'metric-tone-' + (idx % 4) + ' delay-' + (idx + 1)">
-        <div class="metric-icon">
-          <mat-icon>{{ metric.icon }}</mat-icon>
+  <section class="mission-strip surface-card animate-fade-up delay-1">
+    <div class="strip-copy">
+      <span class="strip-kicker">System Status</span>
+      <h2>{{ snapshot().highRiskCourses.length + snapshot().highRiskStudents.length === 0 ? '运行稳定' : '发现重点风险' }}</h2>
+      <p>{{ snapshot().recommendations.length > 0 ? snapshot().recommendations[0].description : '当前可以继续从分析页观察趋势与对比结论。' }}</p>
+    </div>
+
+    <div class="strip-metrics">
+      <article>
+        <span>高风险课程</span>
+        <strong>{{ snapshot().highRiskCourses.length }}</strong>
+      </article>
+      <article>
+        <span>重点学生</span>
+        <strong>{{ snapshot().highRiskStudents.length }}</strong>
+      </article>
+      <article>
+        <span>建议动作</span>
+        <strong>{{ snapshot().recommendations.length }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="metrics-grid animate-fade-up delay-2">
+    @for (metric of metrics(); track metric.label) {
+      <article class="metric-card surface-card" [class]="'metric-tone-' + metric.tone">
+        <div class="metric-header">
+          <div class="metric-icon">
+            <mat-icon>{{ metric.icon }}</mat-icon>
+          </div>
+          <span class="metric-trend">{{ metric.trend }}</span>
         </div>
-        <div class="metric-body">
-          <span class="metric-label">{{ metric.label }}</span>
-          <strong class="metric-value">{{ metric.value }}</strong>
-          <p>{{ metric.helper }}</p>
-        </div>
+        <span class="metric-label">{{ metric.label }}</span>
+        <strong class="metric-value">{{ metric.value }}</strong>
+        <p>{{ metric.helper }}</p>
       </article>
     }
   </section>
 
-  <section class="content-grid">
-    <article class="quick-actions surface-card animate-fade-up delay-2">
+  <section class="mission-grid">
+    <article class="quick-actions surface-card animate-fade-up delay-3">
       <div class="section-heading">
         <div>
-          <h2>快捷操作</h2>
-          <p>常用动作直接跳转到目标功能页。</p>
+          <h2>行动卡</h2>
+          <p>将高频操作压缩成更直接的舰桥动作。</p>
         </div>
       </div>
 
       <div class="action-grid">
         @for (action of quickActions; track action.label) {
-          <a
-            class="action-card"
-            [class.action-card-primary]="action.tone === 'primary'"
-            [routerLink]="action.route"
-            [queryParams]="action.queryParams"
-            matRipple
-          >
+          <a class="action-card" [class.action-card-primary]="action.tone === 'primary'" [routerLink]="action.route" matRipple>
             <div class="action-card-header">
               <span class="action-card-icon">
                 <mat-icon>{{ action.icon }}</mat-icon>
@@ -54,116 +72,131 @@
       </div>
     </article>
 
-    <article class="surface-card spotlight-panel animate-fade-up delay-3">
+    <article class="risk-panel surface-card animate-fade-up delay-4">
       <div class="section-heading">
         <div>
-          <h2>重点课程</h2>
-          <p>按学生规模排序，优先关注影响面最大的课程。</p>
+          <h2>风险雷达</h2>
+          <p>自动识别大班低进度课程和低分学生。</p>
         </div>
       </div>
 
-      <div class="spotlight-list">
-        @for (course of highlightedCourses(); track course.id) {
-          <a class="spotlight-item" [routerLink]="['/courses/detail', course.id]">
-            <div class="spotlight-left">
-              <span class="spotlight-icon">
-                <mat-icon>{{ course.icon }}</mat-icon>
-              </span>
-              <div>
-                <strong>{{ course.name }}</strong>
-                <span>{{ course.instructor }} · {{ course.schedule }}</span>
-              </div>
+      <div class="risk-list">
+        @for (card of chartSummary().risks; track card.id) {
+          <a class="risk-card" [class]="'severity-' + card.severity" [routerLink]="card.route || '/analytics'">
+            <span class="risk-icon"><mat-icon>{{ card.icon }}</mat-icon></span>
+            <div class="risk-copy">
+              <strong>{{ card.title }}</strong>
+              <p>{{ card.summary }}</p>
             </div>
-            <div class="spotlight-meta">
-              <span class="spotlight-chip"><mat-icon>groups</mat-icon> {{ course.students }}</span>
-              <div class="mini-progress-track">
-                <div class="mini-progress-fill" [style.width.%]="course.progress"></div>
-              </div>
-            </div>
+            <span class="risk-metric">{{ card.metric }}</span>
           </a>
         }
       </div>
     </article>
+
+    <article class="workspace-panel surface-card animate-fade-up delay-5">
+      <div class="section-heading">
+        <div>
+          <h2>最近工作区</h2>
+          <p>回到你最近处理的页面和模块。</p>
+        </div>
+      </div>
+
+      @if (chartSummary().workspace.length > 0) {
+        <div class="workspace-list">
+          @for (item of chartSummary().workspace; track item.route) {
+            <a class="workspace-item" [routerLink]="item.route">
+              <span class="workspace-icon"><mat-icon>{{ item.icon }}</mat-icon></span>
+              <div class="workspace-copy">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.subtitle || '最近访问' }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="empty-inline-state">
+          <mat-icon>travel_explore</mat-icon>
+          <p>访问更多模块后，这里会自动记录你的最近工作区。</p>
+        </div>
+      }
+    </article>
   </section>
 
-  <section class="content-grid charts-grid">
-    <article class="surface-card info-panel animate-fade-up delay-4">
+  <section class="charts-grid">
+    <article class="surface-card info-panel animate-fade-up delay-6">
       <div class="section-heading">
         <div>
           <h2>课程状态分布</h2>
-          <p>通过环形图直观查看课程各状态占比。</p>
+          <p>从整体状态判断当前运营节奏。</p>
         </div>
       </div>
       <app-donut-chart [data]="courseStatusChart()" centerLabel="课程" />
     </article>
 
-    <article class="surface-card info-panel animate-fade-up delay-5">
+    <article class="surface-card info-panel animate-fade-up delay-7">
       <div class="section-heading">
         <div>
           <h2>成绩等级分布</h2>
-          <p>柱状图显示全体学生的等级人数统计。</p>
+          <p>定位中间层与低分层是否扩大。</p>
         </div>
       </div>
       <app-bar-chart [data]="gradeChart()" suffix="人" [height]="220" />
     </article>
 
-    <article class="surface-card info-panel animate-fade-up delay-5">
+    <article class="surface-card info-panel animate-fade-up delay-8">
       <div class="section-heading">
         <div>
-          <h2>分数段人数</h2>
-          <p>统计各分数段学生人数，快速定位薄弱区间。</p>
+          <h2>分数段密度</h2>
+          <p>快速判断优秀、临界与低分区间的密度。</p>
         </div>
       </div>
-      <app-line-chart [data]="scoreRangeChart()" suffix="人" lineColor="#4F46E5" areaColor="#4F46E5" [height]="200" />
+      <app-line-chart [data]="scoreRangeChart()" suffix="人" lineColor="var(--chart-blue, #60A5FA)" areaColor="var(--chart-blue, #60A5FA)" [height]="200" />
     </article>
   </section>
 
-  <section class="two-col-grid">
-    <article class="surface-card info-panel animate-fade-up delay-6">
+  <section class="timeline-grid">
+    <article class="surface-card timeline-panel animate-fade-up delay-9">
       <div class="section-heading">
         <div>
-          <h2>系统提醒</h2>
-          <p>自动根据课程状态与规模生成运营提示。</p>
+          <h2>运营时间线</h2>
+          <p>把风险提示与最近活动合并在一条时间轴上。</p>
         </div>
       </div>
 
-      <div class="alert-list">
-        @for (alert of alerts(); track alert.title) {
-          <article class="alert-card" [class]="'tone-' + alert.tone">
-            <span class="alert-icon-wrap">
-              <mat-icon>{{ alert.icon }}</mat-icon>
-            </span>
-            <div>
-              <strong>{{ alert.title }}</strong>
-              <p>{{ alert.text }}</p>
+      <div class="timeline-list">
+        @for (entry of operationsTimeline(); track entry.id) {
+          <article class="timeline-item" [class]="'tone-' + entry.tone">
+            <span class="timeline-icon"><mat-icon>{{ entry.icon }}</mat-icon></span>
+            <div class="timeline-copy">
+              <div class="timeline-header">
+                <strong>{{ entry.title }}</strong>
+                <time>{{ entry.timestamp | date:'MM-dd HH:mm' }}</time>
+              </div>
+              <p>{{ entry.detail }}</p>
             </div>
           </article>
         }
       </div>
     </article>
 
-    <article class="surface-card info-panel animate-fade-up delay-7">
+    <article class="surface-card recommendation-panel animate-fade-up delay-10">
       <div class="section-heading">
         <div>
-          <h2>最近活动</h2>
-          <p>展示最近被创建或更新的课程与学生记录。</p>
+          <h2>推荐动作</h2>
+          <p>从本地规则层直接生成建议。</p>
         </div>
       </div>
 
-      <div class="activity-list">
-        @for (activity of recentActivities(); track activity.type + activity.title) {
-          <article class="activity-item">
-            <span class="activity-icon">
-              <mat-icon>{{ activity.icon }}</mat-icon>
-            </span>
-            <div class="activity-copy">
-              <div class="activity-header">
-                <strong>{{ activity.title }}</strong>
-                <time>{{ activity.timestamp | date: 'MM-dd HH:mm' }}</time>
-              </div>
-              <p>{{ activity.type }} · {{ activity.description }}</p>
+      <div class="recommendation-list">
+        @for (action of chartSummary().recommendations; track action.id) {
+          <a class="recommendation-card" [routerLink]="action.route" [class]="'tone-' + action.tone">
+            <span class="recommendation-icon"><mat-icon>{{ action.icon }}</mat-icon></span>
+            <div>
+              <strong>{{ action.label }}</strong>
+              <p>{{ action.description }}</p>
             </div>
-          </article>
+          </a>
         }
       </div>
     </article>

@@ -30,15 +30,8 @@ if not exist "node_modules" (
 )
 
 echo [Aurora] 正在启动开发服务器...
-echo [Aurora] 浏览器将自动打开 http://localhost:4200
+echo [Aurora] 浏览器将自动打开可用地址（默认从 http://127.0.0.1:4200 开始）
 echo [Aurora] 关闭此窗口即可停止服务。
 echo.
-
-REM 检查端口 4200 是否被占用，若占用则先释放
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":4200 " ^| findstr "LISTENING"') do (
-  echo [Aurora] 端口 4200 被 PID %%a 占用，正在释放...
-  taskkill /F /PID %%a >nul 2>nul
-  timeout /t 1 /nobreak >nul
-)
 
 call npm run start:open

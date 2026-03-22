@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 export interface ActivityEntry {
   readonly id: number;
@@ -55,7 +56,7 @@ export class ActivityLogService {
 
   private loadFromStorage(): readonly ActivityEntry[] {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = safeStorageGetItem(STORAGE_KEY);
       if (!raw) return this.generateSeedData();
       const parsed: unknown = JSON.parse(raw);
       if (!Array.isArray(parsed)) return this.generateSeedData();
@@ -71,7 +72,7 @@ export class ActivityLogService {
   }
 
   private saveToStorage(entries: readonly ActivityEntry[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    safeStorageSetItem(STORAGE_KEY, JSON.stringify(entries));
   }
 
   private generateSeedData(): ActivityEntry[] {

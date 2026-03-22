@@ -1,18 +1,26 @@
 <div class="app-layout">
-  <app-sidebar />
   <main class="main-content">
-    <header class="shell-topbar">
-      <div class="topbar-copy">
-        <span class="eyebrow">课程管理中心</span>
-        <strong>{{ pageTitle() }}</strong>
+    <div class="shell-atmosphere shell-atmosphere-a"></div>
+    <div class="shell-atmosphere shell-atmosphere-b"></div>
+
+    <header class="command-strip">
+      <div class="route-identity">
+        <div class="route-icon-orb">
+          <mat-icon>{{ pageIcon() }}</mat-icon>
+        </div>
+        <div class="route-copy">
+          <span class="eyebrow">Aurora Deck · {{ todayLabel() }}</span>
+          <strong>{{ pageTitle() }}</strong>
+        </div>
       </div>
+
       <div class="search-wrap" (focusin)="showSearchResults.set(true)">
         <mat-icon class="search-icon">search</mat-icon>
         <input
           #searchInput
           class="search-input"
           type="text"
-          placeholder="搜索课程或学生... (Ctrl+K)"
+          placeholder="搜索课程、学生或工作区... (Ctrl+K)"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event); showSearchResults.set(true)"
           (keydown.escape)="closeSearch()"
@@ -45,6 +53,16 @@
       </div>
 
       <div class="topbar-actions">
+        <button
+          mat-stroked-button
+          type="button"
+          class="command-trigger"
+          (click)="toggleQuickCommands()"
+        >
+          <mat-icon>offline_bolt</mat-icon>
+          快捷指令
+        </button>
+
         <div class="notification-wrap">
           <button
             mat-icon-button
@@ -56,7 +74,7 @@
               <span class="notification-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
             }
           </button>
-          
+
           @if (showNotifications()) {
             <div class="notification-dropdown surface-card animate-fade-up">
               <div class="notification-header">
@@ -99,12 +117,77 @@
           {{ isDarkTheme() ? '切换亮色' : '切换暗色' }}
         </button>
       </div>
+
+      @if (showQuickCommands()) {
+        <div class="command-panel surface-card animate-fade-up">
+          <div class="panel-section">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">Quick Commands</span>
+                <h3>舰桥快捷指令</h3>
+              </div>
+              <span class="panel-shortcut">Ctrl+J</span>
+            </div>
+
+            <div class="command-grid">
+              @for (command of quickCommands; track command.label) {
+                <button class="command-entry" [class.tone-primary]="command.tone === 'primary'" (click)="executeQuickCommand(command)">
+                  <span class="entry-icon"><mat-icon>{{ command.icon }}</mat-icon></span>
+                  <span class="entry-copy">
+                    <strong>{{ command.label }}</strong>
+                    <small>{{ command.description }}</small>
+                  </span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section recent-section">
+            <div class="panel-heading">
+              <div>
+                <span class="panel-kicker">Recent Workspace</span>
+                <h3>最近工作区</h3>
+              </div>
+            </div>
+
+            @if (workspaceItems().length > 0) {
+              <div class="recent-list">
+                @for (item of workspaceItems(); track item.route) {
+                  <button
+                    class="recent-entry"
+                    (click)="closeAllPanels(); executeQuickCommand({ label: item.label, description: item.subtitle ?? '', icon: item.icon, tone: 'secondary', route: item.route })"
+                  >
+                    <span class="recent-icon"><mat-icon>{{ item.icon }}</mat-icon></span>
+                    <span class="recent-copy">
+                      <strong>{{ item.label }}</strong>
+                      <small>{{ item.subtitle || '最近访问' }}</small>
+                    </span>
+                    <span class="recent-time">{{ item.visitedAt | date:'MM-dd HH:mm' }}</span>
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="empty-panel-state">
+                <mat-icon>travel_explore</mat-icon>
+                <span>最近工作区会在你浏览模块后自动出现。</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </header>
-    <div class="route-content" [@routeTransition]="prepareRoute(outlet)">
-      <router-outlet #outlet="outlet" />
-    </div>
-    @if (showSearchResults() || showNotifications()) {
-      <div class="search-backdrop" (click)="closeSearch(); closeNotifications()"></div>
+
+    <section class="content-frame">
+      <div class="route-content" [@routeTransition]="prepareRoute(outlet)">
+        <router-outlet #outlet="outlet" />
+      </div>
+    </section>
+
+    <app-sidebar />
+    <input #backupFileInput type="file" accept=".json" hidden (change)="onBackupSelected($event)" />
+
+    @if (showSearchResults() || showNotifications() || showQuickCommands()) {
+      <div class="search-backdrop" (click)="closeAllPanels()"></div>
     }
   </main>
 </div>

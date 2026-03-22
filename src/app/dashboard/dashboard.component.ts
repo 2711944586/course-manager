@@ -5,7 +5,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
-import { isPassingScore, scoreToGrade, GRADE_ORDER, GRADE_LABELS } from '../core/utils/score-grade.util';
+import { ActivityLogService } from '../core/services/activity-log.service';
+import { RecentWorkspaceService } from '../core/services/recent-workspace.service';
+import { InsightEngineService } from '../core/services/insight-engine.service';
+import { scoreToGrade, GRADE_ORDER, GRADE_LABELS } from '../core/utils/score-grade.util';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 import { BarChartComponent, DonutChartComponent, LineChartComponent, ChartDataItem } from '../shared/components/charts';
 
@@ -14,14 +17,8 @@ interface DashboardMetric {
   readonly value: string;
   readonly helper: string;
   readonly icon: string;
-  readonly trend?: string;
-}
-
-interface DashboardAlert {
-  readonly title: string;
-  readonly text: string;
-  readonly icon: string;
-  readonly tone: 'warning' | 'info' | 'success';
+  readonly tone: 'primary' | 'secondary' | 'success' | 'warning';
+  readonly trend: string;
 }
 
 interface DashboardQuickAction {
@@ -29,8 +26,16 @@ interface DashboardQuickAction {
   readonly description: string;
   readonly icon: string;
   readonly route: string;
-  readonly queryParams?: Record<string, string>;
   readonly tone: 'primary' | 'secondary';
+}
+
+interface TimelineEntry {
+  readonly id: string;
+  readonly title: string;
+  readonly detail: string;
+  readonly timestamp: string;
+  readonly icon: string;
+  readonly tone: 'insight' | 'activity';
 }
 
 @Component({
@@ -43,31 +48,34 @@ interface DashboardQuickAction {
 export class DashboardComponent {
   readonly courses = this.courseStore.courses;
   readonly students = this.studentStore.students;
+  readonly snapshot = this.insightEngine.snapshot;
+  readonly recentWorkspace = this.workspace.items;
+
   readonly quickActions: readonly DashboardQuickAction[] = [
     {
       label: '新建课程',
-      description: '快速进入课程创建表单，适合日常录入新课。',
-      icon: 'add',
+      description: '快速补录新课程并进入深度编辑页。',
+      icon: 'add_circle',
       route: '/courses/create',
       tone: 'primary',
     },
     {
       label: '新建学生',
-      description: '直接打开学生录入面板，减少页面切换成本。',
+      description: '立刻进入学生建档流程，保留现有深链路。',
       icon: 'person_add',
       route: '/students/create',
+      tone: 'primary',
+    },
+    {
+      label: '进入智能洞察',
+      description: '查看对比、趋势与 AI 预留摘要。',
+      icon: 'auto_awesome',
+      route: '/analytics',
       tone: 'secondary',
     },
     {
-      label: '查看教务日程',
-      description: '按工作周巡检排课分布和重点提醒。',
-      icon: 'calendar_month',
-      route: '/schedule',
-      tone: 'secondary',
-    },
-    {
-      label: '查看数据报表',
-      description: '快速进入课程进度、年龄与负载分析视图。',
+      label: '打开报表中心',
+      description: '继续查看课程进度、成绩段与结构分析。',
       icon: 'insights',
       route: '/reports',
       tone: 'secondary',
@@ -75,196 +83,128 @@ export class DashboardComponent {
   ];
 
   readonly metrics = computed<readonly DashboardMetric[]>(() => {
-    const courseList = this.courses();
-    const studentList = this.students();
-    const averageProgress =
-      courseList.length > 0
-        ? Math.round(
-            courseList.reduce((totalProgress, course) => totalProgress + course.progress, 0) /
-              courseList.length,
-          )
-        : 0;
-    const completionRate =
-      courseList.length > 0
-        ? Math.round(
-            (courseList.filter(course => course.status === 'completed').length / courseList.length) * 100,
-          )
-        : 0;
-
-    const averageScore =
-      studentList.length > 0
-        ? Math.round(
-            studentList.reduce((total, student) => total + student.score, 0) / studentList.length,
-          )
-        : 0;
-
-    const passRate =
-      studentList.length > 0
-        ? Math.round(
-            (studentList.filter(s => isPassingScore(s.score)).length / studentList.length) * 100,
-          )
-        : 0;
+    const snapshot = this.snapshot();
 
     return [
       {
         label: '课程总量',
-        value: `${courseList.length}`,
+        value: `${snapshot.totalCourses}`,
         helper: '当前课程库中的全部课程',
         icon: 'menu_book',
-        trend: '+5% 本月',
+        tone: 'primary',
+        trend: `${snapshot.activeCourses} 门进行中`,
       },
       {
         label: '学生总量',
-        value: `${studentList.length}`,
-        helper: '已录入学生档案数量',
+        value: `${snapshot.totalStudents}`,
+        helper: '已录入学生档案总量',
         icon: 'groups',
-        trend: '+12% 本月',
+        tone: 'secondary',
+        trend: `${snapshot.passRate}% 及格率`,
       },
       {
         label: '平均进度',
-        value: `${averageProgress}%`,
-        helper: '全部课程的平均教学进展',
+        value: `${snapshot.avgProgress}%`,
+        helper: '衡量教学推进是否掉速',
         icon: 'trending_up',
-        trend: '+3% 环比',
+        tone: snapshot.avgProgress >= 70 ? 'success' : 'warning',
+        trend: `${snapshot.completionRate}% 结课率`,
       },
       {
-        label: '结课率',
-        value: `${completionRate}%`,
-        helper: '已结课课程占全部课程比例',
-        icon: 'task_alt',
-        trend: '+8% 环比',
-      },
-      {
-        label: '全员平均分',
-        value: `${averageScore}`,
-        helper: '全体学生的综合平均成绩',
-        icon: 'insights',
-        trend: '+2.1 环比',
-      },
-      {
-        label: '及格率',
-        value: `${passRate}%`,
-        helper: '成绩 ≥ 60 分的学生占比',
-        icon: 'verified',
-        trend: '+4% 环比',
+        label: '全员均分',
+        value: `${snapshot.avgScore}`,
+        helper: '综合反映课程与学生表现',
+        icon: 'grade',
+        tone: snapshot.avgScore >= 80 ? 'success' : 'warning',
+        trend: `${snapshot.highRiskStudents.length} 名重点学生`,
       },
     ];
   });
 
-  readonly highlightedCourses = computed(() =>
-    [...this.courses()]
-      .sort((firstCourse, secondCourse) => secondCourse.students - firstCourse.students)
-      .slice(0, 5),
-  );
+  readonly chartSummary = computed(() => ({
+    risks: this.snapshot().risks.slice(0, 4),
+    recommendations: this.snapshot().recommendations.slice(0, 4),
+    workspace: this.recentWorkspace().slice(0, 4),
+  }));
 
-  readonly recentActivities = computed(() => {
-    const recentCourses = this.courses().slice(0, 3).map(course => ({
-      type: '课程更新',
-      title: course.name,
-      description: `${course.instructor} · ${course.schedule}`,
-      timestamp: course.updatedAt,
-      icon: course.icon,
+  readonly operationsTimeline = computed<readonly TimelineEntry[]>(() => {
+    const insightItems = this.snapshot().risks.slice(0, 3).map(item => ({
+      id: item.id,
+      title: item.title,
+      detail: item.summary,
+      timestamp: this.snapshot().generatedAt,
+      icon: item.icon,
+      tone: 'insight' as const,
+    }));
+    const activityItems = this.activityLog.recentEntries().slice(0, 5).map(entry => ({
+      id: `activity-${entry.id}`,
+      title: entry.entityName,
+      detail: entry.detail,
+      timestamp: entry.timestamp,
+      icon: entry.entity === 'student' ? 'person' : entry.entity === 'course' ? 'menu_book' : 'history',
+      tone: 'activity' as const,
     }));
 
-    const recentStudents = this.students().slice(0, 3).map(student => ({
-      type: '学生更新',
-      title: student.name,
-      description: `学号 ${student.studentNo}`,
-      timestamp: student.updatedAt,
-      icon: 'person',
-    }));
-
-    return [...recentCourses, ...recentStudents]
-      .sort((firstItem, secondItem) => new Date(secondItem.timestamp).getTime() - new Date(firstItem.timestamp).getTime())
-      .slice(0, 6);
-  });
-
-  readonly alerts = computed<readonly DashboardAlert[]>(() => {
-    const courseList = this.courses();
-    const activeCourses = courseList.filter(course => course.status === 'active');
-    const plannedCourses = courseList.filter(course => course.status === 'planned');
-    const heavyCourses = courseList.filter(course => course.students >= 150);
-    const nearCompletionCourses = courseList.filter(
-      course => course.status === 'active' && course.progress >= 80,
-    );
-
-    return [
-      {
-        title: '待开课课程',
-        text:
-          plannedCourses.length > 0
-            ? `当前还有 ${plannedCourses.length} 门课程未开始，建议尽快确认排课与教师安排。`
-            : '所有课程都已经进入教学流程，没有待开课积压。',
-        icon: 'event_available',
-        tone: plannedCourses.length > 0 ? 'warning' : 'success',
-      },
-      {
-        title: '高负载课程',
-        text:
-          heavyCourses.length > 0
-            ? `${heavyCourses[0]?.name ?? '重点课程'} 等 ${heavyCourses.length} 门课程学生数较高，建议关注助教与答疑资源。`
-            : '当前没有超大班课程，容量分布较均衡。',
-        icon: 'local_fire_department',
-        tone: heavyCourses.length > 0 ? 'warning' : 'info',
-      },
-      {
-        title: '近期可结课',
-        text:
-          nearCompletionCourses.length > 0
-            ? `${nearCompletionCourses.map(course => course.name).slice(0, 2).join('、')} 进度已接近结课。`
-            : `${activeCourses.length} 门进行中课程仍在稳定推进。`,
-        icon: 'flag',
-        tone: nearCompletionCourses.length > 0 ? 'info' : 'success',
-      },
-    ];
+    return [...insightItems, ...activityItems]
+      .sort((first, second) => new Date(second.timestamp).getTime() - new Date(first.timestamp).getTime())
+      .slice(0, 8);
   });
 
   constructor(
     private readonly courseStore: CourseStoreService,
     private readonly studentStore: StudentStoreService,
+    private readonly insightEngine: InsightEngineService,
+    private readonly activityLog: ActivityLogService,
+    private readonly workspace: RecentWorkspaceService,
   ) {}
 
   readonly courseStatusChart = computed<readonly ChartDataItem[]>(() => {
     const courseList = this.courses();
     return [
-      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: 'var(--chart-indigo, #4F46E5)' },
-      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: 'var(--chart-amber, #f59e0b)' },
-      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: 'var(--chart-emerald, #10b981)' },
+      { label: '进行中', value: courseList.filter(c => c.status === 'active').length, color: 'var(--chart-indigo, #5EEAD4)' },
+      { label: '未开始', value: courseList.filter(c => c.status === 'planned').length, color: 'var(--chart-amber, #F59E0B)' },
+      { label: '已结课', value: courseList.filter(c => c.status === 'completed').length, color: 'var(--chart-emerald, #34D399)' },
     ];
   });
 
   readonly gradeChart = computed<readonly ChartDataItem[]>(() => {
     const studentList = this.students();
     const gradeColors: Record<string, string> = {
-      A: 'var(--chart-emerald, #10b981)', B: 'var(--chart-indigo, #4F46E5)', C: 'var(--chart-amber, #f59e0b)',
-      D: 'var(--chart-orange, #f97316)', E: 'var(--chart-red, #ef4444)', F: 'var(--chart-red, #dc2626)',
+      A: 'var(--chart-emerald, #34D399)',
+      B: 'var(--chart-indigo, #5EEAD4)',
+      C: 'var(--chart-blue, #60A5FA)',
+      D: 'var(--chart-amber, #F59E0B)',
+      E: 'var(--chart-red, #FB7185)',
+      F: 'var(--chart-red, #FB7185)',
     };
     const counts: Record<string, number> = {};
-    for (const g of GRADE_ORDER) counts[g] = 0;
-    for (const s of studentList) {
-      const g = scoreToGrade(s.score);
-      counts[g] = (counts[g] ?? 0) + 1;
+    for (const grade of GRADE_ORDER) {
+      counts[grade] = 0;
     }
-    return GRADE_ORDER.map(g => ({
-      label: `${g} ${GRADE_LABELS[g]}`,
-      value: counts[g] ?? 0,
-      color: gradeColors[g] ?? 'var(--text-tertiary, #94a3b8)',
+    for (const student of studentList) {
+      const grade = scoreToGrade(student.score);
+      counts[grade] = (counts[grade] ?? 0) + 1;
+    }
+    return GRADE_ORDER.map(grade => ({
+      label: `${grade} ${GRADE_LABELS[grade]}`,
+      value: counts[grade] ?? 0,
+      color: gradeColors[grade] ?? 'var(--text-tertiary)',
     }));
   });
 
   readonly scoreRangeChart = computed<readonly ChartDataItem[]>(() => {
     const ranges = [
-      { label: '90+', min: 90, max: 100, color: 'var(--chart-emerald, #10b981)' },
-      { label: '80-89', min: 80, max: 89, color: 'var(--chart-indigo, #4F46E5)' },
-      { label: '70-79', min: 70, max: 79, color: 'var(--chart-violet, #7C3AED)' },
-      { label: '60-69', min: 60, max: 69, color: 'var(--chart-amber, #f59e0b)' },
-      { label: '<60', min: 0, max: 59, color: 'var(--chart-red, #ef4444)' },
+      { label: '90+', min: 90, max: 100, color: 'var(--chart-emerald, #34D399)' },
+      { label: '80-89', min: 80, max: 89, color: 'var(--chart-blue, #60A5FA)' },
+      { label: '70-79', min: 70, max: 79, color: 'var(--chart-indigo, #5EEAD4)' },
+      { label: '60-69', min: 60, max: 69, color: 'var(--chart-amber, #F59E0B)' },
+      { label: '<60', min: 0, max: 59, color: 'var(--chart-red, #FB7185)' },
     ];
     const studentList = this.students();
-    return ranges.map(r => ({
-      label: r.label,
-      value: studentList.filter(s => s.score >= r.min && s.score <= r.max).length,
-      color: r.color,
+    return ranges.map(range => ({
+      label: range.label,
+      value: studentList.filter(student => student.score >= range.min && student.score <= range.max).length,
+      color: range.color,
     }));
   });
 }

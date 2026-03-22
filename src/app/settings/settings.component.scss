@@ -1,8 +1,6 @@
 :host {
   display: block;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   padding: 0 28px 40px;
 }
 
@@ -39,6 +37,20 @@
 
   h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text-primary); }
   p { margin: 4px 0 0; font-size: 0.82rem; color: var(--text-tertiary); }
+}
+
+.status-chip {
+  margin-left: auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  &.status-configured { background: var(--accent-success-container); color: var(--accent-success); }
+  &.status-offline { background: var(--accent-warning-container); color: var(--accent-warning); }
+  &.status-idle,
+  &.status-error { background: var(--accent-error-container); color: var(--accent-error); }
 }
 
 .section-icon {
@@ -182,6 +194,72 @@
   }
 }
 
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.ai-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  span {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+  }
+
+  input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--shell-input);
+    color: var(--text-primary);
+    outline: none;
+
+    &:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-primary-container);
+    }
+  }
+}
+
+.ai-field-wide {
+  grid-column: 1 / -1;
+}
+
+.ai-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.meta-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-low);
+  border: 1px solid var(--border-subtle);
+
+  span {
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+  }
+}
+
 // About
 .about-section {
   grid-column: 1 / -1;
@@ -251,4 +329,11 @@
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--text-primary);
+}
+
+@media (max-width: 720px) {
+  .ai-grid,
+  .ai-meta-grid {
+    grid-template-columns: 1fr;
+  }
 }

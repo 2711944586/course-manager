@@ -1,99 +1,229 @@
 <div class="page-shell">
   <app-page-hero
-    title="数据分析"
-    subtitle="全维度教学数据洞察与可视化"
+    title="智能分析中枢"
+    subtitle="以概览、对比、智能洞察三层结构组织全局分析，并为未来 AI 接口预留工作台。"
     icon="analytics"
     [badge]="totalStudents() + ' 名学生 · ' + totalCourses() + ' 门课程'"
   />
 
-  <!-- KPI Cards -->
-  <div class="kpi-grid animate-fade-up delay-1">
-    <div class="kpi-card">
-      <div class="kpi-icon courses"><mat-icon>menu_book</mat-icon></div>
-      <div class="kpi-body">
-        <span class="kpi-value">{{ totalCourses() }}</span>
-        <span class="kpi-label">课程总数</span>
-      </div>
-      <div class="kpi-sub">结课率 {{ completionRate() }}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon students"><mat-icon>groups</mat-icon></div>
-      <div class="kpi-body">
-        <span class="kpi-value">{{ totalStudents() }}</span>
-        <span class="kpi-label">学生总数</span>
-      </div>
-      <div class="kpi-sub">及格率 {{ passRate() }}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon progress"><mat-icon>trending_up</mat-icon></div>
-      <div class="kpi-body">
-        <span class="kpi-value">{{ avgProgress() }}<small>%</small></span>
-        <span class="kpi-label">平均进度</span>
-      </div>
-      <div class="kpi-sub">全校课程均值</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon score"><mat-icon>grade</mat-icon></div>
-      <div class="kpi-body">
-        <span class="kpi-value">{{ avgScore() }}</span>
-        <span class="kpi-label">全员均分</span>
-      </div>
-      <div class="kpi-sub">教师 {{ totalTeachers() }} 人</div>
-    </div>
-  </div>
+  <nav class="tab-bar animate-fade-up delay-1">
+    <button [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+      <mat-icon>space_dashboard</mat-icon> 概览
+    </button>
+    <button [class.active]="activeTab() === 'compare'" (click)="activeTab.set('compare')">
+      <mat-icon>compare_arrows</mat-icon> 对比
+    </button>
+    <button [class.active]="activeTab() === 'intelligence'" (click)="activeTab.set('intelligence')">
+      <mat-icon>auto_awesome</mat-icon> 智能洞察
+    </button>
+  </nav>
 
-  <!-- Charts Row 1 -->
-  <div class="charts-row animate-fade-up delay-2">
-    <div class="chart-panel surface-card">
-      <h3 class="chart-title"><mat-icon>pie_chart</mat-icon> 课程状态分布</h3>
-      <app-donut-chart [data]="courseStatus()" />
-    </div>
-    <div class="chart-panel surface-card">
-      <h3 class="chart-title"><mat-icon>bar_chart</mat-icon> 成绩等级分布</h3>
-      <app-bar-chart [data]="gradeDistribution()" />
-    </div>
-    <div class="chart-panel surface-card">
-      <h3 class="chart-title"><mat-icon>wc</mat-icon> 性别分布</h3>
-      <app-donut-chart [data]="genderDistribution()" />
-    </div>
-  </div>
-
-  <!-- Charts Row 2 -->
-  <div class="charts-row animate-fade-up delay-3">
-    <div class="chart-panel wide surface-card">
-      <h3 class="chart-title"><mat-icon>leaderboard</mat-icon> 课程进度排行</h3>
-      <app-bar-chart [data]="courseRanking()" suffix="%" />
-    </div>
-    <div class="chart-panel surface-card">
-      <h3 class="chart-title"><mat-icon>person</mat-icon> 教师授课负载</h3>
-      <app-bar-chart [data]="teacherWorkload()" suffix=" 门" />
-    </div>
-  </div>
-
-  <!-- Charts Row 3 -->
-  <div class="charts-row animate-fade-up delay-4">
-    <div class="chart-panel wide surface-card">
-      <h3 class="chart-title"><mat-icon>score</mat-icon> 分数段分布</h3>
-      <app-bar-chart [data]="scoreDistribution()" suffix=" 人" />
-    </div>
-  </div>
-
-  <!-- Top Students -->
-  <div class="ranking-panel surface-card animate-fade-up delay-5">
-    <h3 class="chart-title"><mat-icon>emoji_events</mat-icon> 学生成绩 Top 10</h3>
-    <div class="ranking-list">
-      @for (stu of topStudents(); track stu.studentNo; let i = $index) {
-        <div class="ranking-item">
-          <span class="rank-num" [class.top3]="i < 3">{{ i + 1 }}</span>
-          <div class="rank-avatar">{{ stu.name.charAt(0) }}</div>
-          <div class="rank-info">
-            <span class="rank-name">{{ stu.name }}</span>
-            <span class="rank-no">{{ stu.studentNo }}</span>
+  @if (activeTab() === 'overview') {
+    <section class="page-section">
+      <div class="kpi-grid animate-fade-up delay-2">
+        <div class="kpi-card">
+          <div class="kpi-icon courses"><mat-icon>menu_book</mat-icon></div>
+          <div class="kpi-body">
+            <span class="kpi-value">{{ totalCourses() }}</span>
+            <span class="kpi-label">课程总数</span>
           </div>
-          <span class="rank-score">{{ stu.score }}</span>
-          <span class="rank-grade" [attr.data-grade]="stu.grade">{{ stu.grade }}</span>
+          <div class="kpi-sub">结课率 {{ completionRate() }}%</div>
         </div>
-      }
-    </div>
-  </div>
+        <div class="kpi-card">
+          <div class="kpi-icon students"><mat-icon>groups</mat-icon></div>
+          <div class="kpi-body">
+            <span class="kpi-value">{{ totalStudents() }}</span>
+            <span class="kpi-label">学生总数</span>
+          </div>
+          <div class="kpi-sub">及格率 {{ passRate() }}%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon progress"><mat-icon>trending_up</mat-icon></div>
+          <div class="kpi-body">
+            <span class="kpi-value">{{ avgProgress() }}<small>%</small></span>
+            <span class="kpi-label">平均进度</span>
+          </div>
+          <div class="kpi-sub">在读记录 {{ totalEnrollments() }}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon score"><mat-icon>grade</mat-icon></div>
+          <div class="kpi-body">
+            <span class="kpi-value">{{ avgScore() }}</span>
+            <span class="kpi-label">全员均分</span>
+          </div>
+          <div class="kpi-sub">教师 {{ totalTeachers() }} 人</div>
+        </div>
+      </div>
+
+      <div class="charts-row animate-fade-up delay-3">
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>pie_chart</mat-icon> 课程状态分布</h3>
+          <app-donut-chart [data]="courseStatus()" />
+        </div>
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>bar_chart</mat-icon> 成绩等级分布</h3>
+          <app-bar-chart [data]="gradeDistribution()" />
+        </div>
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>wc</mat-icon> 性别分布</h3>
+          <app-donut-chart [data]="genderDistribution()" />
+        </div>
+      </div>
+
+      <div class="charts-row animate-fade-up delay-4">
+        <div class="chart-panel wide surface-card">
+          <h3 class="chart-title"><mat-icon>leaderboard</mat-icon> 课程进度排行</h3>
+          <app-bar-chart [data]="courseRanking()" suffix="%" />
+        </div>
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>person</mat-icon> 教师授课负载</h3>
+          <app-bar-chart [data]="teacherWorkload()" suffix=" 门" />
+        </div>
+      </div>
+
+      <div class="charts-row animate-fade-up delay-5">
+        <div class="chart-panel wide surface-card">
+          <h3 class="chart-title"><mat-icon>score</mat-icon> 分数段分布</h3>
+          <app-bar-chart [data]="scoreDistribution()" suffix=" 人" />
+        </div>
+      </div>
+
+      <div class="ranking-panel surface-card animate-fade-up delay-6">
+        <h3 class="chart-title"><mat-icon>emoji_events</mat-icon> 学生成绩 Top 10</h3>
+        <div class="ranking-list">
+          @for (stu of topStudents(); track stu.studentNo; let i = $index) {
+            <div class="ranking-item">
+              <span class="rank-num" [class.top3]="i < 3">{{ i + 1 }}</span>
+              <div class="rank-avatar">{{ stu.name.charAt(0) }}</div>
+              <div class="rank-info">
+                <span class="rank-name">{{ stu.name }}</span>
+                <span class="rank-no">{{ stu.studentNo }}</span>
+              </div>
+              <span class="rank-score">{{ stu.score }}</span>
+              <span class="rank-grade" [attr.data-grade]="stu.grade">{{ stu.grade }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (activeTab() === 'compare') {
+    <section class="page-section">
+      <div class="compare-grid animate-fade-up delay-2">
+        @for (item of compareHighlights(); track item.label) {
+          <article class="compare-highlight surface-card">
+            <span class="compare-icon"><mat-icon>{{ item.icon }}</mat-icon></span>
+            <strong>{{ item.value }}</strong>
+            <span>{{ item.label }}</span>
+            <p>{{ item.helper }}</p>
+          </article>
+        }
+      </div>
+
+      <div class="insight-grid animate-fade-up delay-3">
+        @for (card of snapshot().comparisons; track card.id) {
+          <article class="insight-card surface-card">
+            <div class="insight-head">
+              <span class="insight-icon"><mat-icon>{{ card.icon }}</mat-icon></span>
+              <span class="severity-pill" [class]="'severity-' + card.severity">{{ card.severity }}</span>
+            </div>
+            <strong>{{ card.title }}</strong>
+            <span class="insight-metric">{{ card.metric }}</span>
+            <p>{{ card.summary }}</p>
+          </article>
+        }
+      </div>
+
+      <div class="charts-row animate-fade-up delay-4">
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>rule</mat-icon> 通过 vs 未通过</h3>
+          <app-donut-chart [data]="passBand()" centerLabel="成绩" />
+        </div>
+        <div class="chart-panel surface-card">
+          <h3 class="chart-title"><mat-icon>compare</mat-icon> AI 基线对比</h3>
+          <div class="compare-list">
+            @for (card of aiBaselineComparisons(); track card.id) {
+              <article class="compare-item">
+                <div>
+                  <strong>{{ card.title }}</strong>
+                  <p>{{ card.summary }}</p>
+                </div>
+                <span>{{ card.metric }}</span>
+              </article>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (activeTab() === 'intelligence') {
+    <section class="page-section">
+      <div class="ai-status-card surface-card animate-fade-up delay-2">
+        <div>
+          <span class="status-kicker">AI Adapter</span>
+          <h3>智能接口预留状态</h3>
+          <p>当前为本地 mock provider，仅生成摘要与建议，不发起真实外部请求。</p>
+        </div>
+        <span class="status-chip" [class]="'status-' + aiStatus()">{{ aiStatusLabel() }}</span>
+      </div>
+
+      <div class="intelligence-grid animate-fade-up delay-3">
+        <article class="surface-card">
+          <div class="section-heading">
+            <div>
+              <h2>本地智能摘要</h2>
+              <p>优先展示高风险对象与关键趋势结论。</p>
+            </div>
+          </div>
+          <div class="summary-list">
+            @for (card of aiSummaryCards(); track card.id) {
+              <article class="summary-card">
+                <span class="summary-icon"><mat-icon>{{ card.icon }}</mat-icon></span>
+                <div>
+                  <strong>{{ card.title }}</strong>
+                  <p>{{ card.summary }}</p>
+                </div>
+              </article>
+            }
+          </div>
+        </article>
+
+        <article class="surface-card">
+          <div class="section-heading">
+            <div>
+              <h2>推荐动作</h2>
+              <p>从本地规则层直接生成下一步建议。</p>
+            </div>
+          </div>
+          <div class="action-list">
+            @for (action of aiSuggestedActions(); track action.id) {
+              <a class="action-item" [routerLink]="action.route">
+                <span class="action-icon"><mat-icon>{{ action.icon }}</mat-icon></span>
+                <div>
+                  <strong>{{ action.label }}</strong>
+                  <p>{{ action.description }}</p>
+                </div>
+              </a>
+            }
+          </div>
+        </article>
+      </div>
+
+      <div class="insight-grid animate-fade-up delay-4">
+        @for (card of snapshot().risks; track card.id) {
+          <article class="insight-card surface-card">
+            <div class="insight-head">
+              <span class="insight-icon"><mat-icon>{{ card.icon }}</mat-icon></span>
+              <span class="severity-pill" [class]="'severity-' + card.severity">{{ card.severity }}</span>
+            </div>
+            <strong>{{ card.title }}</strong>
+            <span class="insight-metric">{{ card.metric }}</span>
+            <p>{{ card.summary }}</p>
+          </article>
+        }
+      </div>
+    </section>
+  }
 </div>
