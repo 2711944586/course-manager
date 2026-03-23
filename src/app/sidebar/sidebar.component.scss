@@ -215,9 +215,10 @@
     }
   }
 
-  &:focus-visible .dock-label {
-    opacity: 1;
-    transform: translate(-50%, 0);
+  &:focus-visible {
+    color: var(--text-primary);
+    background: var(--dock-hover-bg);
+    transform: translateY(-8px) scale(1.05);
   }
 }
 
@@ -231,45 +232,6 @@
     width: 22px;
     height: 22px;
   }
-}
-
-.dock-label {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 14px);
-  transform: translate(-50%, 6px);
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--dock-label-bg);
-  border: 1px solid var(--dock-label-border);
-  color: var(--text-primary);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 10px 30px rgba(15, 23, 32, 0.16);
-  transition: opacity 180ms var(--easing-smooth), transform 180ms var(--easing-smooth);
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: calc(100% - 2px);
-    width: 10px;
-    height: 10px;
-    transform: translateX(-50%) rotate(45deg);
-    background: inherit;
-    border-right: 1px solid var(--dock-label-border);
-    border-bottom: 1px solid var(--dock-label-border);
-  }
-}
-
-.dock-item:hover .dock-label,
-.dock-item:focus-visible .dock-label {
-  opacity: 1;
-  transform: translate(-50%, 0);
 }
 
 .dock-core.collapsed .dock-item {
@@ -289,10 +251,6 @@
     box-shadow:
       0 14px 30px rgba(15, 23, 32, 0.14),
       inset 0 0 0 1px color-mix(in srgb, var(--accent-primary) 18%, transparent);
-  }
-
-  .dock-label {
-    box-shadow: 0 10px 26px rgba(15, 23, 32, 0.12);
   }
 }
 
@@ -321,11 +279,6 @@
     width: 46px;
     height: 46px;
   }
-
-  .dock-label {
-    display: none;
-  }
-
   .dock-toggle-badge {
     width: 17px;
     height: 17px;

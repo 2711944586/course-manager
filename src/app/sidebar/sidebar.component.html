@@ -5,9 +5,11 @@
       class="dock-brand dock-toggle"
       (click)="toggleDock()"
       [attr.aria-expanded]="isExpanded()"
+      [attr.aria-label]="isExpanded() ? '收起中控台' : '展开中控台'"
       aria-controls="primary-dock-items"
       [matTooltip]="isExpanded() ? '收起中控台' : '展开中控台'"
       matTooltipPosition="above"
+      matTooltipClass="dock-tooltip"
     >
       <span class="dock-brand-core">
         <mat-icon>neurology</mat-icon>
@@ -25,12 +27,15 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
           [attr.tabindex]="isExpanded() ? null : -1"
+          [attr.aria-label]="item.label"
+          [matTooltip]="item.label"
+          matTooltipPosition="above"
+          matTooltipClass="dock-tooltip"
           matRipple
         >
           <span class="dock-icon">
             <mat-icon>{{ item.icon }}</mat-icon>
           </span>
-          <span class="dock-label">{{ item.label }}</span>
         </a>
       }
     </div>

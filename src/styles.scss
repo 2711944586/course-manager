@@ -636,6 +636,38 @@ body::after {
   fill: var(--text-tertiary) !important;
 }
 
+.mdc-tooltip__surface.dock-tooltip {
+  position: relative;
+  overflow: visible !important;
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  background: var(--dock-label-bg) !important;
+  border: 1px solid var(--dock-label-border);
+  color: var(--text-primary) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  box-shadow: 0 10px 30px rgba(15, 23, 32, 0.16);
+}
+
+.mdc-tooltip__surface.dock-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 2px);
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%) rotate(45deg);
+  background: inherit;
+  border-right: 1px solid var(--dock-label-border);
+  border-bottom: 1px solid var(--dock-label-border);
+}
+
+body.app-theme-light .mdc-tooltip__surface.dock-tooltip {
+  box-shadow: 0 10px 26px rgba(15, 23, 32, 0.12);
+}
+
 // ══════════════════════════════════════════════════════════
 //  Animation Library
 // ══════════════════════════════════════════════════════════
