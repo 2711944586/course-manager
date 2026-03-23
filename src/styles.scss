@@ -636,36 +636,63 @@ body::after {
   fill: var(--text-tertiary) !important;
 }
 
-.mdc-tooltip__surface.dock-tooltip {
-  position: relative;
-  overflow: visible !important;
-  padding: 7px 12px !important;
-  border-radius: 999px !important;
-  background: var(--dock-label-bg) !important;
-  border: 1px solid var(--dock-label-border);
-  color: var(--text-primary) !important;
-  font-size: 0.72rem !important;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  box-shadow: 0 10px 30px rgba(15, 23, 32, 0.16);
+.mat-mdc-tooltip.dock-tooltip {
+  filter: drop-shadow(0 14px 26px rgba(15, 23, 32, 0.14));
 }
 
-.mdc-tooltip__surface.dock-tooltip::after {
+.mat-mdc-tooltip.dock-tooltip .mdc-tooltip__surface {
+  position: relative;
+  overflow: visible !important;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--dock-label-bg) 98%, var(--surface-sheen)),
+      color-mix(in srgb, var(--dock-label-bg) 92%, transparent)
+    ) !important;
+  border: 1px solid var(--dock-label-border);
+  color: var(--text-primary) !important;
+  font-family: $app-font-stack !important;
+  font-size: 0.74rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 86%, transparent),
+    0 10px 24px rgba(15, 23, 32, 0.08);
+}
+
+.mat-mdc-tooltip.dock-tooltip .mdc-tooltip__surface::after {
   content: '';
   position: absolute;
   left: 50%;
-  top: calc(100% - 2px);
+  top: calc(100% - 3px);
   width: 10px;
   height: 10px;
   transform: translateX(-50%) rotate(45deg);
-  background: inherit;
   border-right: 1px solid var(--dock-label-border);
   border-bottom: 1px solid var(--dock-label-border);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--dock-label-bg) 98%, var(--surface-sheen)),
+      color-mix(in srgb, var(--dock-label-bg) 92%, transparent)
+    );
 }
 
-body.app-theme-light .mdc-tooltip__surface.dock-tooltip {
-  box-shadow: 0 10px 26px rgba(15, 23, 32, 0.12);
+body.app-theme-light .mat-mdc-tooltip.dock-tooltip {
+  filter: drop-shadow(0 12px 24px rgba(15, 23, 32, 0.1));
+}
+
+body.app-theme-light .mat-mdc-tooltip.dock-tooltip .mdc-tooltip__surface {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 10px 22px rgba(15, 23, 32, 0.08);
 }
 
 // ══════════════════════════════════════════════════════════
