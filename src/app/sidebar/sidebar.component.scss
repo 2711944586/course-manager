@@ -24,6 +24,14 @@
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   pointer-events: auto;
+  overflow: hidden;
+  transform-origin: center bottom;
+  transition:
+    padding 320ms var(--easing-decel),
+    gap 320ms var(--easing-spring),
+    border-radius 320ms var(--easing-smooth),
+    box-shadow 320ms var(--easing-smooth),
+    transform 320ms var(--easing-spring);
 
   &::before {
     content: '';
@@ -44,6 +52,19 @@
     background: radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 72%);
     filter: blur(18px);
     pointer-events: none;
+    transition: opacity 260ms var(--easing-smooth), transform 320ms var(--easing-decel);
+  }
+
+  &.collapsed {
+    gap: 0;
+    padding: 8px;
+    border-radius: 999px;
+    transform: translateY(2px) scale(0.98);
+
+    &::after {
+      opacity: 0.4;
+      transform: scale(0.8);
+    }
   }
 }
 
@@ -56,8 +77,11 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
+  border: none;
   color: var(--text-secondary);
   text-decoration: none;
+  background: transparent;
+  cursor: pointer;
   transition:
     transform 220ms var(--easing-spring),
     background 220ms var(--easing-smooth),
@@ -71,6 +95,28 @@
   border: 1px solid var(--dock-brand-border);
   box-shadow: var(--dock-brand-shadow);
   animation: pulse-glow 4.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.dock-toggle {
+  overflow: visible;
+
+  &:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow:
+      var(--dock-brand-shadow),
+      0 14px 28px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+}
+
+.dock-brand-core {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   mat-icon {
     font-size: 22px;
@@ -79,8 +125,61 @@
   }
 }
 
+.dock-toggle-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg-elevated) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 18%, var(--border-default));
+  color: var(--accent-primary);
+  box-shadow: 0 8px 18px rgba(10, 18, 34, 0.16);
+  transition:
+    transform 260ms var(--easing-spring),
+    background 220ms var(--easing-smooth),
+    border-color 220ms var(--easing-smooth);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.dock-core.collapsed .dock-toggle-badge {
+  transform: rotate(180deg) scale(1.04);
+}
+
+.dock-items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 640px;
+  opacity: 1;
+  transform: translateX(0);
+  transform-origin: left center;
+  overflow: hidden;
+  transition:
+    max-width 360ms var(--easing-decel),
+    opacity 220ms var(--easing-smooth),
+    transform 360ms var(--easing-spring);
+}
+
+.dock-core.collapsed .dock-items {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-16px) scaleX(0.92);
+  pointer-events: none;
+}
+
 .dock-item {
   overflow: visible;
+  flex-shrink: 0;
 
   &::after {
     content: '';
@@ -173,7 +272,15 @@
   transform: translate(-50%, 0);
 }
 
+.dock-core.collapsed .dock-item {
+  transform: translateX(-10px) scale(0.9);
+}
+
 :host-context(body.app-theme-light) {
+  .dock-toggle-badge {
+    box-shadow: 0 8px 18px rgba(15, 23, 32, 0.12);
+  }
+
   .dock-item:hover {
     box-shadow: 0 12px 28px rgba(15, 23, 32, 0.12);
   }
@@ -204,6 +311,11 @@
     border-radius: 28px;
   }
 
+  .dock-items {
+    gap: 4px;
+    max-width: calc(100vw - 110px);
+  }
+
   .dock-brand,
   .dock-item {
     width: 46px;
@@ -212,5 +324,16 @@
 
   .dock-label {
     display: none;
+  }
+
+  .dock-toggle-badge {
+    width: 17px;
+    height: 17px;
+
+    mat-icon {
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+    }
   }
 }

@@ -1,22 +1,38 @@
 <nav class="floating-dock" aria-label="主导航">
-  <div class="dock-core">
-    <div class="dock-brand">
-      <mat-icon>neurology</mat-icon>
-    </div>
+  <div class="dock-core" [class.collapsed]="!isExpanded()">
+    <button
+      type="button"
+      class="dock-brand dock-toggle"
+      (click)="toggleDock()"
+      [attr.aria-expanded]="isExpanded()"
+      aria-controls="primary-dock-items"
+      [matTooltip]="isExpanded() ? '收起中控台' : '展开中控台'"
+      matTooltipPosition="above"
+    >
+      <span class="dock-brand-core">
+        <mat-icon>neurology</mat-icon>
+      </span>
+      <span class="dock-toggle-badge" aria-hidden="true">
+        <mat-icon>{{ isExpanded() ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</mat-icon>
+      </span>
+    </button>
 
-    @for (item of dockItems; track item.route) {
-      <a
-        class="dock-item"
-        [routerLink]="item.route"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-        matRipple
-      >
-        <span class="dock-icon">
-          <mat-icon>{{ item.icon }}</mat-icon>
-        </span>
-        <span class="dock-label">{{ item.label }}</span>
-      </a>
-    }
+    <div class="dock-items" id="primary-dock-items" [attr.aria-hidden]="!isExpanded()">
+      @for (item of dockItems; track item.route) {
+        <a
+          class="dock-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          [attr.tabindex]="isExpanded() ? null : -1"
+          matRipple
+        >
+          <span class="dock-icon">
+            <mat-icon>{{ item.icon }}</mat-icon>
+          </span>
+          <span class="dock-label">{{ item.label }}</span>
+        </a>
+      }
+    </div>
   </div>
 </nav>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -19,6 +19,8 @@ interface DockItem {
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
+  readonly isExpanded = signal(true);
+
   readonly dockItems: readonly DockItem[] = [
     {
       icon: 'space_dashboard',
@@ -55,4 +57,8 @@ export class SidebarComponent {
       exact: true,
     },
   ];
+
+  toggleDock(): void {
+    this.isExpanded.update((expanded) => !expanded);
+  }
 }

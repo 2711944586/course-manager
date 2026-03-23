@@ -14,6 +14,7 @@
 - `Settings` 系统中心：主题切换、数据导出/导入/重置、AI Provider 状态区
 - 顶部全局搜索：支持 `Ctrl+K`
 - 底部悬浮 Dock：`Dashboard / Courses / Students / Analytics / Schedule / Settings`
+- 底部中控台支持点击最左侧按钮展开 / 收起，并带有平滑开合动画
 
 ## 技术栈
 
@@ -31,6 +32,7 @@
 - 修复页面滚动、路由切换、启动端口冲突、localStorage 脏数据容错等问题
 - 周课表详情弹层改为真正居中显示，不再出现点击后偏右偏下
 - Dock 悬浮标签去重，不再与额外 tooltip 重叠
+- Dock 最左侧品牌按钮改为中控台开关，可一键展开 / 收起整组导航
 
 ## 快速开始
 
