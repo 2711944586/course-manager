@@ -1,0 +1,134 @@
+@if (enrollment(); as e) {
+  <app-page-hero
+    title="选课详情"
+    [subtitle]="(student()?.name ?? '—') + ' · ' + (course()?.name ?? '—')"
+    badge="Enrollment Record"
+    icon="fact_check"
+  />
+
+  <div class="mode-toggle animate-fade-up">
+    <a class="btn-outline" matRipple [routerLink]="'/enrollments/edit/' + e.id">
+      <mat-icon>edit_note</mat-icon>
+      编辑记录
+    </a>
+  </div>
+
+  <div class="detail-grid animate-fade-up delay-1">
+    <!-- 课程 & 学生 -->
+    <div class="surface-card">
+      <h3><mat-icon>school</mat-icon>课程与学生</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>课程名称</dt>
+          <dd><a class="name-link" [routerLink]="'/courses/detail/' + e.courseId">{{ course()?.name ?? '—' }}</a></dd>
+        </div>
+        <div class="info-row">
+          <dt>授课教师</dt>
+          <dd>{{ course()?.instructor ?? '—' }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>学生姓名</dt>
+          <dd><a class="name-link" [routerLink]="'/students/detail/' + e.studentId">{{ student()?.name ?? '—' }}</a></dd>
+        </div>
+        <div class="info-row">
+          <dt>学号</dt>
+          <dd>{{ student()?.studentNo ?? '—' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- 成绩信息 -->
+    <div class="surface-card">
+      <h3><mat-icon>grade</mat-icon>成绩信息</h3>
+      <div class="score-display">
+        <span class="score-big">{{ e.score !== null ? e.score : '—' }}</span>
+        <span class="grade-badge" [class]="'grade-' + e.grade.toLowerCase()">{{ e.grade }}</span>
+      </div>
+      @if (e.score !== null) {
+        <div class="score-bar-track">
+          <div class="score-bar-fill" [style.width.%]="e.score"></div>
+        </div>
+      }
+    </div>
+
+    <!-- 业务状态 -->
+    <div class="surface-card">
+      <h3><mat-icon>assignment</mat-icon>业务状态</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>业务状态</dt>
+          <dd><span class="status-chip" [class]="'status-' + e.status">{{ getStatusLabel(e.status) }}</span></dd>
+        </div>
+        <div class="info-row">
+          <dt>流程状态</dt>
+          <dd><span class="status-chip" [class]="'workflow-' + e.workflowStatus">{{ getWorkflowLabel(e.workflowStatus) }}</span></dd>
+        </div>
+        <div class="info-row">
+          <dt>优先级</dt>
+          <dd><span class="status-chip" [class]="'priority-' + e.priority">{{ getPriorityLabel(e.priority) }}</span></dd>
+        </div>
+        <div class="info-row">
+          <dt>选课日期</dt>
+          <dd>{{ e.enrollDate | date:'yyyy-MM-dd HH:mm' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- 审核 & SLA -->
+    <div class="surface-card">
+      <h3><mat-icon>verified</mat-icon>审核与 SLA</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>处理人</dt>
+          <dd>{{ e.operator || '—' }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>审核意见</dt>
+          <dd>{{ e.decisionReason || '—' }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>审核时间</dt>
+          <dd>{{ e.decisionAt ? (e.decisionAt | date:'yyyy-MM-dd HH:mm') : '—' }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>SLA 截止</dt>
+          <dd [class.sla-overdue]="isSlaOverdue()">{{ e.slaDeadline | date:'yyyy-MM-dd HH:mm' }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- 风险标签 -->
+  @if (e.riskFlags.length > 0) {
+    <div class="risk-section animate-fade-up delay-2">
+      <h3><mat-icon>warning</mat-icon>风险标签</h3>
+      <div class="tag-group">
+        @for (tag of e.riskFlags; track tag) {
+          <span class="tag-chip warning">{{ tag }}</span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="meta-row animate-fade-up delay-2">
+    <span class="meta-text">最后更新　{{ e.updatedAt | date:'yyyy-MM-dd HH:mm' }}</span>
+  </div>
+
+  <div class="action-bar animate-fade-up delay-2">
+    <a class="btn-outline" routerLink="/enrollments">
+      <mat-icon>arrow_back</mat-icon>
+      返回列表
+    </a>
+    <button class="btn-danger" matRipple (click)="deleteEnrollment()">
+      <mat-icon>delete_sweep</mat-icon>
+      删除记录
+    </button>
+  </div>
+} @else {
+  <div class="not-found animate-fade-up">
+    <mat-icon>search_off</mat-icon>
+    <h2>选课记录不存在</h2>
+    <p>该记录可能已被删除或 ID 错误</p>
+    <a class="btn-outline" routerLink="/enrollments">返回列表</a>
+  </div>
+}

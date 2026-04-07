@@ -91,9 +91,9 @@
                   <div class="course-cell">
                     <mat-icon class="course-icon">book_2</mat-icon>
                     <div class="course-info">
-                      <strong>{{ enrollment.courseName }}</strong>
+                      <a class="name-link" [routerLink]="'/courses/detail/' + enrollment.courseId">{{ enrollment.courseName }}</a>
                       <span>{{ enrollment.courseInstructor }}</span>
-                      <p>{{ enrollment.studentName }} · {{ enrollment.studentNo }}</p>
+                      <p><a class="name-link" [routerLink]="'/students/detail/' + enrollment.studentId">{{ enrollment.studentName }}</a> · {{ enrollment.studentNo }}</p>
                     </div>
                   </div>
                 </td>
@@ -140,6 +140,9 @@
                 </td>
                 <td>
                   <div class="action-buttons">
+                    <a class="icon-btn" title="详情" [routerLink]="'/enrollments/detail/' + enrollment.id">
+                      <mat-icon>visibility</mat-icon>
+                    </a>
                     <a class="icon-btn" title="编辑" [routerLink]="'/enrollments/edit/' + enrollment.id">
                       <mat-icon>edit_note</mat-icon>
                     </a>

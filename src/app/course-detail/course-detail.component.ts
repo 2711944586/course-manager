@@ -5,19 +5,21 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
 import { map } from 'rxjs';
 import { COURSE_STATUS_LABELS, CourseStatus, CourseUpsertInput } from '../core/models/course.model';
 import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { scoreToGrade } from '../core/utils/score-grade.util';
 import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
+import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 import { UiNotice } from '../shared/models/ui-notice.model';
 import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  imports: [DatePipe, RouterLink, MatButtonModule, MatChipsModule, MatIconModule, InlineNoticeComponent],
+  imports: [DatePipe, RouterLink, MatButtonModule, MatChipsModule, MatIconModule, MatRippleModule, InlineNoticeComponent, PageHeroComponent],
   templateUrl: './course-detail.component.html',
   styleUrl: './course-detail.component.scss',
 })

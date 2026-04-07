@@ -1,89 +1,83 @@
-<div class="detail-page">
-  <button mat-stroked-button type="button" class="back-button animate-fade-up" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
-    返回课程列表
-  </button>
+@if (course(); as selectedCourse) {
+  <app-page-hero
+    [title]="selectedCourse.name"
+    [subtitle]="selectedCourse.instructor + ' · ' + selectedCourse.schedule"
+    badge="Course Detail"
+    [icon]="selectedCourse.icon || 'menu_book'"
+  />
 
-  @if (course(); as selectedCourse) {
-    <section class="header-card animate-fade-up delay-1">
-      <div class="title-row">
-        <div class="course-title">
-          <mat-icon>{{ selectedCourse.icon }}</mat-icon>
-          <div>
-            <h1>{{ selectedCourse.name }}</h1>
-            <p>{{ selectedCourse.instructor }} · {{ selectedCourse.schedule }}</p>
-          </div>
+  <div class="mode-toggle animate-fade-up">
+    <a class="btn-outline" matRipple [routerLink]="['/courses/edit', selectedCourse.id]">
+      <mat-icon>edit</mat-icon>
+      编辑课程
+    </a>
+    <span class="status-chip" [class]="'status-' + selectedCourse.status">{{ statusLabels[selectedCourse.status] }}</span>
+  </div>
+
+  @if (notice(); as message) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="message" (closeRequested)="closeNotice()" />
+  }
+
+  <div class="detail-grid animate-fade-up delay-1">
+    <!-- 基本信息 -->
+    <div class="surface-card">
+      <h3><mat-icon>info</mat-icon>基本信息</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>课程描述</dt>
+          <dd class="description-text">{{ selectedCourse.description || '—' }}</dd>
         </div>
-        <div class="title-actions">
-          <a mat-stroked-button [routerLink]="['/courses/edit', selectedCourse.id]">
-            <mat-icon>edit</mat-icon> 编辑
-          </a>
-          <mat-chip>{{ statusLabels[selectedCourse.status] }}</mat-chip>
+        <div class="info-row">
+          <dt>当前进度</dt>
+          <dd>{{ selectedCourse.progress }}%</dd>
         </div>
+        <div class="info-row">
+          <dt>学生人数</dt>
+          <dd>{{ selectedCourse.students }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>最近更新</dt>
+          <dd>{{ selectedCourse.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- 进度维护 -->
+    <div class="surface-card">
+      <h3><mat-icon>trending_up</mat-icon>进度维护</h3>
+      <div class="progress-display">
+        <span class="progress-big">{{ progressDraft() }}<small>%</small></span>
       </div>
-
-      <p class="description">{{ selectedCourse.description }}</p>
-
-      <div class="meta-grid">
-        <article>
-          <span class="meta-label">当前进度</span>
-          <span class="meta-value">{{ selectedCourse.progress }}%</span>
-        </article>
-        <article>
-          <span class="meta-label">学生人数</span>
-          <span class="meta-value">{{ selectedCourse.students }}</span>
-        </article>
-        <article>
-          <span class="meta-label">最近更新</span>
-          <span class="meta-value">{{ selectedCourse.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</span>
-        </article>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="progressDraft()"></div>
       </div>
-    </section>
-
-    @if (notice(); as message) {
-      <app-inline-notice class="animate-fade-up delay-2" [notice]="message" (closeRequested)="closeNotice()" />
-    }
-
-    <section class="panel-card animate-fade-up delay-3">
-      <h2>进度维护</h2>
-      <div class="progress-editor">
-        <button mat-stroked-button type="button" (click)="adjustProgress(-10)">
-          <mat-icon>remove</mat-icon>
-          -10%
+      <div class="progress-controls">
+        <button class="btn-outline btn-sm" type="button" (click)="adjustProgress(-10)">
+          <mat-icon>remove</mat-icon> -10%
         </button>
-
-        <div class="slider-wrapper">
-          <div class="custom-track">
-            <div class="custom-fill" [style.width.%]="progressDraft()"></div>
-          </div>
-          <input
-            class="progress-slider"
-            type="range"
-            min="0"
-            max="100"
-            [value]="progressDraft()"
-            (input)="onProgressInput($event)"
-          />
-        </div>
-
-        <button mat-stroked-button type="button" (click)="adjustProgress(10)">
-          <mat-icon>add</mat-icon>
-          +10%
-        </button>
-
-        <span class="progress-value">{{ progressDraft() }}%</span>
-
-        <button mat-flat-button color="primary" type="button" (click)="saveProgress()">
-          保存进度
+        <input
+          class="progress-slider"
+          type="range"
+          min="0"
+          max="100"
+          [value]="progressDraft()"
+          (input)="onProgressInput($event)"
+        />
+        <button class="btn-outline btn-sm" type="button" (click)="adjustProgress(10)">
+          <mat-icon>add</mat-icon> +10%
         </button>
       </div>
-    </section>
+      <button class="btn-primary btn-save-progress" type="button" matRipple (click)="saveProgress()">
+        保存进度
+      </button>
+    </div>
 
-    <section class="panel-card animate-fade-up delay-4">
-      <h2>状态维护</h2>
+    <!-- 状态维护 -->
+    <div class="surface-card">
+      <h3><mat-icon>assignment</mat-icon>状态维护</h3>
       <div class="status-actions">
         <button
-          mat-stroked-button
+          class="status-btn"
           type="button"
           [class.active]="selectedCourse.status === 'planned'"
           (click)="changeStatus('planned')"
@@ -91,7 +85,7 @@
           未开始
         </button>
         <button
-          mat-stroked-button
+          class="status-btn"
           type="button"
           [class.active]="selectedCourse.status === 'active'"
           (click)="changeStatus('active')"
@@ -99,7 +93,7 @@
           进行中
         </button>
         <button
-          mat-stroked-button
+          class="status-btn"
           type="button"
           [class.active]="selectedCourse.status === 'completed'"
           (click)="changeStatus('completed')"
@@ -107,11 +101,12 @@
           已结课
         </button>
       </div>
-    </section>
+    </div>
 
+    <!-- 选课学生 -->
     @if (enrolledStudents().length > 0) {
-      <section class="panel-card animate-fade-up delay-5">
-        <h2>选课学生（{{ enrolledStudents().length }}）</h2>
+      <div class="surface-card">
+        <h3><mat-icon>groups</mat-icon>选课学生（{{ enrolledStudents().length }}）</h3>
         <div class="student-list">
           @for (s of enrolledStudents(); track s.id) {
             <a class="student-row" [routerLink]="'/students/detail/' + s.id">
@@ -123,22 +118,25 @@
             </a>
           }
         </div>
-      </section>
+      </div>
     }
+  </div>
 
-    <section class="danger-zone animate-fade-up delay-6">
-      <button mat-stroked-button type="button" class="danger-button" (click)="deleteCourse()">
-        <mat-icon>delete</mat-icon>
-        删除课程
-      </button>
-    </section>
-  }
-  @else {
-    <section class="empty-card animate-fade-up">
-      <mat-icon>error_outline</mat-icon>
-      <h2>课程不存在</h2>
-      <p>该课程可能已被删除，请返回课程列表重新选择。</p>
-      <button mat-flat-button color="primary" type="button" (click)="goBack()">返回列表</button>
-    </section>
-  }
-</div>
+  <div class="action-bar animate-fade-up delay-2">
+    <a class="btn-outline" routerLink="/courses">
+      <mat-icon>arrow_back</mat-icon>
+      返回列表
+    </a>
+    <button class="btn-danger" matRipple (click)="deleteCourse()">
+      <mat-icon>delete</mat-icon>
+      删除课程
+    </button>
+  </div>
+} @else {
+  <div class="not-found animate-fade-up">
+    <mat-icon>search_off</mat-icon>
+    <h2>课程不存在</h2>
+    <p>该课程可能已被删除，请返回课程列表重新选择。</p>
+    <a class="btn-outline" routerLink="/courses">返回列表</a>
+  </div>
+}

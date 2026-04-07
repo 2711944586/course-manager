@@ -97,6 +97,12 @@ export const routes: Routes = [
     data: { animation: 'enrollments', title: '选课与成绩', icon: 'fact_check' },
   },
   {
+    path: 'enrollments/detail/:id',
+    loadComponent: () =>
+      import('./enrollment-detail/enrollment-detail.component').then(module => module.EnrollmentDetailComponent),
+    data: { animation: 'enrollmentDetail', title: '选课详情', icon: 'fact_check' },
+  },
+  {
     path: 'enrollments/edit/:id',
     loadComponent: () =>
       import('./enrollment-edit/enrollment-edit.component').then(module => module.EnrollmentEditComponent),
