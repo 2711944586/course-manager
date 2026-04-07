@@ -96,15 +96,15 @@
         </div>
       </div>
       <div class="data-actions">
-        <button mat-stroked-button (click)="exportAllData()">
+        <button class="btn-outline" (click)="exportAllData()">
           <mat-icon>download</mat-icon>
           导出备份
         </button>
-        <button mat-stroked-button (click)="clearActivityLog()">
+        <button class="btn-outline" (click)="clearActivityLog()">
           <mat-icon>delete_sweep</mat-icon>
           清除日志
         </button>
-        <button mat-stroked-button class="danger-btn" (click)="resetAllData()">
+        <button class="btn-danger" (click)="resetAllData()">
           <mat-icon>restart_alt</mat-icon>
           重置数据
         </button>
@@ -152,11 +152,11 @@
       </div>
 
       <div class="data-actions">
-        <button mat-stroked-button (click)="saveAiStub()">
+        <button class="btn-primary" (click)="saveAiStub()">
           <mat-icon>save</mat-icon>
           保存服务配置
         </button>
-        <button mat-stroked-button (click)="resetAiStub()">
+        <button class="btn-outline" (click)="resetAiStub()">
           <mat-icon>restart_alt</mat-icon>
           重置服务配置
         </button>

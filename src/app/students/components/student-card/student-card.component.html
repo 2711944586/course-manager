@@ -21,10 +21,10 @@
   </div>
 
   <div class="card-actions">
-    <button mat-stroked-button class="card-btn" (click)="editRequested.emit(student.id)">
+    <button class="btn-outline card-btn" (click)="editRequested.emit(student.id)">
       <mat-icon>edit</mat-icon> 编辑
     </button>
-    <button mat-stroked-button class="card-btn danger" (click)="deleteRequested.emit(student.id)">
+    <button class="btn-danger card-btn" (click)="deleteRequested.emit(student.id)">
       <mat-icon>delete</mat-icon>
     </button>
   </div>

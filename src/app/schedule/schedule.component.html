@@ -13,7 +13,7 @@
           <h2>排课提醒</h2>
           <p>基于现有课程数据自动生成。</p>
         </div>
-        <a mat-stroked-button routerLink="/courses">
+        <a class="btn-outline" routerLink="/courses">
           <mat-icon>open_in_new</mat-icon>
           前往课程管理
         </a>
@@ -109,7 +109,7 @@
         }
       </div>
       <div class="popup-footer">
-        <a mat-flat-button color="primary" [routerLink]="['/courses/detail', course.id]" (click)="closeCourseDetail()">
+        <a class="btn-primary" [routerLink]="['/courses/detail', course.id]" (click)="closeCourseDetail()">
           <mat-icon>open_in_new</mat-icon>
           查看完整详情
         </a>

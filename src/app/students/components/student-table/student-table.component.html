@@ -64,15 +64,15 @@
             </td>
             <td class="updated-cell">{{ student.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
             <td class="actions-col">
-              <a mat-stroked-button class="action-button" [routerLink]="'/students/detail/' + student.id">
+              <a class="btn-outline action-button" [routerLink]="'/students/detail/' + student.id">
                 <mat-icon>visibility</mat-icon>
                 详情
               </a>
-              <button mat-stroked-button type="button" class="action-button" (click)="requestEdit(student.id)">
+              <button class="btn-outline action-button" type="button" (click)="requestEdit(student.id)">
                 <mat-icon>edit</mat-icon>
                 编辑
               </button>
-              <button mat-stroked-button type="button" class="action-button danger-action" (click)="requestDelete(student.id)">
+              <button class="btn-danger action-button" type="button" (click)="requestDelete(student.id)">
                 <mat-icon>delete</mat-icon>
                 删除
               </button>

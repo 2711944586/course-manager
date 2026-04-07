@@ -28,11 +28,11 @@
         <p>学生数据请求链路监控：加载、成功、失败与重试。</p>
       </div>
       <div class="async-actions">
-        <button mat-stroked-button (click)="reloadStudents()" [disabled]="isLoading()">
+        <button class="btn-outline" (click)="reloadStudents()" [disabled]="isLoading()">
           <mat-icon>sync</mat-icon>
           刷新加载
         </button>
-        <button mat-stroked-button color="warn" (click)="simulateAsyncError()" [disabled]="isLoading()">
+        <button class="btn-danger" (click)="simulateAsyncError()" [disabled]="isLoading()">
           <mat-icon>error_outline</mat-icon>
           测试异常恢复
         </button>
@@ -91,7 +91,7 @@
           <strong>加载失败</strong>
           <p>{{ loadErrorMessage() }}</p>
         </div>
-        <button mat-flat-button color="primary" (click)="retryAsyncLoad()" [disabled]="isLoading()">
+        <button class="btn-primary" (click)="retryAsyncLoad()" [disabled]="isLoading()">
           <mat-icon>refresh</mat-icon>
           立即重试
         </button>
@@ -125,7 +125,7 @@
   @if (selectedStudentIds().length > 0) {
     <div class="batch-bar animate-fade-up">
       <span>已选中 {{ selectedStudentIds().length }} 名学生</span>
-      <button mat-flat-button color="warn" (click)="batchDeleteStudents()">
+      <button class="btn-danger" (click)="batchDeleteStudents()">
         <mat-icon>delete_sweep</mat-icon> 批量删除
       </button>
     </div>
@@ -242,11 +242,11 @@
           </div>
 
           <div class="preview-actions">
-            <button mat-stroked-button type="button" (click)="startEdit(student.id)">
+            <button class="btn-outline" type="button" (click)="startEdit(student.id)">
               <mat-icon>edit</mat-icon>
               编辑
             </button>
-            <button mat-flat-button color="primary" type="button" (click)="viewDetail(student.id)">
+            <button class="btn-primary" type="button" (click)="viewDetail(student.id)">
               <mat-icon>open_in_new</mat-icon>
               打开详情
             </button>

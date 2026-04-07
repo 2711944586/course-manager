@@ -148,10 +148,10 @@
       </div>
 
       <div class="form-actions">
-        <a mat-stroked-button routerLink="/teachers">
+        <a class="btn-outline" routerLink="/teachers">
           <mat-icon>arrow_back</mat-icon> 取消
         </a>
-        <button mat-flat-button color="primary" (click)="save()">
+        <button class="btn-primary" (click)="save()">
           <mat-icon>save</mat-icon> {{ isCreateMode ? '创建教师' : '保存修改' }}
         </button>
       </div>
