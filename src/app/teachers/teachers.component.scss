@@ -44,7 +44,7 @@
   &.warning {
     border-color: color-mix(in srgb, var(--accent-warning) 28%, var(--border-default));
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--accent-warning-container) 70%, transparent), transparent),
+      linear-gradient(180deg, color-mix(in srgb, var(--accent-warning-container) 15%, transparent), transparent),
       var(--bg-surface);
   }
 }

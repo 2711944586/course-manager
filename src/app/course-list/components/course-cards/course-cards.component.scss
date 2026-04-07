@@ -31,8 +31,8 @@
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(130deg, color-mix(in srgb, var(--surface-sheen) 70%, transparent), transparent 30%),
-      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-secondary) 18%, transparent), transparent 42%);
+      linear-gradient(130deg, color-mix(in srgb, var(--surface-sheen) 20%, transparent), transparent 30%),
+      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-primary) 5%, transparent), transparent 42%);
     pointer-events: none;
     opacity: 0.85;
   }
@@ -185,7 +185,7 @@
 .progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  background: var(--accent-primary);
   border-radius: inherit;
   transition: width 0.6s var(--easing-decel);
   animation: progress-fill 0.8s var(--easing-decel) both;
