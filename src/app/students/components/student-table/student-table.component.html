@@ -64,6 +64,10 @@
             </td>
             <td class="updated-cell">{{ student.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
             <td class="actions-col">
+              <a mat-stroked-button class="action-button" [routerLink]="'/students/detail/' + student.id">
+                <mat-icon>visibility</mat-icon>
+                详情
+              </a>
               <button mat-stroked-button type="button" class="action-button" (click)="requestEdit(student.id)">
                 <mat-icon>edit</mat-icon>
                 编辑

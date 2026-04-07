@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { COURSE_STATUS_LABELS, Course } from '../../../core/models/course.model';
@@ -6,7 +7,7 @@ import { COURSE_STATUS_LABELS, Course } from '../../../core/models/course.model'
 @Component({
   selector: 'app-course-cards',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule],
+  imports: [RouterLink, MatButtonModule, MatIconModule],
   templateUrl: './course-cards.component.html',
   styleUrl: './course-cards.component.scss',
 })

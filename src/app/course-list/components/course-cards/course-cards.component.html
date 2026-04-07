@@ -15,7 +15,7 @@
               <mat-icon>{{ course.icon }}</mat-icon>
             </span>
             <div>
-              <h3>{{ course.name }}</h3>
+              <h3><a class="name-link" [routerLink]="'/courses/detail/' + course.id" (click)="$event.stopPropagation()">{{ course.name }}</a></h3>
               <p>{{ course.instructor }} · {{ course.schedule }}</p>
             </div>
           </div>
