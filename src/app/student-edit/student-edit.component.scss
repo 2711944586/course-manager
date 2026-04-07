@@ -251,14 +251,14 @@
   justify-content: center;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-on-accent);
   margin-bottom: 14px;
   transition: background 0.3s;
 
 &[data-grade="A"] { background: linear-gradient(135deg, #34d399, #10b981); }
       &[data-grade="B"] { background: linear-gradient(135deg, #6366f1, #4F46E5); }
       &[data-grade="C"] { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
-  &[data-grade="D"] { background: linear-gradient(135deg, #f97316, #ea580c); }
+  &[data-grade="D"] { background: linear-gradient(135deg, var(--accent-warning), var(--accent-error)); }
   &[data-grade="E"], &[data-grade="F"] { background: linear-gradient(135deg, #ff6369, #e5484d); }
 }
 
@@ -329,8 +329,8 @@
   &[data-grade="A"] { background: linear-gradient(90deg, #34d399, #10b981); }
   &[data-grade="B"] { background: linear-gradient(90deg, #6366f1, #4F46E5); }
   &[data-grade="C"] { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
-  &[data-grade="D"] { background: linear-gradient(90deg, #f97316, #ea580c); }
-  &[data-grade="E"], &[data-grade="F"] { background: linear-gradient(90deg, #f87171, #ef4444); }
+  &[data-grade="D"] { background: linear-gradient(90deg, var(--accent-warning), var(--accent-error)); }
+  &[data-grade="E"], &[data-grade="F"] { background: linear-gradient(90deg, var(--accent-error), var(--accent-error)); }
 }
 
 @media (max-width: 900px) {

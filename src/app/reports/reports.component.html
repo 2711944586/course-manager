@@ -7,14 +7,14 @@
   />
 
   <!-- Tab 切换 -->
-  <nav class="tab-bar animate-fade-up delay-1">
-    <button [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+  <nav class="tab-bar animate-fade-up delay-1" role="tablist" aria-label="报表视图切换">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'overview'" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
       <mat-icon>dashboard</mat-icon> 综合总览
     </button>
-    <button [class.active]="activeTab() === 'courses'" (click)="activeTab.set('courses')">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'courses'" [class.active]="activeTab() === 'courses'" (click)="activeTab.set('courses')">
       <mat-icon>menu_book</mat-icon> 课程分析
     </button>
-    <button [class.active]="activeTab() === 'students'" (click)="activeTab.set('students')">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'students'" [class.active]="activeTab() === 'students'" (click)="activeTab.set('students')">
       <mat-icon>groups</mat-icon> 学生分析
     </button>
   </nav>

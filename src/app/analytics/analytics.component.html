@@ -6,14 +6,14 @@
     [badge]="totalStudents() + ' 名学生 · ' + totalCourses() + ' 门课程'"
   />
 
-  <nav class="tab-bar animate-fade-up delay-1">
-    <button [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+  <nav class="tab-bar animate-fade-up delay-1" role="tablist" aria-label="分析视图切换">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'overview'" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
       <mat-icon>space_dashboard</mat-icon> 概览
     </button>
-    <button [class.active]="activeTab() === 'compare'" (click)="activeTab.set('compare')">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'compare'" [class.active]="activeTab() === 'compare'" (click)="activeTab.set('compare')">
       <mat-icon>compare_arrows</mat-icon> 对比
     </button>
-    <button [class.active]="activeTab() === 'intelligence'" (click)="activeTab.set('intelligence')">
+    <button role="tab" [attr.aria-selected]="activeTab() === 'intelligence'" [class.active]="activeTab() === 'intelligence'" (click)="activeTab.set('intelligence')">
       <mat-icon>auto_awesome</mat-icon> 洞察
     </button>
   </nav>

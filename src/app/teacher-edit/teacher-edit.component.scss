@@ -187,11 +187,11 @@
   justify-content: center;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-on-accent);
   margin-bottom: 14px;
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
 
-  &.warning { background: linear-gradient(135deg, #f97316, #ea580c); }
+  &.warning { background: linear-gradient(135deg, var(--accent-warning), var(--accent-error)); }
 }
 
 .preview-name {
@@ -245,7 +245,7 @@
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   transition: width 0.4s var(--easing-decel);
 
-  &.overload { background: linear-gradient(90deg, #f97316, #ef4444); }
+  &.overload { background: linear-gradient(90deg, var(--accent-warning), var(--accent-error)); }
 }
 
 .preview-tags {
