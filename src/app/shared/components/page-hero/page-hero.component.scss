@@ -16,7 +16,7 @@
     var(--shadow-md),
     inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 86%, transparent);
   backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 
   &::before {
     content: '';

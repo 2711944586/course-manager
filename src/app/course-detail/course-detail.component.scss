@@ -147,14 +147,14 @@
 
 .progress-slider {
   flex: 1;
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
   height: 20px;
 
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
+  &::slider-thumb {
+    appearance: none;
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -165,11 +165,11 @@
     margin-top: -5px;
   }
 
-  &::-webkit-slider-thumb:hover {
+  &::slider-thumb:hover {
     box-shadow: 0 0 0 4px var(--border-default);
   }
 
-  &::-webkit-slider-runnable-track {
+  &::slider-runnable-track {
     height: 6px;
     border-radius: 3px;
     background: var(--border-subtle);

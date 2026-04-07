@@ -1322,3 +1322,158 @@ a,
     scroll-behavior: auto !important;
   }
 }
+// ══════════════════════════════════════════════════════════
+//  Enterprise Data Table
+// ══════════════════════════════════════════════════════════
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  th {
+    padding: 14px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    background-color: var(--bg-level-2);
+    border-bottom: 1px solid var(--border-default);
+    white-space: nowrap;
+    transition: background 0.2s var(--easing-smooth), color 0.2s var(--easing-smooth);
+
+    &.sortable {
+      cursor: pointer;
+      user-select: none;
+      
+      &:hover {
+        color: var(--text-primary);
+        background-color: var(--bg-hover);
+      }
+    }
+  }
+
+  td {
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: var(--line-height-base);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s var(--easing-smooth);
+    background-color: transparent;
+
+    &:hover {
+      background-color: var(--bg-hover);
+    }
+    
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  Enterprise Badges & Tags
+// ══════════════════════════════════════════════════════════
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px solid transparent;
+
+  &--outline {
+    background: transparent !important;
+    border-color: var(--border-strong) !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  &--info {
+    color: var(--accent-info);
+    background: var(--accent-info-container);
+    border-color: color-mix(in srgb, var(--accent-info) 30%, transparent);
+  }
+  
+  &--success {
+    color: var(--accent-success);
+    background: var(--accent-success-container);
+    border-color: color-mix(in srgb, var(--accent-success) 30%, transparent);
+  }
+  
+  &--warning {
+    color: var(--accent-warning);
+    background: var(--accent-warning-container);
+    border-color: color-mix(in srgb, var(--accent-warning) 30%, transparent);
+  }
+  
+  &--error {
+    color: var(--accent-error);
+    background: var(--accent-error-container);
+    border-color: color-mix(in srgb, var(--accent-error) 30%, transparent);
+  }
+
+  &--primary {
+    color: var(--accent-primary);
+    background: var(--accent-primary-container);
+    border-color: color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  }
+  
+  &--neutral {
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+    border-color: var(--border-default);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  Enterprise Form Inputs
+// ══════════════════════════════════════════════════════════
+
+.form-control {
+  // Overriding any raw styling globally to a flat input
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: var(--line-height-base);
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  
+  &:hover {
+    border-color: var(--border-strong);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--accent-primary-container);
+  }
+  
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+}

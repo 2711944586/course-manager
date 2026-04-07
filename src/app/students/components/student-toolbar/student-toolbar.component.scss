@@ -18,7 +18,7 @@
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 
   &::before {
     content: '';

@@ -19,7 +19,7 @@
   border: 1px solid var(--border-glass);
   background: var(--bg-glass);
   backdrop-filter: blur(12px) saturate(1.6);
-  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  backdrop-filter: blur(12px) saturate(1.6);
   cursor: pointer;
   box-shadow:
     var(--shadow-xs),
@@ -148,10 +148,10 @@
   color: var(--text-secondary);
   font-size: 0.86rem;
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
+  display: box;
   line-clamp: 3;
-  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  box-orient: vertical;
   overflow: hidden;
 }
 

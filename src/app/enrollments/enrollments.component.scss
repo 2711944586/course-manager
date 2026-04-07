@@ -322,20 +322,7 @@
   border-collapse: collapse;
   text-align: left;
 
-  th,
-  td {
-    padding: 18px 20px;
-    border-bottom: 1px solid var(--border-default);
-    vertical-align: top;
-  }
 
-  th {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-secondary);
-    background: color-mix(in srgb, var(--bg-surface-low) 84%, transparent);
-  }
 
   tr:last-child td {
     border-bottom: none;
