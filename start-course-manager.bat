@@ -55,10 +55,10 @@ for /L %%i in (1,1,20) do (
   if !BACKEND_READY! equ 0 (
     :: 使用 PowerShell 测试后端端口是否可用
     powershell -Command "try { [System.Net.Sockets.TcpClient]::new('127.0.0.1', 8000).Dispose(); exit 0 } catch { exit 1 }" >nul 2>nul
-    if errorlevel 0 (
-      set "BACKEND_READY=1"
-    ) else (
+    if errorlevel 1 (
       timeout /t 1 /nobreak >nul
+    ) else (
+      set "BACKEND_READY=1"
     )
   )
 )
@@ -69,7 +69,7 @@ if !BACKEND_READY! equ 0 (
   echo.
   timeout /t 2
 ) else (
-  echo [启动中] ✓ 后端已就绪！
+  echo [启动中] ✓ 后端已就绪（127.0.0.1:8000）！
 )
 endlocal
 
