@@ -43,6 +43,8 @@ export class TeachersComponent {
   readonly selectedStatus = signal<'all' | TeacherStatus>('all');
   readonly creating = signal(false);
   readonly editingTeacherId = signal<number | null>(null);
+  readonly pageIndex = signal(0);
+  readonly pageSize = signal(10);
 
   readonly teachers = this.store.teachers;
   readonly statusOptions = TEACHER_STATUS_OPTIONS;
@@ -112,6 +114,13 @@ export class TeachersComponent {
       .slice(0, 4),
   );
 
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.filteredTeachers().length / this.pageSize())));
+
+  readonly pagedTeachers = computed(() => {
+    const start = this.pageIndex() * this.pageSize();
+    return this.filteredTeachers().slice(start, start + this.pageSize());
+  });
+
   readonly showEditor = computed(() => this.creating() || this.editingTeacherId() !== null);
 
   editForm: TeacherFormValue = this.getEmptyForm();
@@ -120,6 +129,11 @@ export class TeachersComponent {
     this.creating.set(true);
     this.editingTeacherId.set(null);
     this.editForm = this.getEmptyForm();
+  }
+
+  goToPage(page: number): void {
+    const max = this.totalPages() - 1;
+    this.pageIndex.set(Math.max(0, Math.min(page, max)));
   }
 
   startEdit(teacher: Teacher): void {

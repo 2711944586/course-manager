@@ -164,7 +164,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (enrollment of viewModels(); track enrollment.id) {
+            @for (enrollment of pagedViewModels(); track enrollment.id) {
               <tr>
                 <td>
                   <div class="course-cell">
@@ -231,6 +231,26 @@
             }
           </tbody>
         </table>
+
+        @if (viewModels().length > pageSize()) {
+          <div class="pagination-bar">
+            <span class="pagination-info">共 {{ viewModels().length }} 条，第 {{ pageIndex() + 1 }}/{{ totalPages() }} 页</span>
+            <div class="pagination-actions">
+              <button class="icon-btn" [disabled]="pageIndex() === 0" (click)="goToPage(0)" title="首页">
+                <mat-icon>first_page</mat-icon>
+              </button>
+              <button class="icon-btn" [disabled]="pageIndex() === 0" (click)="goToPage(pageIndex() - 1)" title="上一页">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button class="icon-btn" [disabled]="pageIndex() >= totalPages() - 1" (click)="goToPage(pageIndex() + 1)" title="下一页">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <button class="icon-btn" [disabled]="pageIndex() >= totalPages() - 1" (click)="goToPage(totalPages() - 1)" title="末页">
+                <mat-icon>last_page</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
 
         @if (viewModels().length === 0) {
           <div class="empty-state">

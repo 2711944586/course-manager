@@ -1,7 +1,7 @@
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Component, computed, effect, ElementRef, HostListener, signal, untracked, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet, Event as RouterEvent } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -202,6 +202,10 @@ export class AppComponent {
     private readonly activityLog: ActivityLogService,
     private readonly recentWorkspace: RecentWorkspaceService,
   ) {
+    this.router.events.pipe(
+      filter((event: RouterEvent) => event instanceof NavigationEnd),
+    ).subscribe(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+
     effect(
       () => {
         const routeMeta = this.currentRouteMetaSignal();

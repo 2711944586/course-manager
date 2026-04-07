@@ -55,6 +55,8 @@ export class EnrollmentsComponent {
   readonly creating = signal(false);
   readonly editingEnrollmentId = signal<number | null>(null);
   readonly enrollmentError = signal<string | null>(null);
+  readonly pageIndex = signal(0);
+  readonly pageSize = signal(10);
 
   readonly statusOptions = ENROLLMENT_STATUS_OPTIONS;
   readonly workflowOptions = ENROLLMENT_WORKFLOW_OPTIONS;
@@ -125,6 +127,13 @@ export class EnrollmentsComponent {
       .slice(0, 5),
   );
 
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.viewModels().length / this.pageSize())));
+
+  readonly pagedViewModels = computed(() => {
+    const start = this.pageIndex() * this.pageSize();
+    return this.viewModels().slice(start, start + this.pageSize());
+  });
+
   readonly showEditor = computed(() => this.creating() || this.editingEnrollmentId() !== null);
 
   editForm: EnrollmentEditForm = this.getEmptyForm();
@@ -140,6 +149,11 @@ export class EnrollmentsComponent {
 
     if (students.length > 0) this.editForm.studentId = students[0].id;
     if (courses.length > 0) this.editForm.courseId = courses[0].id;
+  }
+
+  goToPage(page: number): void {
+    const max = this.totalPages() - 1;
+    this.pageIndex.set(Math.max(0, Math.min(page, max)));
   }
 
   startEdit(enrollment: EnrollmentViewModel): void {

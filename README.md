@@ -18,6 +18,16 @@
 - 底部悬浮 Dock：`Dashboard / Courses / Students / Teachers / Enrollments / Analytics / Reports / Schedule / Activity Log / Settings`
 - 底部中控台支持点击最左侧按钮展开 / 收起，并带有平滑开合动画
 
+## 界面预览
+
+> 截图放置在 `docs/screenshots/` 目录下。首次运行后通过浏览器截图补充。
+
+| 页面 | 暗色主题 | 亮色主题 |
+| ------ | ---------- | ---------- |
+| Dashboard | ![Dashboard Dark](docs/screenshots/dashboard-dark.png) | ![Dashboard Light](docs/screenshots/dashboard-light.png) |
+| Students | ![Students Dark](docs/screenshots/students-dark.png) | ![Students Light](docs/screenshots/students-light.png) |
+| Schedule | ![Schedule Dark](docs/screenshots/schedule-dark.png) | ![Schedule Light](docs/screenshots/schedule-light.png) |
+
 ## Fullstack 升级进展
 
 - 仓库内公开执行文档：`fullstack-modernization-plan.md`
