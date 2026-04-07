@@ -41,6 +41,8 @@ export class CourseListComponent {
   readonly creating = signal(false);
   readonly notice = signal<UiNotice | null>(null);
   readonly selectedPreviewCourseId = signal<number | null>(null);
+  readonly pageIndex = signal(0);
+  readonly pageSize = signal(12);
 
   readonly courses = this.courseStore.courses;
   readonly filteredCourses = computed(() => {
@@ -86,6 +88,13 @@ export class CourseListComponent {
       averageProgress,
       totalStudents,
     };
+  });
+
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.filteredCourses().length / this.pageSize())));
+
+  readonly pagedCourses = computed(() => {
+    const start = this.pageIndex() * this.pageSize();
+    return this.filteredCourses().slice(start, start + this.pageSize());
   });
 
   readonly editingCourse = computed(() => {
@@ -172,10 +181,12 @@ export class CourseListComponent {
 
   handleSearchChange(keyword: string): void {
     this.searchKeyword.set(keyword);
+    this.pageIndex.set(0);
   }
 
   handleStatusChange(status: CourseFilterStatus): void {
     this.selectedStatus.set(status);
+    this.pageIndex.set(0);
     void this.router.navigate(['/courses'], {
       queryParams: status === 'all' ? {} : { status },
       replaceUrl: true,
@@ -184,6 +195,12 @@ export class CourseListComponent {
 
   handleSortChange(sortKey: CourseSortKey): void {
     this.selectedSort.set(sortKey);
+    this.pageIndex.set(0);
+  }
+
+  goToPage(page: number): void {
+    const max = this.totalPages() - 1;
+    this.pageIndex.set(Math.max(0, Math.min(page, max)));
   }
 
   startCreate(): void {

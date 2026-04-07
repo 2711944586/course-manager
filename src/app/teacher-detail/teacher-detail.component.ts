@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TeacherStoreService } from '../core/services/teacher-store.service';
 import { TEACHER_STATUS_OPTIONS, TeacherStatus } from '../core/models/teacher.model';
@@ -11,7 +12,7 @@ import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 @Component({
   selector: 'app-teacher-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, PageHeroComponent],
+  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, MatRippleModule, PageHeroComponent],
   templateUrl: './teacher-detail.component.html',
   styleUrl: './teacher-detail.component.scss',
 })

@@ -37,13 +37,41 @@
   <section class="course-workbench animate-fade-up delay-5">
     <div class="workbench-main">
       <app-course-cards
-        [courses]="filteredCourses()"
+        [courses]="pagedCourses()"
         [keyword]="searchKeyword()"
         (viewRequested)="viewDetail($event)"
         (editRequested)="startEdit($event)"
         (deleteRequested)="deleteCourse($event)"
         (previewRequested)="updatePreview($event)"
       />
+
+      @if (filteredCourses().length > pageSize()) {
+        <div class="pagination-bar">
+          <span class="pagination-info">共 {{ filteredCourses().length }} 条，第 {{ pageIndex() + 1 }}/{{ totalPages() }} 页</span>
+          <div class="pagination-actions">
+            <button class="icon-btn" [disabled]="pageIndex() === 0" (click)="goToPage(0)" title="首页">
+              <mat-icon>first_page</mat-icon>
+            </button>
+            <button class="icon-btn" [disabled]="pageIndex() === 0" (click)="goToPage(pageIndex() - 1)" title="上一页">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span class="page-jump">
+              <span>跳至</span>
+              <input type="number" min="1" [max]="totalPages()" class="page-jump-input"
+                [value]="pageIndex() + 1"
+                (keydown.enter)="goToPage(+$any($event.target).value - 1)"
+                (blur)="goToPage(+$any($event.target).value - 1)" />
+              <span>页</span>
+            </span>
+            <button class="icon-btn" [disabled]="pageIndex() >= totalPages() - 1" (click)="goToPage(pageIndex() + 1)" title="下一页">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <button class="icon-btn" [disabled]="pageIndex() >= totalPages() - 1" (click)="goToPage(totalPages() - 1)" title="末页">
+              <mat-icon>last_page</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
     <aside class="preview-panel surface-card">

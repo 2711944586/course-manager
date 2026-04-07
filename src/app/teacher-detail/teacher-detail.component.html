@@ -7,7 +7,7 @@
   />
 
   <div class="mode-toggle animate-fade-up delay-1">
-    <a mat-stroked-button [routerLink]="['/teachers/edit', t.id]">
+    <a class="btn-outline" matRipple [routerLink]="['/teachers/edit', t.id]">
       <mat-icon>edit</mat-icon> 编辑教师
     </a>
   </div>
@@ -90,10 +90,10 @@
   </div>
 
   <div class="action-bar animate-fade-up delay-3">
-    <a mat-stroked-button routerLink="/teachers">
+    <a class="btn-outline" routerLink="/teachers">
       <mat-icon>arrow_back</mat-icon> 返回列表
     </a>
-    <button mat-stroked-button color="warn" (click)="deleteTeacher()">
+    <button class="btn-danger" matRipple (click)="deleteTeacher()">
       <mat-icon>delete</mat-icon> 删除教师
     </button>
   </div>
@@ -102,6 +102,6 @@
     <mat-icon>person_off</mat-icon>
     <h2>教师不存在</h2>
     <p>该教师档案可能已被删除。</p>
-    <a mat-flat-button color="primary" routerLink="/teachers">返回教师列表</a>
+    <a class="btn-outline" routerLink="/teachers">返回教师列表</a>
   </div>
 }

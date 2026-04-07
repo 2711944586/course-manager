@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { STUDENT_GENDER_LABELS } from '../core/models/student.model';
@@ -13,7 +14,7 @@ import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 @Component({
   selector: 'app-student-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, PageHeroComponent],
+  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, MatRippleModule, PageHeroComponent],
   templateUrl: './student-detail.component.html',
   styleUrl: './student-detail.component.scss',
 })

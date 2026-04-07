@@ -206,6 +206,11 @@ export class AppComponent {
       filter((event: RouterEvent) => event instanceof NavigationEnd),
     ).subscribe(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
+    effect(() => {
+      const routeMeta = this.currentRouteMetaSignal();
+      document.title = `${routeMeta.title} — Aurora`;
+    });
+
     effect(
       () => {
         const routeMeta = this.currentRouteMetaSignal();
