@@ -19,24 +19,6 @@ import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
-interface EnrollmentViewModel extends Enrollment {
-  readonly courseName: string;
-  readonly courseInstructor: string;
-  readonly studentName: string;
-  readonly studentNo: string;
-}
-
-interface EnrollmentEditForm {
-  studentId: number | null;
-  courseId: number | null;
-  score: number | string | null;
-  status: EnrollmentStatus;
-  workflowStatus: EnrollmentWorkflowStatus;
-  priority: EnrollmentPriority;
-  operator: string;
-  decisionReason: string;
-}
-
 @Component({
   selector: 'app-enrollments',
   standalone: true,
@@ -53,9 +35,6 @@ export class EnrollmentsComponent {
   readonly searchKeyword = signal('');
   readonly selectedStatus = signal<'all' | EnrollmentStatus>('all');
   readonly selectedWorkflowStatus = signal<'all' | EnrollmentWorkflowStatus>('all');
-  readonly creating = signal(false);
-  readonly editingEnrollmentId = signal<number | null>(null);
-  readonly enrollmentError = signal<string | null>(null);
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
 
@@ -63,8 +42,6 @@ export class EnrollmentsComponent {
   readonly workflowOptions = ENROLLMENT_WORKFLOW_OPTIONS;
   readonly priorityOptions = ENROLLMENT_PRIORITY_OPTIONS;
 
-  readonly allCourses = this.courseStore.courses;
-  readonly allStudents = this.studentStore.students;
   readonly enrollments = this.store.enrollments;
 
   readonly viewModels = computed(() => {
@@ -135,85 +112,15 @@ export class EnrollmentsComponent {
     return this.viewModels().slice(start, start + this.pageSize());
   });
 
-  readonly showEditor = computed(() => this.creating() || this.editingEnrollmentId() !== null);
-
-  editForm: EnrollmentEditForm = this.getEmptyForm();
-
-  startCreate(): void {
-    this.creating.set(true);
-    this.editingEnrollmentId.set(null);
-    this.enrollmentError.set(null);
-    this.editForm = this.getEmptyForm();
-
-    const students = this.allStudents();
-    const courses = this.allCourses();
-
-    if (students.length > 0) this.editForm.studentId = students[0].id;
-    if (courses.length > 0) this.editForm.courseId = courses[0].id;
-  }
-
   goToPage(page: number): void {
     const max = this.totalPages() - 1;
     this.pageIndex.set(Math.max(0, Math.min(page, max)));
   }
 
-  startEdit(enrollment: EnrollmentViewModel): void {
-    this.creating.set(false);
-    this.editingEnrollmentId.set(enrollment.id);
-    this.enrollmentError.set(null);
-    this.editForm = {
-      studentId: enrollment.studentId,
-      courseId: enrollment.courseId,
-      score: enrollment.score,
-      status: enrollment.status,
-      workflowStatus: enrollment.workflowStatus,
-      priority: enrollment.priority,
-      operator: enrollment.operator,
-      decisionReason: enrollment.decisionReason,
-    };
-  }
-
-  cancelEdit(): void {
-    this.creating.set(false);
-    this.editingEnrollmentId.set(null);
-    this.enrollmentError.set(null);
-    this.editForm = this.getEmptyForm();
-  }
-
-  saveEnrollment(): void {
-    const id = this.editingEnrollmentId();
-
-    try {
-      const payload = {
-        studentId: Number(this.editForm.studentId),
-        courseId: Number(this.editForm.courseId),
-        score:
-          this.editForm.score === '' || this.editForm.score === null
-            ? null
-            : Number(this.editForm.score),
-        status: this.editForm.status,
-        workflowStatus: this.editForm.workflowStatus,
-        priority: this.editForm.priority,
-        operator: this.editForm.operator,
-        decisionReason: this.editForm.decisionReason,
-      };
-
-      if (id) {
-        this.store.updateEnrollment(id, payload);
-      } else {
-        this.store.createEnrollment(payload);
-      }
-
-      this.cancelEdit();
-    } catch (error: unknown) {
-      this.enrollmentError.set(error instanceof Error ? error.message : '保存失败');
-    }
-  }
-
-  async deleteEnrollment(enrollment: EnrollmentViewModel): Promise<void> {
+  async deleteEnrollment(enrollment: { id: number; studentName?: string; courseName?: string }): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: '删除选课记录',
-      message: `确认删除 ${enrollment.studentName} 的《${enrollment.courseName}》选课记录？`,
+      message: `确认删除该选课记录？`,
       confirmText: '确认删除',
       tone: 'danger',
     });
@@ -247,18 +154,5 @@ export class EnrollmentsComponent {
       return 2;
     }
     return 1;
-  }
-
-  private getEmptyForm(): EnrollmentEditForm {
-    return {
-      studentId: null,
-      courseId: null,
-      score: null,
-      status: 'enrolled',
-      workflowStatus: 'pending-review',
-      priority: 'attention',
-      operator: '教务运营台',
-      decisionReason: '待院系完成容量复核',
-    };
   }
 }

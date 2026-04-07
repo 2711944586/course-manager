@@ -73,6 +73,12 @@ export const routes: Routes = [
     data: { animation: 'teachers', title: '教师管理', icon: 'school' },
   },
   {
+    path: 'teachers/detail/:id',
+    loadComponent: () =>
+      import('./teacher-detail/teacher-detail.component').then(module => module.TeacherDetailComponent),
+    data: { animation: 'teacherDetail', title: '教师详情', icon: 'person' },
+  },
+  {
     path: 'teachers/edit/:id',
     loadComponent: () =>
       import('./teacher-edit/teacher-edit.component').then(module => module.TeacherEditComponent),

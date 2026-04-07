@@ -964,6 +964,18 @@ a,
   color: var(--text-tertiary);
 }
 
+.name-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--accent-secondary);
+  }
+}
+
 .pagination-actions {
   display: flex;
   gap: 4px;

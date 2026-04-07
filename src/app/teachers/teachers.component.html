@@ -90,7 +90,7 @@
                   <div class="teacher-cell">
                     <div class="avatar">{{ teacher.name.charAt(0) }}</div>
                     <div>
-                      <strong>{{ teacher.name }}</strong>
+                      <a class="name-link" [routerLink]="'/teachers/detail/' + teacher.id">{{ teacher.name }}</a>
                       <p>{{ teacher.employeeNo }} · {{ teacher.title }}</p>
                     </div>
                   </div>

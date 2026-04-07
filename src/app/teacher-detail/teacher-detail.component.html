@@ -1,0 +1,107 @@
+@if (teacher(); as t) {
+  <app-page-hero
+    icon="school"
+    badge="FACULTY PROFILE"
+    [title]="t.name"
+    [subtitle]="t.employeeNo + ' · ' + t.title + ' · ' + t.department"
+  />
+
+  <div class="mode-toggle animate-fade-up delay-1">
+    <a mat-stroked-button [routerLink]="['/teachers/edit', t.id]">
+      <mat-icon>edit</mat-icon> 编辑教师
+    </a>
+  </div>
+
+  <div class="detail-grid animate-fade-up delay-2">
+    <section class="surface-card info-section">
+      <h3><mat-icon>badge</mat-icon> 基本信息</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>姓名</dt>
+          <dd>{{ t.name }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>工号</dt>
+          <dd>{{ t.employeeNo }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>职称</dt>
+          <dd>{{ t.title }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>院系</dt>
+          <dd>{{ t.department }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>办公地点</dt>
+          <dd>{{ t.office }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>状态</dt>
+          <dd>
+            <span class="status-chip" [class]="'status-' + t.status">{{ getStatusLabel(t.status) }}</span>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="surface-card info-section">
+      <h3><mat-icon>contact_mail</mat-icon> 联系方式</h3>
+      <dl class="info-list">
+        <div class="info-row">
+          <dt>邮箱</dt>
+          <dd>{{ t.email }}</dd>
+        </div>
+        <div class="info-row">
+          <dt>电话</dt>
+          <dd>{{ t.phone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="surface-card load-section">
+      <h3><mat-icon>schedule</mat-icon> 排班负荷</h3>
+      <div class="load-display">
+        <div class="load-big">{{ t.currentWeeklyHours }}<small>/{{ t.maxWeeklyHours }} 节</small></div>
+        <div class="load-badge" [class.warning]="t.currentWeeklyHours > t.maxWeeklyHours">{{ loadLabel() }}</div>
+      </div>
+      <div class="load-bar-track">
+        <div class="load-bar-fill" [style.width.%]="loadPercent()"></div>
+      </div>
+      <p class="load-hint">当前负荷 {{ loadPercent() }}%，{{ loadPercent() >= 85 ? '建议分担课时' : '运行正常' }}</p>
+    </section>
+
+    <section class="surface-card info-section">
+      <h3><mat-icon>local_offer</mat-icon> 专长标签</h3>
+      <div class="tag-group">
+        @for (tag of t.expertise; track tag) {
+          <span class="tag-chip">{{ tag }}</span>
+        }
+        @if (t.expertise.length === 0) {
+          <span class="muted-text">暂无标签</span>
+        }
+      </div>
+    </section>
+  </div>
+
+  <div class="meta-row animate-fade-up delay-3">
+    <span class="meta-text">最近复核：{{ t.lastReviewAt | date:'yyyy-MM-dd HH:mm' }}</span>
+    <span class="meta-text">最近更新：{{ t.updatedAt | date:'yyyy-MM-dd HH:mm' }}</span>
+  </div>
+
+  <div class="action-bar animate-fade-up delay-3">
+    <a mat-stroked-button routerLink="/teachers">
+      <mat-icon>arrow_back</mat-icon> 返回列表
+    </a>
+    <button mat-stroked-button color="warn" (click)="deleteTeacher()">
+      <mat-icon>delete</mat-icon> 删除教师
+    </button>
+  </div>
+} @else {
+  <div class="not-found">
+    <mat-icon>person_off</mat-icon>
+    <h2>教师不存在</h2>
+    <p>该教师档案可能已被删除。</p>
+    <a mat-flat-button color="primary" routerLink="/teachers">返回教师列表</a>
+  </div>
+}

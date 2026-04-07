@@ -9,24 +9,9 @@ import {
   TEACHER_STATUS_OPTIONS,
   Teacher,
   TeacherStatus,
-  TeacherUpsertInput,
 } from '../core/models/teacher.model';
 import { TeacherStoreService } from '../core/services/teacher-store.service';
 import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
-
-interface TeacherFormValue {
-  employeeNo: string;
-  name: string;
-  title: string;
-  department: string;
-  email: string;
-  phone: string;
-  office: string;
-  expertiseText: string;
-  maxWeeklyHours: number | string;
-  currentWeeklyHours: number | string;
-  status: TeacherStatus;
-}
 
 @Component({
   selector: 'app-teachers',
@@ -42,8 +27,6 @@ export class TeachersComponent {
   readonly searchKeyword = signal('');
   readonly selectedDepartment = signal<'all' | string>('all');
   readonly selectedStatus = signal<'all' | TeacherStatus>('all');
-  readonly creating = signal(false);
-  readonly editingTeacherId = signal<number | null>(null);
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
 
@@ -122,44 +105,9 @@ export class TeachersComponent {
     return this.filteredTeachers().slice(start, start + this.pageSize());
   });
 
-  readonly showEditor = computed(() => this.creating() || this.editingTeacherId() !== null);
-
-  editForm: TeacherFormValue = this.getEmptyForm();
-
-  startCreate(): void {
-    this.creating.set(true);
-    this.editingTeacherId.set(null);
-    this.editForm = this.getEmptyForm();
-  }
-
   goToPage(page: number): void {
     const max = this.totalPages() - 1;
     this.pageIndex.set(Math.max(0, Math.min(page, max)));
-  }
-
-  startEdit(teacher: Teacher): void {
-    this.creating.set(false);
-    this.editingTeacherId.set(teacher.id);
-    this.editForm = this.toFormValue(teacher);
-  }
-
-  cancelEdit(): void {
-    this.creating.set(false);
-    this.editingTeacherId.set(null);
-    this.editForm = this.getEmptyForm();
-  }
-
-  saveTeacher(): void {
-    const payload = this.toPayload();
-    const id = this.editingTeacherId();
-
-    if (id) {
-      this.store.updateTeacher(id, payload);
-    } else {
-      this.store.createTeacher(payload);
-    }
-
-    this.cancelEdit();
   }
 
   async deleteTeacher(teacher: Teacher): Promise<void> {
@@ -197,63 +145,5 @@ export class TeachersComponent {
     }
 
     return '平稳';
-  }
-
-  private getEmptyForm(): TeacherFormValue {
-    return {
-      employeeNo: this.generateEmployeeNo(),
-      name: '',
-      title: '讲师',
-      department: '',
-      email: '',
-      phone: '',
-      office: '',
-      expertiseText: '课程建设, 学业督导',
-      maxWeeklyHours: 12,
-      currentWeeklyHours: 8,
-      status: 'active',
-    };
-  }
-
-  private toFormValue(teacher: Teacher): TeacherFormValue {
-    return {
-      employeeNo: teacher.employeeNo,
-      name: teacher.name,
-      title: teacher.title,
-      department: teacher.department,
-      email: teacher.email,
-      phone: teacher.phone,
-      office: teacher.office,
-      expertiseText: teacher.expertise.join(', '),
-      maxWeeklyHours: teacher.maxWeeklyHours,
-      currentWeeklyHours: teacher.currentWeeklyHours,
-      status: teacher.status,
-    };
-  }
-
-  private toPayload(): TeacherUpsertInput {
-    return {
-      employeeNo: this.editForm.employeeNo,
-      name: this.editForm.name,
-      title: this.editForm.title,
-      department: this.editForm.department,
-      email: this.editForm.email,
-      phone: this.editForm.phone,
-      office: this.editForm.office,
-      expertise: this.editForm.expertiseText.split(/[,，]/).map(item => item.trim()).filter(Boolean),
-      maxWeeklyHours: Number(this.editForm.maxWeeklyHours),
-      currentWeeklyHours: Number(this.editForm.currentWeeklyHours),
-      status: this.editForm.status,
-      active: this.editForm.status === 'active',
-    };
-  }
-
-  private generateEmployeeNo(): string {
-    const nextSequence = this.teachers().reduce((maxValue, teacher) => {
-      const parsed = Number.parseInt(teacher.employeeNo.replace(/\D/g, ''), 10);
-      return Number.isFinite(parsed) ? Math.max(maxValue, parsed) : maxValue;
-    }, 26000) + 1;
-
-    return `T${String(nextSequence).padStart(5, '0')}`;
   }
 }
