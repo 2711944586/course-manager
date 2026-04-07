@@ -1,0 +1,171 @@
+<div class="edit-page">
+  <app-page-hero
+    icon="how_to_reg"
+    [badge]="isCreateMode ? 'NEW ENROLLMENT' : 'EDIT ENROLLMENT'"
+    [title]="pageTitle()"
+    subtitle="选择学生和课程，配置选课状态与审批流程。"
+  />
+
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
+  <div class="edit-layout animate-fade-up delay-2">
+    <section class="edit-card">
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>people</mat-icon>
+          <h3>选课对象</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>学生 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">person</mat-icon>
+              <select [ngModel]="draft().studentId" (ngModelChange)="updateField('studentId', +$event)">
+                @for (s of allStudents(); track s.id) {
+                  <option [value]="s.id">{{ s.name }}（{{ s.studentNo }}）</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>课程 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">menu_book</mat-icon>
+              <select [ngModel]="draft().courseId" (ngModelChange)="updateField('courseId', +$event)">
+                @for (c of allCourses(); track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>tune</mat-icon>
+          <h3>状态与流程</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>选课状态</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">assignment</mat-icon>
+              <select [ngModel]="draft().status" (ngModelChange)="updateField('status', $event)">
+                @for (opt of statusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>审批状态</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">fact_check</mat-icon>
+              <select [ngModel]="draft().workflowStatus" (ngModelChange)="updateField('workflowStatus', $event)">
+                @for (opt of workflowOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>优先级</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">priority_high</mat-icon>
+              <select [ngModel]="draft().priority" (ngModelChange)="updateField('priority', $event)">
+                @for (opt of priorityOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>成绩（可选）</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">grade</mat-icon>
+              <input type="number" min="0" max="100" placeholder="留空表示未评分"
+                [ngModel]="draft().score"
+                (ngModelChange)="updateField('score', $event === '' ? null : +$event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>notes</mat-icon>
+          <h3>审批信息</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>操作人</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">account_circle</mat-icon>
+              <input type="text" placeholder="教务运营台"
+                [ngModel]="draft().operator"
+                (ngModelChange)="updateField('operator', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>决策原因</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">comment</mat-icon>
+              <input type="text" placeholder="待院系完成容量复核"
+                [ngModel]="draft().decisionReason"
+                (ngModelChange)="updateField('decisionReason', $event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a mat-stroked-button routerLink="/enrollments">
+          <mat-icon>arrow_back</mat-icon> 取消
+        </a>
+        <button mat-flat-button color="primary" (click)="save()">
+          <mat-icon>save</mat-icon> {{ isCreateMode ? '创建选课' : '保存修改' }}
+        </button>
+      </div>
+    </section>
+
+    <aside class="preview-panel animate-fade-up delay-4">
+      <div class="preview-header">
+        <mat-icon>visibility</mat-icon>
+        <span>实时预览</span>
+      </div>
+      <div class="preview-card">
+        <div class="preview-avatar">
+          <mat-icon>how_to_reg</mat-icon>
+        </div>
+        <h4 class="preview-name">{{ draftStudentName() }}</h4>
+        <span class="preview-no">{{ draftCourseName() }}</span>
+
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <mat-icon>assignment</mat-icon>
+            <span>{{ draft().status }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>fact_check</mat-icon>
+            <span>{{ draft().workflowStatus }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>priority_high</mat-icon>
+            <span>{{ draft().priority }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>grade</mat-icon>
+            <span>{{ draft().score !== null ? draft().score + ' 分' : '未评分' }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

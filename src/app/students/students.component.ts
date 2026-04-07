@@ -9,8 +9,7 @@ import {
   StudentSortKey,
   StudentUpsertInput,
 } from '../core/models/student.model';
-import { SchoolClass } from '../core/models/class.model';
-import { ClassService } from '../core/services/class.service';
+import { ClassStoreService } from '../core/services/class-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { exportCsv } from '../core/utils/csv-export.util';
 import { calculateAgeFromBirthDate } from '../core/utils/date-age.util';
@@ -73,7 +72,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   readonly lastLoadDurationMs = signal<number | null>(null);
   readonly lastLoadedAt = signal<Date | null>(null);
   readonly selectedPreviewStudentId = signal<number | null>(null);
-  readonly classes = signal<readonly SchoolClass[]>([]);
+  readonly classes = computed(() => this.classStore.classes());
 
   readonly students = this.studentStore.students;
   readonly classNameMap = computed<Record<string, string>>(() => {
@@ -227,7 +226,6 @@ export class StudentsComponent implements OnInit, OnDestroy {
   readonly showEditor = computed(() => this.creating() || this.editingStudentId() !== null);
 
   private activeLoadSubscription: Subscription | null = null;
-  private activeClassSubscription: Subscription | null = null;
   private loadRequestToken = 0;
 
   private readonly routeMode = toSignal(
@@ -237,7 +235,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly studentStore: StudentStoreService,
-    private readonly classService: ClassService,
+    private readonly classStore: ClassStoreService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly confirmDialog: ConfirmDialogService,
@@ -278,30 +276,11 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadClasses();
     this.reloadStudents();
   }
 
   ngOnDestroy(): void {
     this.activeLoadSubscription?.unsubscribe();
-    this.activeClassSubscription?.unsubscribe();
-  }
-
-  loadClasses(): void {
-    this.activeClassSubscription?.unsubscribe();
-    this.pushAsyncEvent('开始通过 HTTP 获取班级数据');
-
-    this.activeClassSubscription = this.classService.getClasses().subscribe({
-      next: classes => {
-        this.classes.set(classes);
-        this.pushAsyncEvent(`班级加载成功：共 ${classes.length} 个班级`);
-      },
-      error: error => {
-        const message = this.extractErrorMessage(error);
-        this.notice.set({ type: 'error', text: `班级数据加载失败：${message}` });
-        this.pushAsyncEvent(`班级加载失败：${message}`);
-      },
-    });
   }
 
   reloadStudents(simulateFailure = false): void {

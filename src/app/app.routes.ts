@@ -73,10 +73,34 @@ export const routes: Routes = [
     data: { animation: 'teachers', title: '教师管理', icon: 'school' },
   },
   {
+    path: 'teachers/edit/:id',
+    loadComponent: () =>
+      import('./teacher-edit/teacher-edit.component').then(module => module.TeacherEditComponent),
+    data: { animation: 'teacherEdit', title: '编辑教师', icon: 'edit' },
+  },
+  {
+    path: 'teachers/create',
+    loadComponent: () =>
+      import('./teacher-edit/teacher-edit.component').then(module => module.TeacherEditComponent),
+    data: { animation: 'teacherCreate', title: '新建教师', icon: 'person_add' },
+  },
+  {
     path: 'enrollments',
     loadComponent: () =>
       import('./enrollments/enrollments.component').then(module => module.EnrollmentsComponent),
     data: { animation: 'enrollments', title: '选课与成绩', icon: 'fact_check' },
+  },
+  {
+    path: 'enrollments/edit/:id',
+    loadComponent: () =>
+      import('./enrollment-edit/enrollment-edit.component').then(module => module.EnrollmentEditComponent),
+    data: { animation: 'enrollmentEdit', title: '编辑选课', icon: 'edit' },
+  },
+  {
+    path: 'enrollments/create',
+    loadComponent: () =>
+      import('./enrollment-edit/enrollment-edit.component').then(module => module.EnrollmentEditComponent),
+    data: { animation: 'enrollmentCreate', title: '新建选课', icon: 'add_circle' },
   },
   {
     path: 'reports',

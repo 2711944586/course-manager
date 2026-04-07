@@ -64,84 +64,11 @@
           </label>
         </div>
 
-        <button class="btn-primary" matRipple (click)="startCreate()">
+        <a class="btn-primary" matRipple routerLink="/teachers/create">
           <mat-icon>person_add</mat-icon>
           新增教师
-        </button>
+        </a>
       </div>
-
-      @if (showEditor()) {
-        <div class="editor-panel surface-card animate-scale-in">
-          <div class="editor-heading">
-            <div>
-              <span class="eyebrow">{{ editingTeacherId() ? 'Edit Faculty' : 'New Faculty' }}</span>
-              <h3>{{ editingTeacherId() ? '编辑教师档案' : '新建教师档案' }}</h3>
-            </div>
-            <span class="status-chip" [class]="'status-' + editForm.status">{{ getStatusLabel(editForm.status) }}</span>
-          </div>
-
-          <div class="form-grid">
-            <label class="form-field">
-              <span>教师工号</span>
-              <input type="text" [(ngModel)]="editForm.employeeNo" placeholder="T26018" />
-            </label>
-            <label class="form-field">
-              <span>姓名</span>
-              <input type="text" [(ngModel)]="editForm.name" placeholder="请输入教师姓名" />
-            </label>
-            <label class="form-field">
-              <span>职称</span>
-              <select [(ngModel)]="editForm.title">
-                <option value="教授">教授</option>
-                <option value="副教授">副教授</option>
-                <option value="讲师">讲师</option>
-                <option value="助教">助教</option>
-              </select>
-            </label>
-            <label class="form-field">
-              <span>所属院系</span>
-              <input type="text" [(ngModel)]="editForm.department" placeholder="如：计算机学院" />
-            </label>
-            <label class="form-field">
-              <span>工作邮箱</span>
-              <input type="email" [(ngModel)]="editForm.email" placeholder="teacher@campus.example.edu.cn" />
-            </label>
-            <label class="form-field">
-              <span>联系电话</span>
-              <input type="text" [(ngModel)]="editForm.phone" placeholder="13800000000" />
-            </label>
-            <label class="form-field">
-              <span>办公地点</span>
-              <input type="text" [(ngModel)]="editForm.office" placeholder="如：博学楼 A-302" />
-            </label>
-            <label class="form-field">
-              <span>当前状态</span>
-              <select [(ngModel)]="editForm.status">
-                @for (option of statusOptions; track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            </label>
-            <label class="form-field form-field-wide">
-              <span>专长标签</span>
-              <input type="text" [(ngModel)]="editForm.expertiseText" placeholder="课程建设, 教学评估, 学业督导" />
-            </label>
-            <label class="form-field">
-              <span>每周容量</span>
-              <input type="number" [(ngModel)]="editForm.maxWeeklyHours" min="0" max="30" />
-            </label>
-            <label class="form-field">
-              <span>当前负荷</span>
-              <input type="number" [(ngModel)]="editForm.currentWeeklyHours" min="0" max="30" />
-            </label>
-          </div>
-
-          <div class="editor-actions">
-            <button class="btn-secondary" type="button" (click)="cancelEdit()">取消</button>
-            <button class="btn-primary" type="button" (click)="saveTeacher()">保存档案</button>
-          </div>
-        </div>
-      }
 
       <div class="table-container surface-card">
         <table class="data-table">
@@ -201,9 +128,9 @@
                 <td class="time-cell">{{ teacher.lastReviewAt | date:'MM-dd HH:mm' }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button class="icon-btn" title="编辑" type="button" (click)="startEdit(teacher)">
+                    <a class="icon-btn" title="编辑" [routerLink]="'/teachers/edit/' + teacher.id">
                       <mat-icon>edit</mat-icon>
-                    </button>
+                    </a>
                     <button class="icon-btn danger" title="删除" type="button" (click)="deleteTeacher(teacher)">
                       <mat-icon>delete</mat-icon>
                     </button>
@@ -224,6 +151,14 @@
               <button class="icon-btn" [disabled]="pageIndex() === 0" (click)="goToPage(pageIndex() - 1)" title="上一页">
                 <mat-icon>chevron_left</mat-icon>
               </button>
+              <span class="page-jump">
+                <span>跳至</span>
+                <input type="number" min="1" [max]="totalPages()" class="page-jump-input"
+                  [value]="pageIndex() + 1"
+                  (keydown.enter)="goToPage(+$any($event.target).value - 1)"
+                  (blur)="goToPage(+$any($event.target).value - 1)" />
+                <span>页</span>
+              </span>
               <button class="icon-btn" [disabled]="pageIndex() >= totalPages() - 1" (click)="goToPage(pageIndex() + 1)" title="下一页">
                 <mat-icon>chevron_right</mat-icon>
               </button>

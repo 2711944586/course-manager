@@ -1,0 +1,207 @@
+<div class="edit-page">
+  <app-page-hero
+    icon="school"
+    [badge]="isCreateMode ? 'NEW FACULTY' : 'EDIT FACULTY'"
+    [title]="pageTitle()"
+    subtitle="填写教师基本信息、排班负荷与专长标签，提交后将保存到系统中。"
+  />
+
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
+  <div class="edit-layout animate-fade-up delay-2">
+    <section class="edit-card">
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>badge</mat-icon>
+          <h3>基本信息</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>工号 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">tag</mat-icon>
+              <input type="text" placeholder="T26018"
+                [ngModel]="draft().employeeNo"
+                (ngModelChange)="updateField('employeeNo', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>姓名 <span class="required">*</span></label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">person</mat-icon>
+              <input type="text" placeholder="输入教师姓名"
+                [ngModel]="draft().name"
+                (ngModelChange)="updateField('name', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>职称</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">military_tech</mat-icon>
+              <select [ngModel]="draft().title" (ngModelChange)="updateField('title', $event)">
+                <option value="教授">教授</option>
+                <option value="副教授">副教授</option>
+                <option value="讲师">讲师</option>
+                <option value="助教">助教</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>状态</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">toggle_on</mat-icon>
+              <select [ngModel]="draft().status" (ngModelChange)="updateField('status', $event)">
+                @for (opt of statusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>domain</mat-icon>
+          <h3>组织与联络</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>院系</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">apartment</mat-icon>
+              <input type="text" placeholder="计算机科学系"
+                [ngModel]="draft().department"
+                (ngModelChange)="updateField('department', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>办公室</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">meeting_room</mat-icon>
+              <input type="text" placeholder="A306"
+                [ngModel]="draft().office"
+                (ngModelChange)="updateField('office', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>邮箱</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">email</mat-icon>
+              <input type="email" placeholder="name@university.edu.cn"
+                [ngModel]="draft().email"
+                (ngModelChange)="updateField('email', $event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>电话</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">phone</mat-icon>
+              <input type="tel" placeholder="138-0000-0000"
+                [ngModel]="draft().phone"
+                (ngModelChange)="updateField('phone', $event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>schedule</mat-icon>
+          <h3>排班与专长</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>周课时上限</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">timer</mat-icon>
+              <input type="number" min="0" max="40"
+                [ngModel]="draft().maxWeeklyHours"
+                (ngModelChange)="updateField('maxWeeklyHours', +$event)" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>当前周课时</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">hourglass_top</mat-icon>
+              <input type="number" min="0" max="40"
+                [ngModel]="draft().currentWeeklyHours"
+                (ngModelChange)="updateField('currentWeeklyHours', +$event)" />
+            </div>
+          </div>
+          <div class="form-field full-width">
+            <label>专长标签（逗号分隔）</label>
+            <div class="input-wrap">
+              <mat-icon class="field-icon">label</mat-icon>
+              <input type="text" placeholder="课程建设, 学业督导, 算法设计"
+                [ngModel]="draft().expertiseText"
+                (ngModelChange)="updateField('expertiseText', $event)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a mat-stroked-button routerLink="/teachers">
+          <mat-icon>arrow_back</mat-icon> 取消
+        </a>
+        <button mat-flat-button color="primary" (click)="save()">
+          <mat-icon>save</mat-icon> {{ isCreateMode ? '创建教师' : '保存修改' }}
+        </button>
+      </div>
+    </section>
+
+    <aside class="preview-panel animate-fade-up delay-4">
+      <div class="preview-header">
+        <mat-icon>visibility</mat-icon>
+        <span>实时预览</span>
+      </div>
+      <div class="preview-card">
+        <div class="preview-avatar" [class.warning]="draftLoadPercent() > 100">
+          {{ draft().name ? draft().name[0] : '?' }}
+        </div>
+        <h4 class="preview-name">{{ draft().name || '教师姓名' }}</h4>
+        <span class="preview-no">{{ draft().employeeNo || 'T-----' }} · {{ draft().title }}</span>
+
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <mat-icon>apartment</mat-icon>
+            <span>{{ draft().department || '未填写' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>meeting_room</mat-icon>
+            <span>{{ draft().office || '未填写' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ draft().currentWeeklyHours }}/{{ draft().maxWeeklyHours }} 节</span>
+          </div>
+          <div class="preview-info-item">
+            <mat-icon>speed</mat-icon>
+            <span>负荷 {{ draftLoadPercent() }}%</span>
+          </div>
+        </div>
+
+        <div class="preview-load-bar">
+          <div class="preview-load-fill" [style.width.%]="draftLoadPercent()" [class.overload]="draftLoadPercent() > 100"></div>
+        </div>
+
+        <div class="preview-tags">
+          @for (tag of draft().expertiseText.split(','); track tag) {
+            @if (tag.trim()) {
+              <span class="tag-chip">{{ tag.trim() }}</span>
+            }
+          }
+        </div>
+
+        <span class="preview-status status-chip" [class]="'status-' + draft().status">{{ draftStatusLabel() }}</span>
+      </div>
+    </aside>
+  </div>
+</div>

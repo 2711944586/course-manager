@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
@@ -30,7 +31,7 @@ interface TeacherFormValue {
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
   templateUrl: './teachers.component.html',
   styleUrl: './teachers.component.scss',
 })
