@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 import { ActivityLogService, ActivityEntry } from '../core/services/activity-log.service';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-activity-log',
@@ -34,7 +35,10 @@ export class ActivityLogComponent {
     { value: 'system', label: '系统', icon: 'settings' },
   ];
 
-  constructor(private readonly activityLog: ActivityLogService) {}
+  constructor(
+    private readonly activityLog: ActivityLogService,
+    private readonly confirmDialog: ConfirmDialogService,
+  ) {}
 
   setFilter(value: ActivityEntry['entity'] | 'all'): void {
     this.activeFilter.set(value);
@@ -73,8 +77,15 @@ export class ActivityLogComponent {
     return map[entity];
   }
 
-  clearLog(): void {
-    if (confirm('确定清除全部活动日志？此操作不可撤销。')) {
+  async clearLog(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: '清空活动日志',
+      message: '清空后将无法恢复操作审计记录。',
+      confirmText: '确认清空',
+      tone: 'danger',
+    });
+
+    if (confirmed) {
       this.activityLog.clearAll();
     }
   }

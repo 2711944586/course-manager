@@ -15,6 +15,7 @@ import { scoreToGrade, GRADE_LABELS, type Grade } from '../../../core/utils/scor
 })
 export class StudentCardComponent {
   @Input({ required: true }) student!: Student;
+  @Input() className = '未分班';
 
   @Output() readonly editRequested = new EventEmitter<number>();
   @Output() readonly deleteRequested = new EventEmitter<number>();

@@ -1,7 +1,7 @@
 <div class="student-page">
   <app-page-hero
     title="学生管理中心"
-    subtitle="基于姓名、学号、性别、出生日期进行学生信息维护，支持批量 fake 数据演示。"
+    subtitle="基于姓名、学号、性别、出生日期进行学生信息维护，支持批量操作与数据导出。"
     badge="Student Operations"
     icon="groups"
   />
@@ -24,8 +24,8 @@
   <section class="async-lab bento-card animate-fade-up delay-3">
     <header class="async-lab-header">
       <div>
-        <h3>异步优化与加载状态</h3>
-        <p>演示学生数据的 Observable 请求链路：请求 → loading → 成功/失败 → 重试。</p>
+        <h3>数据加载状态</h3>
+        <p>学生数据请求链路监控：加载、成功、失败与重试。</p>
       </div>
       <div class="async-actions">
         <button mat-stroked-button (click)="reloadStudents()" [disabled]="isLoading()">
@@ -34,7 +34,7 @@
         </button>
         <button mat-stroked-button color="warn" (click)="simulateAsyncError()" [disabled]="isLoading()">
           <mat-icon>error_outline</mat-icon>
-          模拟失败
+          测试异常恢复
         </button>
       </div>
     </header>
@@ -148,6 +148,7 @@
           @for (student of paginatedStudents(); track student.id) {
             <app-student-card
               [student]="student"
+              [className]="resolveStudentClassName(student)"
               (editRequested)="startEdit($event)"
               (deleteRequested)="deleteStudent($event)"
               (previewRequested)="updatePreview($event)"
@@ -179,6 +180,7 @@
       } @else {
         <app-student-table
           [students]="paginatedStudents()"
+          [classNameByStudentId]="studentClassNames()"
           [keyword]="searchKeyword()"
           [currentPage]="currentPage()"
           [totalPages]="totalPages()"
@@ -224,6 +226,10 @@
             <article>
               <span>年龄</span>
               <strong>{{ calculateAgeFromBirthDate(student.birthDate) }}岁</strong>
+            </article>
+            <article>
+              <span>所属班级</span>
+              <strong>{{ resolveStudentClassName(student) }}</strong>
             </article>
             <article>
               <span>出生日期</span>

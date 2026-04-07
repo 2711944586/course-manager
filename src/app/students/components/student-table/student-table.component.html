@@ -42,7 +42,12 @@
             <td class="check-col">
               <input type="checkbox" [checked]="selectedIds.has(student.id)" (change)="toggleOne(student.id, $any($event.target).checked)" />
             </td>
-            <td class="name-cell"><a class="name-link" [routerLink]="'/students/detail/' + student.id">{{ student.name }}</a></td>
+            <td class="name-cell">
+              <div class="name-stack">
+                <a class="name-link" [routerLink]="'/students/detail/' + student.id">{{ student.name }}</a>
+                <span class="class-hint">{{ resolveClassName(student.id) }}</span>
+              </div>
+            </td>
             <td><span class="mono">{{ student.studentNo }}</span></td>
             <td>
               <span class="gender-tag" [class.gender-male]="student.gender === 'male'" [class.gender-female]="student.gender === 'female'">

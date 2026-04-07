@@ -15,6 +15,7 @@ import { CourseCardsComponent } from './components/course-cards/course-cards.com
 import { CourseEditorComponent } from './components/course-editor/course-editor.component';
 import { CourseStatsComponent, CourseStatsView } from './components/course-stats/course-stats.component';
 import { CourseFilterStatus, CourseToolbarComponent } from './components/course-toolbar/course-toolbar.component';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-course-list',
@@ -119,6 +120,7 @@ export class CourseListComponent {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly courseStore: CourseStoreService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {
     effect(
       () => {
@@ -205,7 +207,7 @@ export class CourseListComponent {
     this.selectedPreviewCourseId.set(courseId);
   }
 
-  saveCourse(payload: CourseUpsertInput): void {
+  async saveCourse(payload: CourseUpsertInput): Promise<void> {
     try {
       const currentEditingCourseId = this.editingCourseId();
 
@@ -218,9 +220,13 @@ export class CourseListComponent {
       );
 
       if (conflicts.length > 0) {
-        const proceed = window.confirm(
-          `检测到排课冲突：\n${conflicts.join('\n')}\n\n是否仍然保存？`,
-        );
+        const proceed = await this.confirmDialog.confirm({
+          title: '检测到排课冲突',
+          message: '当前课程与同讲师的现有课表存在冲突，确认后仍会继续保存。',
+          details: conflicts,
+          confirmText: '仍然保存',
+          tone: 'danger',
+        });
         if (!proceed) return;
       }
 
@@ -238,14 +244,19 @@ export class CourseListComponent {
     }
   }
 
-  deleteCourse(courseId: number): void {
+  async deleteCourse(courseId: number): Promise<void> {
     const currentCourse = this.courseStore.getCourseById(courseId);
     if (!currentCourse) {
       this.notice.set({ type: 'error', text: '课程不存在或已被删除。' });
       return;
     }
 
-    const confirmed = window.confirm(`确认删除课程“${currentCourse.name}”？该操作无法撤销。`);
+    const confirmed = await this.confirmDialog.confirm({
+      title: '删除课程',
+      message: `确认删除课程“${currentCourse.name}”？该操作无法撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    });
     if (!confirmed) {
       return;
     }

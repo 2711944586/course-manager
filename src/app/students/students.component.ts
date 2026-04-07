@@ -9,6 +9,8 @@ import {
   StudentSortKey,
   StudentUpsertInput,
 } from '../core/models/student.model';
+import { SchoolClass } from '../core/models/class.model';
+import { ClassService } from '../core/services/class.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { exportCsv } from '../core/utils/csv-export.util';
 import { calculateAgeFromBirthDate } from '../core/utils/date-age.util';
@@ -27,6 +29,7 @@ import { StudentStatsComponent, StudentStatsView } from './components/student-st
 import { StudentFilterGender, StudentToolbarComponent } from './components/student-toolbar/student-toolbar.component';
 import { StudentTableComponent } from './components/student-table/student-table.component';
 import { StudentCardComponent } from './components/student-card/student-card.component';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-students',
@@ -70,8 +73,28 @@ export class StudentsComponent implements OnInit, OnDestroy {
   readonly lastLoadDurationMs = signal<number | null>(null);
   readonly lastLoadedAt = signal<Date | null>(null);
   readonly selectedPreviewStudentId = signal<number | null>(null);
+  readonly classes = signal<readonly SchoolClass[]>([]);
 
   readonly students = this.studentStore.students;
+  readonly classNameMap = computed<Record<string, string>>(() => {
+    const classNameMap: Record<string, string> = {};
+
+    for (const schoolClass of this.classes()) {
+      classNameMap[schoolClass.id] = schoolClass.className;
+    }
+
+    return classNameMap;
+  });
+  readonly studentClassNames = computed<Record<number, string>>(() => {
+    const classMap = this.classNameMap();
+    const classNames: Record<number, string> = {};
+
+    for (const student of this.students()) {
+      classNames[student.id] = student.classId ? (classMap[student.classId] ?? student.classId) : '未分班';
+    }
+
+    return classNames;
+  });
   readonly filteredStudents = computed(() => {
     const keyword = this.searchKeyword().trim().toLowerCase();
     const selectedGender = this.selectedGender();
@@ -204,6 +227,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   readonly showEditor = computed(() => this.creating() || this.editingStudentId() !== null);
 
   private activeLoadSubscription: Subscription | null = null;
+  private activeClassSubscription: Subscription | null = null;
   private loadRequestToken = 0;
 
   private readonly routeMode = toSignal(
@@ -213,8 +237,10 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly studentStore: StudentStoreService,
+    private readonly classService: ClassService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {
     effect(
       () => {
@@ -252,11 +278,30 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loadClasses();
     this.reloadStudents();
   }
 
   ngOnDestroy(): void {
     this.activeLoadSubscription?.unsubscribe();
+    this.activeClassSubscription?.unsubscribe();
+  }
+
+  loadClasses(): void {
+    this.activeClassSubscription?.unsubscribe();
+    this.pushAsyncEvent('开始通过 HTTP 获取班级数据');
+
+    this.activeClassSubscription = this.classService.getClasses().subscribe({
+      next: classes => {
+        this.classes.set(classes);
+        this.pushAsyncEvent(`班级加载成功：共 ${classes.length} 个班级`);
+      },
+      error: error => {
+        const message = this.extractErrorMessage(error);
+        this.notice.set({ type: 'error', text: `班级数据加载失败：${message}` });
+        this.pushAsyncEvent(`班级加载失败：${message}`);
+      },
+    });
   }
 
   reloadStudents(simulateFailure = false): void {
@@ -376,14 +421,19 @@ export class StudentsComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteStudent(studentId: number): void {
+  async deleteStudent(studentId: number): Promise<void> {
     const targetStudent = this.studentStore.getStudentById(studentId);
     if (!targetStudent) {
       this.notice.set({ type: 'error', text: '学生不存在或已被删除。' });
       return;
     }
 
-    const confirmed = window.confirm(`确认删除学生“${targetStudent.name}”？该操作无法撤销。`);
+    const confirmed = await this.confirmDialog.confirm({
+      title: '删除学生',
+      message: `确认删除学生“${targetStudent.name}”？该操作无法撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    });
     if (!confirmed) {
       return;
     }
@@ -399,8 +449,13 @@ export class StudentsComponent implements OnInit, OnDestroy {
     }
   }
 
-  regenerateFakeData(): void {
-    const confirmed = window.confirm('确认重置为批量 Fake 学生数据？现有学生数据将被覆盖。');
+  async regenerateFakeData(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: '重建学生场景数据',
+      message: '现有学生数据将被覆盖，并重新生成 120 条学生场景记录。',
+      confirmText: '确认重建',
+      tone: 'danger',
+    });
     if (!confirmed) {
       return;
     }
@@ -408,7 +463,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
     try {
       this.studentStore.regenerateFakeStudents(120);
       this.cancelEdit();
-      this.notice.set({ type: 'success', text: 'Fake 数据已重置，已生成 120 条学生记录。' });
+      this.notice.set({ type: 'success', text: '学生场景数据已重建，已生成 120 条学生记录。' });
     } catch (error) {
       this.notice.set({ type: 'error', text: this.extractErrorMessage(error) });
     }
@@ -420,10 +475,11 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   exportStudents(): void {
     const students = this.filteredStudents();
-    const headers = ['姓名', '学号', '性别', '出生日期', '年龄', '成绩', '等级', '更新时间'] as const;
+    const headers = ['姓名', '学号', '班级', '性别', '出生日期', '年龄', '成绩', '等级', '更新时间'] as const;
     const rows = students.map(s => [
       s.name,
       s.studentNo,
+      this.resolveStudentClassName(s),
       s.gender,
       s.birthDate,
       calculateAgeFromBirthDate(s.birthDate),
@@ -463,15 +519,28 @@ export class StudentsComponent implements OnInit, OnDestroy {
     return '操作失败，请稍后重试。';
   }
 
+  resolveStudentClassName(student: Student): string {
+    if (!student.classId) {
+      return '未分班';
+    }
+
+    return this.classNameMap()[student.classId] ?? student.classId;
+  }
+
   handleSelectionChange(ids: readonly number[]): void {
     this.selectedStudentIds.set(ids);
   }
 
-  batchDeleteStudents(): void {
+  async batchDeleteStudents(): Promise<void> {
     const ids = this.selectedStudentIds();
     if (ids.length === 0) return;
 
-    const confirmed = window.confirm(`确认批量删除 ${ids.length} 名学生？该操作无法撤销。`);
+    const confirmed = await this.confirmDialog.confirm({
+      title: '批量删除学生',
+      message: `确认批量删除 ${ids.length} 名学生？该操作无法撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    });
     if (!confirmed) return;
 
     const count = this.studentStore.removeMany(ids);

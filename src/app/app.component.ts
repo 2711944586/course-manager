@@ -18,6 +18,8 @@ import { exportBackup, readBackupFile } from './core/utils/data-backup.util';
 import { ToastService } from './core/services/toast.service';
 import { ActivityLogService } from './core/services/activity-log.service';
 import { RecentWorkspaceService } from './core/services/recent-workspace.service';
+import { TeacherStoreService } from './core/services/teacher-store.service';
+import { EnrollmentStoreService } from './core/services/enrollment-store.service';
 
 interface SearchResult {
   type: 'course' | 'student';
@@ -125,14 +127,14 @@ export class AppComponent {
     },
     {
       label: '导出备份',
-      description: '下载课程与学生 JSON 备份',
+      description: '下载完整工作区 JSON 备份',
       icon: 'download',
       tone: 'secondary',
       action: 'export',
     },
     {
       label: '恢复备份',
-      description: '导入课程与学生 JSON 备份',
+      description: '恢复课程、学生、教师与选课数据',
       icon: 'upload',
       tone: 'secondary',
       action: 'import',
@@ -193,6 +195,8 @@ export class AppComponent {
     private readonly themeService: ThemeService,
     private readonly courseStore: CourseStoreService,
     private readonly studentStore: StudentStoreService,
+    private readonly teacherStore: TeacherStoreService,
+    private readonly enrollmentStore: EnrollmentStoreService,
     private readonly notificationStore: NotificationStoreService,
     private readonly toast: ToastService,
     private readonly activityLog: ActivityLogService,
@@ -300,9 +304,16 @@ export class AppComponent {
   }
 
   exportProjectBackup(): void {
-    exportBackup(this.courseStore.courses(), this.studentStore.students());
-    this.toast.success('备份已导出', '课程与学生 JSON 备份已下载到本地。');
-    this.activityLog.log('export', 'system', '系统', '从指挥条导出课程与学生数据备份');
+    exportBackup({
+      courses: this.courseStore.courses(),
+      students: this.studentStore.students(),
+      teachers: this.teacherStore.teachers(),
+      enrollments: this.enrollmentStore.enrollments(),
+      notifications: this.notificationStore.notifications(),
+      activities: this.activityLog.entries(),
+    });
+    this.toast.success('备份已导出', '完整工作区 JSON 备份已下载到本地。');
+    this.activityLog.log('export', 'system', '系统', '从指挥条导出完整工作区备份');
     this.showQuickCommands.set(false);
   }
 
@@ -321,12 +332,25 @@ export class AppComponent {
       const backup = await readBackupFile(file);
       const courseCount = this.courseStore.importAll(backup.courses);
       const studentCount = this.studentStore.importAll(backup.students);
-      this.toast.success('恢复成功', `已恢复 ${courseCount} 门课程、${studentCount} 名学生。`);
-      this.activityLog.log('import', 'system', '系统', `恢复备份：${courseCount} 门课程 / ${studentCount} 名学生`);
+      const teacherCount = this.teacherStore.importAll(backup.teachers);
+      const enrollmentCount = this.enrollmentStore.importAll(backup.enrollments);
+      const notificationCount = this.notificationStore.importAll(backup.notifications);
+      const activityCount = this.activityLog.importAll(backup.activities);
+
+      this.toast.success(
+        '恢复成功',
+        `已恢复 ${courseCount} 门课程、${studentCount} 名学生、${teacherCount} 名教师、${enrollmentCount} 条选课记录。`,
+      );
+      this.activityLog.log(
+        'import',
+        'system',
+        '系统',
+        `恢复备份：课程 ${courseCount} / 学生 ${studentCount} / 教师 ${teacherCount} / 选课 ${enrollmentCount} / 通知 ${notificationCount} / 日志 ${activityCount}`,
+      );
       this.notificationStore.addNotification({
         type: 'success',
         title: '数据恢复完成',
-        message: `已恢复 ${courseCount} 门课程、${studentCount} 名学生。`,
+        message: `已恢复 ${courseCount} 门课程、${studentCount} 名学生、${teacherCount} 名教师与 ${enrollmentCount} 条选课记录。`,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : '恢复失败';

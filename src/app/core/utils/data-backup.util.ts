@@ -1,16 +1,33 @@
 export interface BackupData {
-  version: 1;
+  version: 2;
   exportedAt: string;
   courses: unknown[];
   students: unknown[];
+  teachers: unknown[];
+  enrollments: unknown[];
+  notifications: unknown[];
+  activities: unknown[];
 }
 
-export function exportBackup(courses: readonly unknown[], students: readonly unknown[]): void {
+export interface BackupExportPayload {
+  readonly courses: readonly unknown[];
+  readonly students: readonly unknown[];
+  readonly teachers?: readonly unknown[];
+  readonly enrollments?: readonly unknown[];
+  readonly notifications?: readonly unknown[];
+  readonly activities?: readonly unknown[];
+}
+
+export function exportBackup(payload: BackupExportPayload): void {
   const backup: BackupData = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
-    courses: [...courses],
-    students: [...students],
+    courses: [...payload.courses],
+    students: [...payload.students],
+    teachers: [...(payload.teachers ?? [])],
+    enrollments: [...(payload.enrollments ?? [])],
+    notifications: [...(payload.notifications ?? [])],
+    activities: [...(payload.activities ?? [])],
   };
 
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -53,10 +70,14 @@ export function readBackupFile(file: File): Promise<BackupData> {
         }
 
         resolve({
-          version: backup.version ?? 1,
+          version: 2,
           exportedAt: backup.exportedAt ?? '',
           courses: backup.courses,
           students: backup.students,
+          teachers: Array.isArray(backup.teachers) ? backup.teachers : [],
+          enrollments: Array.isArray(backup.enrollments) ? backup.enrollments : [],
+          notifications: Array.isArray(backup.notifications) ? backup.notifications : [],
+          activities: Array.isArray(backup.activities) ? backup.activities : [],
         });
       } catch {
         reject(new Error('文件解析失败，请检查 JSON 格式'));

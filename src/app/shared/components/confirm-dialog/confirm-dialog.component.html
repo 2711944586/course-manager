@@ -1,0 +1,31 @@
+<section class="confirm-shell" [class]="'tone-' + data.tone">
+  <header class="confirm-header">
+    <div class="confirm-icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="confirm-copy">
+      <h2>{{ data.title }}</h2>
+      <p>{{ data.message }}</p>
+    </div>
+  </header>
+
+  @if (data.details?.length) {
+    <ul class="confirm-list">
+      @for (detail of data.details; track detail) {
+        <li>{{ detail }}</li>
+      }
+    </ul>
+  }
+
+  <footer class="confirm-actions">
+    <button mat-stroked-button type="button" (click)="close(false)">{{ data.cancelText }}</button>
+    <button
+      mat-flat-button
+      type="button"
+      [color]="data.tone === 'danger' ? 'warn' : 'primary'"
+      (click)="close(true)"
+    >
+      {{ data.confirmText }}
+    </button>
+  </footer>
+</section>

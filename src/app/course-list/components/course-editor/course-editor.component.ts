@@ -53,7 +53,7 @@ export class CourseEditorComponent {
     { value: 'account_tree', label: '算法' },
     { value: 'storage', label: '数据库' },
     { value: 'lan', label: '网络' },
-    { value: 'psychology', label: 'AI' },
+    { value: 'psychology', label: '洞察' },
     { value: 'memory', label: '系统' },
   ] as const;
 

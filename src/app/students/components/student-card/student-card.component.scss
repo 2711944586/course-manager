@@ -101,6 +101,19 @@
   margin-top: 2px;
 }
 
+.card-class {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent-primary-container);
+  color: var(--accent-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
 .card-score-row {
   display: flex;
   align-items: center;

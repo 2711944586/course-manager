@@ -1,0 +1,277 @@
+<div class="page-shell enrollment-shell">
+  <app-page-hero
+    title="选课控制台"
+    subtitle="面向审核、成绩录入与 SLA 跟踪的一体化选课工作台，统一查看风险标签与待办队列。"
+    badge="Enrollment Control"
+    icon="fact_check"
+  />
+
+  <section class="overview-grid animate-fade-up">
+    <article class="overview-card surface-card">
+      <span>记录总量</span>
+      <strong>{{ controlStats().total }}</strong>
+      <small>覆盖当前全部选课记录</small>
+    </article>
+    <article class="overview-card surface-card">
+      <span>待审核</span>
+      <strong>{{ controlStats().pendingReview }}</strong>
+      <small>仍在审核流程中的记录</small>
+    </article>
+    <article class="overview-card surface-card warning">
+      <span>SLA 超时</span>
+      <strong>{{ controlStats().overdue }}</strong>
+      <small>已超出处理时限，建议优先清理</small>
+    </article>
+    <article class="overview-card surface-card">
+      <span>风险标签</span>
+      <strong>{{ controlStats().highRisk }}</strong>
+      <small>存在成绩、退课或容量风险</small>
+    </article>
+  </section>
+
+  <section class="workspace-grid animate-fade-up delay-1">
+    <div class="workspace-main">
+      <div class="toolbar-card surface-card">
+        <div class="toolbar-cluster">
+          <label class="search-box">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              placeholder="搜索课程、学生、学号、审核人或风险标签"
+              [ngModel]="searchKeyword()"
+              (ngModelChange)="searchKeyword.set($event)"
+            />
+          </label>
+
+          <label class="filter-field">
+            <span>业务状态</span>
+            <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+              <option value="all">全部状态</option>
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>流程状态</span>
+            <select [ngModel]="selectedWorkflowStatus()" (ngModelChange)="selectedWorkflowStatus.set($event)">
+              <option value="all">全部流程</option>
+              @for (option of workflowOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <button class="btn-primary" matRipple (click)="startCreate()">
+          <mat-icon>playlist_add</mat-icon>
+          新增记录
+        </button>
+      </div>
+
+      @if (showEditor()) {
+        <div class="editor-panel surface-card animate-scale-in">
+          <div class="editor-heading">
+            <div>
+              <span class="eyebrow">{{ editingEnrollmentId() ? 'Edit Workflow' : 'New Workflow' }}</span>
+              <h3>{{ editingEnrollmentId() ? '编辑选课记录' : '新建选课记录' }}</h3>
+            </div>
+            <span class="status-chip" [class]="'priority-' + editForm.priority">{{ getPriorityLabel(editForm.priority) }}</span>
+          </div>
+
+          <div class="form-grid">
+            <label class="form-field">
+              <span>学生</span>
+              <select [(ngModel)]="editForm.studentId" [disabled]="editingEnrollmentId() !== null">
+                @for (student of allStudents(); track student.id) {
+                  <option [value]="student.id">{{ student.studentNo }} · {{ student.name }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field">
+              <span>课程</span>
+              <select [(ngModel)]="editForm.courseId" [disabled]="editingEnrollmentId() !== null">
+                @for (course of allCourses(); track course.id) {
+                  <option [value]="course.id">{{ course.name }} · {{ course.instructor }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field">
+              <span>成绩</span>
+              <input type="number" [(ngModel)]="editForm.score" placeholder="尚未录入可留空" min="0" max="100" />
+            </label>
+            <label class="form-field">
+              <span>业务状态</span>
+              <select [(ngModel)]="editForm.status">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field">
+              <span>流程状态</span>
+              <select [(ngModel)]="editForm.workflowStatus">
+                @for (option of workflowOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field">
+              <span>优先级</span>
+              <select [(ngModel)]="editForm.priority">
+                @for (option of priorityOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field">
+              <span>处理人</span>
+              <input type="text" [(ngModel)]="editForm.operator" placeholder="如：教务运营台" />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>处理说明</span>
+              <input type="text" [(ngModel)]="editForm.decisionReason" placeholder="填写审批、退课或归档说明" />
+            </label>
+          </div>
+
+          @if (enrollmentError()) {
+            <div class="error-msg">
+              <mat-icon>error</mat-icon>
+              {{ enrollmentError() }}
+            </div>
+          }
+
+          <div class="editor-actions">
+            <button class="btn-secondary" type="button" (click)="cancelEdit()">取消</button>
+            <button class="btn-primary" type="button" (click)="saveEnrollment()">保存记录</button>
+          </div>
+        </div>
+      }
+
+      <div class="table-container surface-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>课程与学生</th>
+              <th>业务状态</th>
+              <th>流程状态</th>
+              <th>成绩</th>
+              <th>风险标签</th>
+              <th>SLA</th>
+              <th>处理人</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (enrollment of viewModels(); track enrollment.id) {
+              <tr>
+                <td>
+                  <div class="course-cell">
+                    <mat-icon class="course-icon">book_2</mat-icon>
+                    <div class="course-info">
+                      <strong>{{ enrollment.courseName }}</strong>
+                      <span>{{ enrollment.courseInstructor }}</span>
+                      <p>{{ enrollment.studentName }} · {{ enrollment.studentNo }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="status-column">
+                    <span class="status-chip" [class]="'status-' + enrollment.status">{{ getStatusLabel(enrollment.status) }}</span>
+                    <small>{{ enrollment.enrollDate | date:'MM-dd HH:mm' }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="status-column">
+                    <span class="status-chip" [class]="'workflow-' + enrollment.workflowStatus">{{ getWorkflowLabel(enrollment.workflowStatus) }}</span>
+                    <span class="status-chip" [class]="'priority-' + enrollment.priority">{{ getPriorityLabel(enrollment.priority) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="score-cell">
+                    <strong [class.empty]="enrollment.score === null">{{ enrollment.score !== null ? enrollment.score : '-' }}</strong>
+                    <span class="grade-badge" [class]="'grade-' + enrollment.grade.toLowerCase()">{{ enrollment.grade }}</span>
+                  </div>
+                </td>
+                <td>
+                  @if (enrollment.riskFlags.length > 0) {
+                    <div class="tag-group">
+                      @for (tag of enrollment.riskFlags; track tag) {
+                        <span class="tag-chip">{{ tag }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="muted-text">无</span>
+                  }
+                </td>
+                <td>
+                  <div class="sla-cell" [class.overdue]="isSlaOverdue(enrollment)">
+                    <strong>{{ enrollment.slaDeadline | date:'MM-dd HH:mm' }}</strong>
+                    <span>{{ isSlaOverdue(enrollment) ? '已超时' : '处理中' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="meta-column">
+                    <strong>{{ enrollment.operator }}</strong>
+                    <span>{{ enrollment.decisionReason }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="icon-btn" title="编辑" type="button" (click)="startEdit(enrollment)">
+                      <mat-icon>edit_note</mat-icon>
+                    </button>
+                    <button class="icon-btn danger" title="删除" type="button" (click)="deleteEnrollment(enrollment)">
+                      <mat-icon>delete_sweep</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (viewModels().length === 0) {
+          <div class="empty-state">
+            <mat-icon>receipt_long</mat-icon>
+            <p>暂无符合条件的选课记录</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <aside class="queue-panel surface-card">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Action Queue</span>
+          <h3>待办队列</h3>
+        </div>
+        <span class="panel-badge">{{ queuePreview().length }} 条</span>
+      </div>
+
+      @if (queuePreview().length > 0) {
+        <div class="queue-list">
+          @for (item of queuePreview(); track item.id) {
+            <article class="queue-card">
+              <div class="queue-head">
+                <strong>{{ item.studentName }}</strong>
+                <span class="status-chip" [class]="'priority-' + item.priority">{{ getPriorityLabel(item.priority) }}</span>
+              </div>
+              <p>{{ item.courseName }}</p>
+              <div class="queue-meta">
+                <span>{{ getWorkflowLabel(item.workflowStatus) }}</span>
+                <span [class.overdue]="isSlaOverdue(item)">{{ isSlaOverdue(item) ? 'SLA 超时' : 'SLA 正常' }}</span>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-side">
+          <mat-icon>inventory_2</mat-icon>
+          <p>当前没有待优先处理的选课事项。</p>
+        </div>
+      }
+    </aside>
+  </section>
+</div>

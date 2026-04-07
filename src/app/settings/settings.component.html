@@ -113,40 +113,40 @@
 
     <section class="settings-section surface-card">
       <div class="section-header">
-        <div class="section-icon"><mat-icon>auto_awesome</mat-icon></div>
+        <div class="section-icon"><mat-icon>insights</mat-icon></div>
         <div>
-          <h3>AI Provider 预留</h3>
-          <p>保存 endpoint / model / key 状态位，为未来接口接入预留位置。</p>
+          <h3>分析服务预设</h3>
+          <p>保存服务地址、服务标识与访问凭证，用于对接外部分析服务。</p>
         </div>
         <span class="status-chip" [class]="'status-' + aiStatus()">{{ aiStatusLabel() }}</span>
       </div>
 
       <form class="ai-grid" autocomplete="off" (submit)="$event.preventDefault(); saveAiStub()">
         <label class="ai-field">
-          <span>Endpoint</span>
-          <input type="text" name="ai-endpoint" autocomplete="url" [ngModel]="aiDraft().endpoint" (ngModelChange)="updateAiField('endpoint', $event)" placeholder="https://api.example.com/v1" />
+          <span>服务地址</span>
+          <input type="text" name="ai-endpoint" autocomplete="url" [ngModel]="aiDraft().endpoint" (ngModelChange)="updateAiField('endpoint', $event)" placeholder="https://analysis.example.com/api" />
         </label>
         <label class="ai-field">
-          <span>Model</span>
-          <input type="text" name="ai-model" autocomplete="off" [ngModel]="aiDraft().model" (ngModelChange)="updateAiField('model', $event)" placeholder="gpt-5.4-mini" />
+          <span>服务标识</span>
+          <input type="text" name="ai-model" autocomplete="off" [ngModel]="aiDraft().model" (ngModelChange)="updateAiField('model', $event)" placeholder="risk-summary-service" />
         </label>
         <label class="ai-field ai-field-wide">
-          <span>API Key</span>
-          <input type="password" name="ai-api-key" autocomplete="new-password" [ngModel]="aiDraft().apiKey" (ngModelChange)="updateAiField('apiKey', $event)" placeholder="sk-..." />
+          <span>访问凭证</span>
+          <input type="password" name="ai-api-key" autocomplete="new-password" [ngModel]="aiDraft().apiKey" (ngModelChange)="updateAiField('apiKey', $event)" placeholder="请输入访问凭证" />
         </label>
       </form>
 
       <div class="ai-meta-grid">
         <div class="meta-chip">
-          <span>当前 Endpoint</span>
+          <span>当前服务地址</span>
           <strong>{{ aiConfig().endpoint || '未配置' }}</strong>
         </div>
         <div class="meta-chip">
-          <span>当前 Model</span>
+          <span>当前服务标识</span>
           <strong>{{ aiConfig().model || '未配置' }}</strong>
         </div>
         <div class="meta-chip">
-          <span>Key 状态</span>
+          <span>凭证状态</span>
           <strong>{{ aiConfig().apiKey ? '已填写' : '未填写' }}</strong>
         </div>
       </div>
@@ -154,11 +154,11 @@
       <div class="data-actions">
         <button mat-stroked-button (click)="saveAiStub()">
           <mat-icon>save</mat-icon>
-          保存占位配置
+          保存服务配置
         </button>
         <button mat-stroked-button (click)="resetAiStub()">
           <mat-icon>restart_alt</mat-icon>
-          重置占位配置
+          重置服务配置
         </button>
       </div>
     </section>
@@ -188,8 +188,8 @@
             <span class="meta-value">Standalone Components · Signals</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">存储方式</span>
-            <span class="meta-value">LocalStorage (纯前端)</span>
+            <span class="meta-label">数据模式</span>
+            <span class="meta-value">本地安全存储</span>
           </div>
           <div class="meta-item">
             <span class="meta-label">构建工具</span>

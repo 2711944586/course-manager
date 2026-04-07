@@ -112,6 +112,23 @@ tbody tr {
   font-weight: 500;
 }
 
+.name-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.class-hint {
+  display: inline-flex;
+  width: fit-content;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent-primary-container);
+  color: var(--accent-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
 .updated-cell {
   color: var(--text-secondary);
 }

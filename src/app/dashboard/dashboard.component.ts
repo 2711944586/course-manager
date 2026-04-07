@@ -67,8 +67,8 @@ export class DashboardComponent {
       tone: 'primary',
     },
     {
-      label: '进入智能洞察',
-      description: '查看对比、趋势与 AI 预留摘要。',
+      label: '进入风险分析',
+      description: '查看对比、趋势与运营摘要。',
       icon: 'auto_awesome',
       route: '/analytics',
       tone: 'secondary',

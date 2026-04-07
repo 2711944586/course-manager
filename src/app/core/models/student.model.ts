@@ -5,6 +5,7 @@ export interface Student {
   readonly name: string;
   readonly studentNo: string;
   readonly gender: StudentGender;
+  readonly classId: string | null;
   readonly birthDate: string;
   readonly score: number;
   readonly updatedAt: string;
@@ -14,6 +15,7 @@ export interface StudentUpsertInput {
   readonly name: string;
   readonly studentNo: string;
   readonly gender: StudentGender;
+  readonly classId?: string | null;
   readonly birthDate: string;
   readonly score: number;
 }

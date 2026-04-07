@@ -1,268 +1,120 @@
-import { Component, computed, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
-import { TeacherStoreService } from '../core/services/teacher-store.service';
-import { Teacher, TeacherUpsertInput } from '../core/models/teacher.model';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
+import {
+  TEACHER_STATUS_OPTIONS,
+  Teacher,
+  TeacherStatus,
+  TeacherUpsertInput,
+} from '../core/models/teacher.model';
+import { TeacherStoreService } from '../core/services/teacher-store.service';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
+
+interface TeacherFormValue {
+  employeeNo: string;
+  name: string;
+  title: string;
+  department: string;
+  email: string;
+  phone: string;
+  office: string;
+  expertiseText: string;
+  maxWeeklyHours: number | string;
+  currentWeeklyHours: number | string;
+  status: TeacherStatus;
+}
 
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatRippleModule, PageHeroComponent],
-  template: `
-    <div class="page-shell">
-      <app-page-hero
-        title="教师团队"
-        subtitle="管理全校教研人员信息，分配授课权限。"
-        badge="Faculty Management"
-        icon="school"
-      />
-
-      <section class="content-grid animate-fade-up">
-        <div class="toolbar-card surface-card">
-          <div class="search-box">
-            <mat-icon>search</mat-icon>
-            <input 
-              type="text" 
-              placeholder="搜索教师姓名或院系..." 
-              [ngModel]="searchKeyword()"
-              (ngModelChange)="searchKeyword.set($event)"
-            />
-          </div>
-          <button class="btn-primary" matRipple (click)="startCreate()">
-            <mat-icon>add</mat-icon> 新增教师
-          </button>
-        </div>
-
-        @if (showEditor()) {
-          <div class="editor-panel surface-card animate-scale-in">
-            <h3>{{ editingTeacherId() ? '编辑' : '新增' }}教师</h3>
-            <div class="form-grid">
-              <div class="form-field">
-                <label>姓名</label>
-                <input type="text" [(ngModel)]="editForm.name" placeholder="请输入教师姓名" />
-              </div>
-              <div class="form-field">
-                <label>职称</label>
-                <select [(ngModel)]="editForm.title">
-                  <option value="教授">教授</option>
-                  <option value="副教授">副教授</option>
-                  <option value="讲师">讲师</option>
-                  <option value="助教">助教</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label>所属院系</label>
-                <input type="text" [(ngModel)]="editForm.department" placeholder="如：计算机学院" />
-              </div>
-              <div class="form-field">
-                <label>工作邮箱</label>
-                <input type="email" [(ngModel)]="editForm.email" placeholder="example@university.edu.cn" />
-              </div>
-            </div>
-            <div class="actions">
-              <button class="btn-secondary" (click)="cancelEdit()">取消</button>
-              <button class="btn-primary" (click)="saveTeacher()">保存</button>
-            </div>
-          </div>
-        }
-
-        <div class="table-container surface-card">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>姓名</th>
-                <th>职称</th>
-                <th>院系</th>
-                <th>邮箱</th>
-                <th>状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (teacher of filteredTeachers(); track teacher.id) {
-                <tr>
-                  <td>
-                    <div class="user-cell">
-                      <div class="avatar">{{ teacher.name.charAt(0) }}</div>
-                      <strong>{{ teacher.name }}</strong>
-                    </div>
-                  </td>
-                  <td><span class="badge info">{{ teacher.title }}</span></td>
-                  <td>{{ teacher.department }}</td>
-                  <td>{{ teacher.email }}</td>
-                  <td>
-                    <span class="badge success">在职</span>
-                  </td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="icon-btn" title="编辑" (click)="startEdit(teacher)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button class="icon-btn danger" title="删除" (click)="deleteTeacher(teacher)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-
-          @if (filteredTeachers().length === 0) {
-            <div class="empty-state">
-              <mat-icon>groups</mat-icon>
-              <p>暂无符合条件的教师数据</p>
-            </div>
-          }
-        </div>
-      </section>
-    </div>
-  `,
-  styles: [`
-    :host { display: block; height: 100%; overflow-y: auto; overflow-x: hidden; padding: 0 28px 40px; }
-    .toolbar-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 24px;
-      margin-bottom: 24px;
-    }
-    .search-box {
-      display: flex;
-      align-items: center;
-      background: var(--bg-surface-low);
-      border: 1px solid var(--border-default);
-      border-radius: var(--radius-sm);
-      padding: 8px 16px;
-      width: 300px;
-      mat-icon { color: var(--text-tertiary); margin-right: 8px; font-size: 20px; width: 20px; height: 20px; }
-      input {
-        border: none;
-        background: transparent;
-        outline: none;
-        color: var(--text-primary);
-        width: 100%;
-        font-family: inherit;
-        &::placeholder { color: var(--text-tertiary); }
-      }
-      &:focus-within { border-color: var(--accent-primary); }
-    }
-    .btn-primary {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 20px;
-      background: var(--accent-primary);
-      color: var(--text-on-accent);
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-      &:hover { background: var(--accent-primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-    }
-    .btn-secondary {
-      padding: 10px 20px;
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border-default);
-      border-radius: var(--radius-sm);
-      font-weight: 500;
-      cursor: pointer;
-      &:hover { background: var(--bg-hover); color: var(--text-primary); }
-    }
-    .editor-panel {
-      padding: 24px;
-      margin-bottom: 24px;
-      border-top: 4px solid var(--accent-primary);
-      h3 { margin: 0 0 20px 0; font-size: 1.1rem; color: var(--text-primary); }
-    }
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 24px;
-    }
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
-      input, select {
-        padding: 10px 12px;
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-sm);
-        background: var(--bg-surface-low);
-        color: var(--text-primary);
-        font-family: inherit;
-        outline: none;
-        transition: border-color 0.2s;
-        &:focus { border-color: var(--accent-primary); }
-      }
-    }
-    .actions { display: flex; justify-content: flex-end; gap: 12px; }
-    
-    .table-container { overflow-x: auto; padding: 0; }
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      th, td { padding: 16px 24px; border-bottom: 1px solid var(--border-default); }
-      th { font-weight: 500; color: var(--text-secondary); font-size: 0.85rem; background: var(--bg-surface-low); text-transform: uppercase; letter-spacing: 0.05em; }
-      tr:last-child td { border-bottom: none; }
-      tr:hover td { background: var(--bg-tint); }
-    }
-    .user-cell { display: flex; align-items: center; gap: 12px; }
-    .avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: var(--accent-primary-container);
-      color: var(--accent-primary-text);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 0.9rem;
-    }
-    .badge {
-      padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
-      &.success { background: var(--accent-success-container); color: var(--accent-success); }
-      &.info { background: var(--accent-info-container); color: var(--accent-info); }
-    }
-    .action-buttons { display: flex; gap: 8px; }
-    .icon-btn {
-      width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; cursor: pointer;
-      color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-      &:hover { background: var(--bg-hover); color: var(--accent-primary); }
-      &.danger:hover { background: var(--accent-error-container); color: var(--accent-error); }
-    }
-    .empty-state { display: flex; flex-direction: column; align-items: center; padding: 60px 20px; color: var(--text-tertiary); mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; } }
-  `]
+  imports: [CommonModule, FormsModule, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
+  templateUrl: './teachers.component.html',
+  styleUrl: './teachers.component.scss',
 })
 export class TeachersComponent {
   private readonly store = inject(TeacherStoreService);
-  
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
   readonly searchKeyword = signal('');
+  readonly selectedDepartment = signal<'all' | string>('all');
+  readonly selectedStatus = signal<'all' | TeacherStatus>('all');
   readonly creating = signal(false);
   readonly editingTeacherId = signal<number | null>(null);
 
   readonly teachers = this.store.teachers;
+  readonly statusOptions = TEACHER_STATUS_OPTIONS;
+
+  readonly departmentOptions = computed(() =>
+    [...new Set(this.teachers().map(teacher => teacher.department))].sort((first, second) =>
+      first.localeCompare(second, 'zh-CN'),
+    ),
+  );
+
+  readonly teacherStats = computed(() => {
+    const teachers = this.teachers();
+    const activeTeachers = teachers.filter(teacher => teacher.status === 'active').length;
+    const overloadedTeachers = teachers.filter(teacher => teacher.currentWeeklyHours > teacher.maxWeeklyHours).length;
+    const pendingTeachers = teachers.filter(teacher => teacher.status === 'pending').length;
+    const averageLoad =
+      teachers.length > 0
+        ? Math.round(
+            teachers.reduce((total, teacher) => total + this.getLoadPercent(teacher), 0) / teachers.length,
+          )
+        : 0;
+
+    return {
+      total: teachers.length,
+      active: activeTeachers,
+      overloaded: overloadedTeachers,
+      pending: pendingTeachers,
+      averageLoad,
+    };
+  });
+
   readonly filteredTeachers = computed(() => {
     const keyword = this.searchKeyword().trim().toLowerCase();
-    if (!keyword) return this.teachers();
-    
-    return this.teachers().filter(t => 
-      t.name.toLowerCase().includes(keyword) || 
-      t.department.toLowerCase().includes(keyword)
-    );
+    const department = this.selectedDepartment();
+    const status = this.selectedStatus();
+
+    return this.teachers()
+      .filter(teacher => {
+        const keywordMatched =
+          keyword.length === 0 ||
+          [
+            teacher.name,
+            teacher.employeeNo,
+            teacher.department,
+            teacher.office,
+            teacher.email,
+            ...teacher.expertise,
+          ].some(field => field.toLowerCase().includes(keyword));
+        const departmentMatched = department === 'all' || teacher.department === department;
+        const statusMatched = status === 'all' || teacher.status === status;
+
+        return keywordMatched && departmentMatched && statusMatched;
+      })
+      .sort((firstTeacher, secondTeacher) => {
+        const loadDiff = this.getLoadPercent(secondTeacher) - this.getLoadPercent(firstTeacher);
+        if (loadDiff !== 0) {
+          return loadDiff;
+        }
+
+        return new Date(secondTeacher.updatedAt).getTime() - new Date(firstTeacher.updatedAt).getTime();
+      });
   });
+
+  readonly spotlightTeachers = computed(() =>
+    [...this.teachers()]
+      .sort((firstTeacher, secondTeacher) => this.getLoadPercent(secondTeacher) - this.getLoadPercent(firstTeacher))
+      .slice(0, 4),
+  );
 
   readonly showEditor = computed(() => this.creating() || this.editingTeacherId() !== null);
 
-  editForm: TeacherUpsertInput = this.getEmptyForm();
+  editForm: TeacherFormValue = this.getEmptyForm();
 
   startCreate(): void {
     this.creating.set(true);
@@ -273,31 +125,120 @@ export class TeachersComponent {
   startEdit(teacher: Teacher): void {
     this.creating.set(false);
     this.editingTeacherId.set(teacher.id);
-    this.editForm = { ...teacher };
+    this.editForm = this.toFormValue(teacher);
   }
 
   cancelEdit(): void {
     this.creating.set(false);
     this.editingTeacherId.set(null);
+    this.editForm = this.getEmptyForm();
   }
 
   saveTeacher(): void {
+    const payload = this.toPayload();
     const id = this.editingTeacherId();
+
     if (id) {
-      this.store.updateTeacher(id, this.editForm);
+      this.store.updateTeacher(id, payload);
     } else {
-      this.store.createTeacher(this.editForm);
+      this.store.createTeacher(payload);
     }
+
     this.cancelEdit();
   }
 
-  deleteTeacher(teacher: Teacher): void {
-    if (confirm(`确定要删除教师 ${teacher.name} 吗？`)) {
+  async deleteTeacher(teacher: Teacher): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: '删除教师档案',
+      message: `确认删除教师 ${teacher.name}（${teacher.employeeNo}）？该操作不可撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    });
+
+    if (confirmed) {
       this.store.removeTeacher(teacher.id);
     }
   }
 
-  private getEmptyForm(): TeacherUpsertInput {
-    return { name: '', title: '讲师', department: '', email: '', active: true };
+  getLoadPercent(teacher: Teacher): number {
+    if (teacher.maxWeeklyHours <= 0) {
+      return 0;
+    }
+
+    return Math.min(160, Math.round((teacher.currentWeeklyHours / teacher.maxWeeklyHours) * 100));
+  }
+
+  getStatusLabel(status: TeacherStatus): string {
+    return this.statusOptions.find(option => option.value === status)?.label ?? status;
+  }
+
+  getLoadLabel(teacher: Teacher): string {
+    if (teacher.currentWeeklyHours > teacher.maxWeeklyHours) {
+      return '超载';
+    }
+
+    if (this.getLoadPercent(teacher) >= 85) {
+      return '高负荷';
+    }
+
+    return '平稳';
+  }
+
+  private getEmptyForm(): TeacherFormValue {
+    return {
+      employeeNo: this.generateEmployeeNo(),
+      name: '',
+      title: '讲师',
+      department: '',
+      email: '',
+      phone: '',
+      office: '',
+      expertiseText: '课程建设, 学业督导',
+      maxWeeklyHours: 12,
+      currentWeeklyHours: 8,
+      status: 'active',
+    };
+  }
+
+  private toFormValue(teacher: Teacher): TeacherFormValue {
+    return {
+      employeeNo: teacher.employeeNo,
+      name: teacher.name,
+      title: teacher.title,
+      department: teacher.department,
+      email: teacher.email,
+      phone: teacher.phone,
+      office: teacher.office,
+      expertiseText: teacher.expertise.join(', '),
+      maxWeeklyHours: teacher.maxWeeklyHours,
+      currentWeeklyHours: teacher.currentWeeklyHours,
+      status: teacher.status,
+    };
+  }
+
+  private toPayload(): TeacherUpsertInput {
+    return {
+      employeeNo: this.editForm.employeeNo,
+      name: this.editForm.name,
+      title: this.editForm.title,
+      department: this.editForm.department,
+      email: this.editForm.email,
+      phone: this.editForm.phone,
+      office: this.editForm.office,
+      expertise: this.editForm.expertiseText.split(/[,，]/).map(item => item.trim()).filter(Boolean),
+      maxWeeklyHours: Number(this.editForm.maxWeeklyHours),
+      currentWeeklyHours: Number(this.editForm.currentWeeklyHours),
+      status: this.editForm.status,
+      active: this.editForm.status === 'active',
+    };
+  }
+
+  private generateEmployeeNo(): string {
+    const nextSequence = this.teachers().reduce((maxValue, teacher) => {
+      const parsed = Number.parseInt(teacher.employeeNo.replace(/\D/g, ''), 10);
+      return Number.isFinite(parsed) ? Math.max(maxValue, parsed) : maxValue;
+    }, 26000) + 1;
+
+    return `T${String(nextSequence).padStart(5, '0')}`;
   }
 }

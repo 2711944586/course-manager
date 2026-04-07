@@ -9,6 +9,7 @@ const DEFAULT_FAKE_COUNT = 120;
 const MIN_NAME_LENGTH = 2;
 const STUDENT_NO_REGEX = /^\d{8,12}$/;
 const EARLIEST_BIRTH_DATE = '1980-01-01';
+const DEFAULT_CLASS_IDS = ['CS2021', 'SE2021', 'AI2021', 'NET2021', 'DS2021', 'BUS2021'] as const;
 
 export interface StudentLoadOptions {
   readonly delayMs?: number;
@@ -60,7 +61,7 @@ export class StudentStoreService {
       throw new Error('学生不存在，无法更新');
     }
 
-    const normalizedInput = this.normalizeInput(input);
+    const normalizedInput = this.normalizeInput(input, existingStudent.classId);
     this.ensureStudentNoUnique(normalizedInput.studentNo, studentId);
 
     const updatedStudent: Student = {
@@ -124,7 +125,7 @@ export class StudentStoreService {
       if (Array.isArray(parsedData)) {
         const validStudents = parsedData.filter(item => this.isStudent(item));
         if (validStudents.length > 0) {
-          return validStudents;
+          return this.withDefaultClassIds(validStudents);
         }
       }
     } catch {
@@ -138,7 +139,10 @@ export class StudentStoreService {
     return this.studentState().reduce((maxId, student) => Math.max(maxId, student.id), 0) + 1;
   }
 
-  private normalizeInput(input: StudentUpsertInput): Omit<Student, 'id' | 'updatedAt'> {
+  private normalizeInput(
+    input: StudentUpsertInput,
+    fallbackClassId: string | null = DEFAULT_CLASS_IDS[0],
+  ): Omit<Student, 'id' | 'updatedAt'> {
     const normalizedName = input.name.trim();
     const normalizedStudentNo = input.studentNo.trim();
 
@@ -157,6 +161,7 @@ export class StudentStoreService {
       name: normalizedName,
       studentNo: normalizedStudentNo,
       gender: input.gender,
+      classId: input.classId?.trim() || fallbackClassId,
       birthDate: normalizedBirthDate,
       score: normalizedScore,
     };
@@ -228,6 +233,7 @@ export class StudentStoreService {
         name: `${surname}${givenName}`,
         studentNo,
         gender,
+        classId: DEFAULT_CLASS_IDS[index % DEFAULT_CLASS_IDS.length],
         birthDate,
         score,
         updatedAt,
@@ -287,6 +293,10 @@ export class StudentStoreService {
 
     const typedStudent = candidate as Partial<Student>;
     const isValidGender = typedStudent.gender === 'male' || typedStudent.gender === 'female';
+    const isValidClassId =
+      typedStudent.classId === undefined ||
+      typedStudent.classId === null ||
+      typeof typedStudent.classId === 'string';
 
     return (
       typeof typedStudent.id === 'number' &&
@@ -295,6 +305,7 @@ export class StudentStoreService {
       typeof typedStudent.birthDate === 'string' &&
       typeof typedStudent.updatedAt === 'string' &&
       typeof typedStudent.score === 'number' &&
+      isValidClassId &&
       isValidGender
     );
   }
@@ -302,8 +313,15 @@ export class StudentStoreService {
   importAll(students: unknown[]): number {
     const valid = students.filter((item): item is Student => this.isStudent(item));
     if (valid.length > 0) {
-      this.writeStudents(valid);
+      this.writeStudents(this.withDefaultClassIds(valid));
     }
     return valid.length;
+  }
+
+  private withDefaultClassIds(students: readonly Student[]): readonly Student[] {
+    return students.map((student, index) => ({
+      ...student,
+      classId: student.classId?.trim() || DEFAULT_CLASS_IDS[index % DEFAULT_CLASS_IDS.length],
+    }));
   }
 }

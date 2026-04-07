@@ -15,6 +15,8 @@ import { exportBackup } from '../core/utils/data-backup.util';
 import { AiInsightService } from '../core/services/ai-insight.service';
 import { AiProviderStubConfig } from '../core/models/insight.model';
 import { safeStorageGetItem, safeStorageKeys, safeStorageRemoveItem } from '../core/utils/safe-storage.util';
+import { NotificationStoreService } from '../core/services/notification-store.service';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-settings',
@@ -64,6 +66,8 @@ export class SettingsComponent {
     private readonly activityLog: ActivityLogService,
     private readonly toast: ToastService,
     private readonly aiInsights: AiInsightService,
+    private readonly notificationStore: NotificationStoreService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {
     this.aiDraft.set(this.aiInsights.config());
   }
@@ -75,14 +79,27 @@ export class SettingsComponent {
   }
 
   exportAllData(): void {
-    exportBackup(this.courseStore.courses(), this.studentStore.students());
+    exportBackup({
+      courses: this.courseStore.courses(),
+      students: this.studentStore.students(),
+      teachers: this.teacherStore.teachers(),
+      enrollments: this.enrollmentStore.enrollments(),
+      notifications: this.notificationStore.notifications(),
+      activities: this.activityLog.entries(),
+    });
     this.showMessage('数据已导出为 JSON 文件', 'success');
     this.toast.success('导出成功', '数据备份文件已下载到本地');
     this.activityLog.log('export', 'system', '系统', '导出全部数据备份');
   }
 
-  resetAllData(): void {
-    if (!confirm('确定要重置所有数据？此操作将清除课程、学生、教师、选课及活动日志数据，不可撤销。')) return;
+  async resetAllData(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: '重置全部数据',
+      message: '该操作将清除课程、学生、教师、选课、通知和活动日志数据，且不可撤销。',
+      confirmText: '确认重置',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     const resetKeys = [
       'aurora.course-manager.courses',
@@ -99,13 +116,19 @@ export class SettingsComponent {
       safeStorageRemoveItem(key);
     }
 
-    this.showMessage('数据已重置，请刷新页面以加载种子数据', 'success');
+    this.showMessage('数据已重置，请刷新页面以加载初始数据', 'success');
     this.toast.info('数据已重置', '页面将在 1.5 秒后自动刷新');
     setTimeout(() => window.location.reload(), 1500);
   }
 
-  clearActivityLog(): void {
-    if (!confirm('确定清除全部活动日志？')) return;
+  async clearActivityLog(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: '清除活动日志',
+      message: '清除后将无法再回看最近操作记录。',
+      confirmText: '确认清除',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
     this.activityLog.clearAll();
     this.showMessage('活动日志已清除', 'success');
     this.toast.success('日志已清除', '全部活动日志已清空');
@@ -117,14 +140,14 @@ export class SettingsComponent {
 
   saveAiStub(): void {
     this.aiInsights.saveStubConfig(this.aiDraft());
-    this.showMessage('AI Provider 占位配置已保存', 'success');
-    this.toast.info('AI 占位配置已更新', '当前仅保存前端 stub 配置，不发起真实连接');
+    this.showMessage('分析服务配置已保存', 'success');
+    this.toast.info('分析服务配置已更新', '已保存服务地址、服务标识与访问凭证信息');
   }
 
   resetAiStub(): void {
     this.aiInsights.resetStubConfig();
     this.aiDraft.set(this.aiInsights.config());
-    this.showMessage('AI Provider 占位配置已重置', 'success');
+    this.showMessage('分析服务配置已重置', 'success');
   }
 
   private showMessage(text: string, type: 'success' | 'error'): void {

@@ -6,6 +6,7 @@
     <div class="card-info">
       <a class="card-name" [routerLink]="'/students/detail/' + student.id">{{ student.name }}</a>
       <span class="card-meta">{{ student.studentNo }} · {{ genderLabel }} · {{ age }}岁</span>
+      <span class="card-class">{{ className }}</span>
     </div>
   </div>
 

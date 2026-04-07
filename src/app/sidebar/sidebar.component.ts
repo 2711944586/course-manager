@@ -39,15 +39,38 @@ export class SidebarComponent {
       route: '/students',
     },
     {
+      icon: 'school',
+      label: '教师',
+      route: '/teachers',
+    },
+    {
+      icon: 'how_to_reg',
+      label: '选课',
+      route: '/enrollments',
+      exact: true,
+    },
+    {
       icon: 'analytics',
       label: '洞察',
       route: '/analytics',
       exact: true,
     },
     {
+      icon: 'assessment',
+      label: '报表',
+      route: '/reports',
+      exact: true,
+    },
+    {
       icon: 'calendar_month',
       label: '日程',
       route: '/schedule',
+      exact: true,
+    },
+    {
+      icon: 'history',
+      label: '日志',
+      route: '/activity-log',
       exact: true,
     },
     {

@@ -357,8 +357,8 @@ export class InsightEngineService {
     if (metrics.passRate < 85 || metrics.completionRate < 55) {
       actions.push({
         id: 'action-open-analytics',
-        label: '查看智能洞察',
-        description: '进入分析页签，查看对比结论和 AI 预留摘要。',
+        label: '查看风险分析',
+        description: '进入分析页签，查看对比结论和运营摘要。',
         icon: 'auto_awesome',
         route: '/analytics',
         tone: 'primary',

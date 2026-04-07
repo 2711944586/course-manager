@@ -1,7 +1,7 @@
 <div class="page-shell">
   <app-page-hero
-    title="智能分析中枢"
-    subtitle="以概览、对比、智能洞察三层结构组织全局分析，并为未来 AI 接口预留工作台。"
+    title="分析中枢"
+    subtitle="以概览、对比、洞察三层结构组织全局分析，集中呈现风险、基线差异与行动建议。"
     icon="analytics"
     [badge]="totalStudents() + ' 名学生 · ' + totalCourses() + ' 门课程'"
   />
@@ -14,7 +14,7 @@
       <mat-icon>compare_arrows</mat-icon> 对比
     </button>
     <button [class.active]="activeTab() === 'intelligence'" (click)="activeTab.set('intelligence')">
-      <mat-icon>auto_awesome</mat-icon> 智能洞察
+      <mat-icon>auto_awesome</mat-icon> 洞察
     </button>
   </nav>
 
@@ -141,7 +141,7 @@
           <app-donut-chart [data]="passBand()" centerLabel="成绩" />
         </div>
         <div class="chart-panel surface-card">
-          <h3 class="chart-title"><mat-icon>compare</mat-icon> AI 基线对比</h3>
+          <h3 class="chart-title"><mat-icon>compare</mat-icon> 基线对比</h3>
           <div class="compare-list">
             @for (card of aiBaselineComparisons(); track card.id) {
               <article class="compare-item">
@@ -162,9 +162,9 @@
     <section class="page-section">
       <div class="ai-status-card surface-card animate-fade-up delay-2">
         <div>
-          <span class="status-kicker">AI Adapter</span>
-          <h3>智能接口预留状态</h3>
-          <p>当前为本地 mock provider，仅生成摘要与建议，不发起真实外部请求。</p>
+          <span class="status-kicker">分析服务</span>
+          <h3>分析服务状态</h3>
+          <p>基于教务数据自动生成摘要、风险预警与运营建议。</p>
         </div>
         <span class="status-chip" [class]="'status-' + aiStatus()">{{ aiStatusLabel() }}</span>
       </div>
@@ -173,7 +173,7 @@
         <article class="surface-card">
           <div class="section-heading">
             <div>
-              <h2>本地智能摘要</h2>
+              <h2>重点摘要</h2>
               <p>优先展示高风险对象与关键趋势结论。</p>
             </div>
           </div>
@@ -194,7 +194,7 @@
           <div class="section-heading">
             <div>
               <h2>推荐动作</h2>
-              <p>从本地规则层直接生成下一步建议。</p>
+              <p>基于当前数据状态生成下一步建议。</p>
             </div>
           </div>
           <div class="action-list">

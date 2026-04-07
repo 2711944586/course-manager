@@ -12,6 +12,7 @@ import { StudentStoreService } from '../core/services/student-store.service';
 import { scoreToGrade } from '../core/utils/score-grade.util';
 import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
 import { UiNotice } from '../shared/models/ui-notice.model';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -50,6 +51,7 @@ export class CourseDetailComponent {
     private readonly router: Router,
     private readonly courseStore: CourseStoreService,
     private readonly studentStore: StudentStoreService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {
     effect(
       () => {
@@ -123,14 +125,19 @@ export class CourseDetailComponent {
     }
   }
 
-  deleteCourse(): void {
+  async deleteCourse(): Promise<void> {
     const selectedCourse = this.course();
     if (!selectedCourse) {
       this.notice.set({ type: 'error', text: '课程不存在，无法删除。' });
       return;
     }
 
-    const confirmed = window.confirm(`确认删除课程“${selectedCourse.name}”？该操作无法撤销。`);
+    const confirmed = await this.confirmDialog.confirm({
+      title: '删除课程',
+      message: `确认删除课程“${selectedCourse.name}”？该操作无法撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    });
     if (!confirmed) {
       return;
     }

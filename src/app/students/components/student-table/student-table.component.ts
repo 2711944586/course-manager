@@ -16,6 +16,7 @@ import { scoreToGrade, type Grade } from '../../../core/utils/score-grade.util';
 })
 export class StudentTableComponent implements OnChanges {
   @Input({ required: true }) students: readonly Student[] = [];
+  @Input() classNameByStudentId: Readonly<Record<number, string>> = {};
   @Input() keyword = '';
   @Input() currentPage = 1;
   @Input() totalPages = 1;
@@ -92,6 +93,10 @@ export class StudentTableComponent implements OnChanges {
 
   computeGrade(score: number): Grade {
     return scoreToGrade(score);
+  }
+
+  resolveClassName(studentId: number): string {
+    return this.classNameByStudentId[studentId] ?? '未分班';
   }
 
   goTo(page: number): void {

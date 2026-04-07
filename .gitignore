@@ -10,6 +10,11 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+.env
+server/.env
+.conda/
+.venv/
+venv/
 
 # IDEs and editors
 .idea/
@@ -41,6 +46,20 @@ chrome-dom.html
 runtime-dev.log
 runtime-dev.err.log
 .tmp-ng-*.log
+scripts/seed/output/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+server/data/*.db
+server/data/*.db-*
+server/data/*.backup
+server/data/*.bak
+server/data/*.pre-class-feature-backup
 
 # System files
 .DS_Store

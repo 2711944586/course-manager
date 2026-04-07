@@ -50,6 +50,15 @@ export class ActivityLogService {
     this.saveToStorage([]);
   }
 
+  importAll(entries: unknown[]): number {
+    const validEntries = entries.filter((item): item is ActivityEntry => this.isActivityEntry(item));
+    if (validEntries.length > 0) {
+      this.entriesSignal.set(validEntries.slice(0, MAX_ENTRIES));
+      this.saveToStorage(validEntries.slice(0, MAX_ENTRIES));
+    }
+    return validEntries.length;
+  }
+
   filterByEntity(entity: ActivityEntry['entity']): readonly ActivityEntry[] {
     return this.entriesSignal().filter(e => e.entity === entity);
   }
@@ -60,12 +69,7 @@ export class ActivityLogService {
       if (!raw) return this.generateSeedData();
       const parsed: unknown = JSON.parse(raw);
       if (!Array.isArray(parsed)) return this.generateSeedData();
-      return parsed.filter(
-        (item): item is ActivityEntry =>
-          typeof item === 'object' && item !== null &&
-          typeof item.id === 'number' && typeof item.action === 'string' &&
-          typeof item.entity === 'string' && typeof item.timestamp === 'string'
-      );
+      return parsed.filter((item): item is ActivityEntry => this.isActivityEntry(item));
     } catch {
       return this.generateSeedData();
     }
@@ -75,10 +79,27 @@ export class ActivityLogService {
     safeStorageSetItem(STORAGE_KEY, JSON.stringify(entries));
   }
 
+  private isActivityEntry(candidate: unknown): candidate is ActivityEntry {
+    if (!candidate || typeof candidate !== 'object') {
+      return false;
+    }
+
+    const typedEntry = candidate as Partial<ActivityEntry>;
+
+    return (
+      typeof typedEntry.id === 'number' &&
+      typeof typedEntry.action === 'string' &&
+      typeof typedEntry.entity === 'string' &&
+      typeof typedEntry.entityName === 'string' &&
+      typeof typedEntry.detail === 'string' &&
+      typeof typedEntry.timestamp === 'string'
+    );
+  }
+
   private generateSeedData(): ActivityEntry[] {
     const now = Date.now();
     const entries: ActivityEntry[] = [
-      { id: now - 1, action: 'create', entity: 'system', entityName: '系统', detail: '系统初始化，生成种子数据', timestamp: new Date(now - 86400000).toISOString() },
+      { id: now - 1, action: 'create', entity: 'system', entityName: '系统', detail: '系统初始化，加载默认数据', timestamp: new Date(now - 86400000).toISOString() },
       { id: now - 2, action: 'create', entity: 'course', entityName: '高等数学', detail: '创建课程：高等数学', timestamp: new Date(now - 82800000).toISOString() },
       { id: now - 3, action: 'create', entity: 'student', entityName: '张明远', detail: '新增学生：张明远 (S20260001)', timestamp: new Date(now - 79200000).toISOString() },
       { id: now - 4, action: 'update', entity: 'course', entityName: '线性代数', detail: '更新课程进度：45% → 60%', timestamp: new Date(now - 72000000).toISOString() },

@@ -171,6 +171,9 @@ body.app-theme-light {
   --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-decel: cubic-bezier(0, 0, 0.2, 1);
+  --motion-fast: 180ms;
+  --motion-medium: 260ms;
+  --motion-slow: 420ms;
 }
 
 // ── Dark Theme Tokens ──
@@ -302,6 +305,9 @@ body.app-theme-dark {
   --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-decel: cubic-bezier(0, 0, 0.2, 1);
+  --motion-fast: 180ms;
+  --motion-medium: 260ms;
+  --motion-slow: 420ms;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -379,6 +385,7 @@ body::before {
   width: 260px;
   height: 220px;
   background: var(--shell-glow-a);
+  opacity: 0.85;
 }
 
 body::after {
@@ -387,6 +394,7 @@ body::after {
   width: 320px;
   height: 240px;
   background: var(--shell-glow-b);
+  opacity: 0.78;
 }
 
 // ── Scrollbar ──
@@ -782,6 +790,19 @@ a,
   border: 1px solid var(--border-default) !important;
   border-radius: var(--radius-xl) !important;
   box-shadow: var(--shadow-xl) !important;
+}
+
+.confirm-dialog-panel .mat-mdc-dialog-container {
+  padding: 20px !important;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 98%, transparent), color-mix(in srgb, var(--bg-surface-low) 92%, transparent)) !important;
+  box-shadow:
+    var(--shadow-xl),
+    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 82%, transparent) !important;
+}
+
+.confirm-dialog-panel .mat-mdc-dialog-surface {
+  background: transparent !important;
 }
 
 .mat-mdc-snack-bar-container {

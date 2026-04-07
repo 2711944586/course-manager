@@ -1,0 +1,260 @@
+<div class="page-shell teacher-shell">
+  <app-page-hero
+    title="教师团队"
+    subtitle="围绕工号、排班负荷、专长标签和联络信息建立统一的教师运营工作台。"
+    badge="Faculty Operations"
+    icon="school"
+  />
+
+  <section class="overview-grid animate-fade-up">
+    <article class="overview-card surface-card">
+      <span>教师总量</span>
+      <strong>{{ teacherStats().total }}</strong>
+      <small>覆盖全部已建档教研人员</small>
+    </article>
+    <article class="overview-card surface-card">
+      <span>在岗教师</span>
+      <strong>{{ teacherStats().active }}</strong>
+      <small>当前可直接排课与分配任务</small>
+    </article>
+    <article class="overview-card surface-card warning">
+      <span>负荷预警</span>
+      <strong>{{ teacherStats().overloaded }}</strong>
+      <small>已超出容量上限，建议优先调整</small>
+    </article>
+    <article class="overview-card surface-card">
+      <span>平均负荷</span>
+      <strong>{{ teacherStats().averageLoad }}%</strong>
+      <small>反映本周教师资源利用率</small>
+    </article>
+  </section>
+
+  <section class="workspace-grid animate-fade-up delay-1">
+    <div class="workspace-main">
+      <div class="toolbar-card surface-card">
+        <div class="toolbar-cluster">
+          <label class="search-box">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              placeholder="搜索姓名、工号、院系或专长标签"
+              [ngModel]="searchKeyword()"
+              (ngModelChange)="searchKeyword.set($event)"
+            />
+          </label>
+
+          <label class="filter-field">
+            <span>院系</span>
+            <select [ngModel]="selectedDepartment()" (ngModelChange)="selectedDepartment.set($event)">
+              <option value="all">全部院系</option>
+              @for (department of departmentOptions(); track department) {
+                <option [value]="department">{{ department }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>状态</span>
+            <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+              <option value="all">全部状态</option>
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <button class="btn-primary" matRipple (click)="startCreate()">
+          <mat-icon>person_add</mat-icon>
+          新增教师
+        </button>
+      </div>
+
+      @if (showEditor()) {
+        <div class="editor-panel surface-card animate-scale-in">
+          <div class="editor-heading">
+            <div>
+              <span class="eyebrow">{{ editingTeacherId() ? 'Edit Faculty' : 'New Faculty' }}</span>
+              <h3>{{ editingTeacherId() ? '编辑教师档案' : '新建教师档案' }}</h3>
+            </div>
+            <span class="status-chip" [class]="'status-' + editForm.status">{{ getStatusLabel(editForm.status) }}</span>
+          </div>
+
+          <div class="form-grid">
+            <label class="form-field">
+              <span>教师工号</span>
+              <input type="text" [(ngModel)]="editForm.employeeNo" placeholder="T26018" />
+            </label>
+            <label class="form-field">
+              <span>姓名</span>
+              <input type="text" [(ngModel)]="editForm.name" placeholder="请输入教师姓名" />
+            </label>
+            <label class="form-field">
+              <span>职称</span>
+              <select [(ngModel)]="editForm.title">
+                <option value="教授">教授</option>
+                <option value="副教授">副教授</option>
+                <option value="讲师">讲师</option>
+                <option value="助教">助教</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>所属院系</span>
+              <input type="text" [(ngModel)]="editForm.department" placeholder="如：计算机学院" />
+            </label>
+            <label class="form-field">
+              <span>工作邮箱</span>
+              <input type="email" [(ngModel)]="editForm.email" placeholder="teacher@campus.example.edu.cn" />
+            </label>
+            <label class="form-field">
+              <span>联系电话</span>
+              <input type="text" [(ngModel)]="editForm.phone" placeholder="13800000000" />
+            </label>
+            <label class="form-field">
+              <span>办公地点</span>
+              <input type="text" [(ngModel)]="editForm.office" placeholder="如：博学楼 A-302" />
+            </label>
+            <label class="form-field">
+              <span>当前状态</span>
+              <select [(ngModel)]="editForm.status">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>专长标签</span>
+              <input type="text" [(ngModel)]="editForm.expertiseText" placeholder="课程建设, 教学评估, 学业督导" />
+            </label>
+            <label class="form-field">
+              <span>每周容量</span>
+              <input type="number" [(ngModel)]="editForm.maxWeeklyHours" min="0" max="30" />
+            </label>
+            <label class="form-field">
+              <span>当前负荷</span>
+              <input type="number" [(ngModel)]="editForm.currentWeeklyHours" min="0" max="30" />
+            </label>
+          </div>
+
+          <div class="editor-actions">
+            <button class="btn-secondary" type="button" (click)="cancelEdit()">取消</button>
+            <button class="btn-primary" type="button" (click)="saveTeacher()">保存档案</button>
+          </div>
+        </div>
+      }
+
+      <div class="table-container surface-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>教师信息</th>
+              <th>组织与联系</th>
+              <th>专长标签</th>
+              <th>排班负荷</th>
+              <th>状态</th>
+              <th>最近复核</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (teacher of filteredTeachers(); track teacher.id) {
+              <tr>
+                <td>
+                  <div class="teacher-cell">
+                    <div class="avatar">{{ teacher.name.charAt(0) }}</div>
+                    <div>
+                      <strong>{{ teacher.name }}</strong>
+                      <p>{{ teacher.employeeNo }} · {{ teacher.title }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="meta-column">
+                    <strong>{{ teacher.department }}</strong>
+                    <span>{{ teacher.office }}</span>
+                    <span>{{ teacher.email }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="tag-group">
+                    @for (tag of teacher.expertise; track tag) {
+                      <span class="tag-chip">{{ tag }}</span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <div class="load-cell">
+                    <div class="load-row">
+                      <strong>{{ teacher.currentWeeklyHours }}/{{ teacher.maxWeeklyHours }} 节</strong>
+                      <span [class.warning]="teacher.currentWeeklyHours > teacher.maxWeeklyHours">
+                        {{ getLoadLabel(teacher) }}
+                      </span>
+                    </div>
+                    <div class="load-track">
+                      <span class="load-fill" [style.width.%]="getLoadPercent(teacher)"></span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-chip" [class]="'status-' + teacher.status">{{ getStatusLabel(teacher.status) }}</span>
+                </td>
+                <td class="time-cell">{{ teacher.lastReviewAt | date:'MM-dd HH:mm' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="icon-btn" title="编辑" type="button" (click)="startEdit(teacher)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button class="icon-btn danger" title="删除" type="button" (click)="deleteTeacher(teacher)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (filteredTeachers().length === 0) {
+          <div class="empty-state">
+            <mat-icon>groups</mat-icon>
+            <p>暂无符合条件的教师档案</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <aside class="spotlight-panel surface-card">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Load Watch</span>
+          <h3>负荷关注名单</h3>
+        </div>
+        <span class="panel-badge">{{ teacherStats().pending }} 名待排班</span>
+      </div>
+
+      <div class="spotlight-list">
+        @for (teacher of spotlightTeachers(); track teacher.id) {
+          <article class="spotlight-card">
+            <div class="spotlight-head">
+              <div>
+                <strong>{{ teacher.name }}</strong>
+                <p>{{ teacher.department }} · {{ teacher.title }}</p>
+              </div>
+              <span class="status-chip" [class]="'status-' + teacher.status">{{ getStatusLabel(teacher.status) }}</span>
+            </div>
+            <div class="spotlight-load">
+              <span>本周负荷 {{ getLoadPercent(teacher) }}%</span>
+              <div class="load-track compact">
+                <span class="load-fill" [style.width.%]="getLoadPercent(teacher)"></span>
+              </div>
+            </div>
+            <div class="spotlight-meta">
+              <span>{{ teacher.office }}</span>
+              <span>{{ teacher.phone || '暂无电话' }}</span>
+            </div>
+          </article>
+        }
+      </div>
+    </aside>
+  </section>
+</div>

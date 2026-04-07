@@ -50,6 +50,14 @@ export class NotificationStoreService {
     this.writeNotifications([]);
   }
 
+  importAll(notifications: unknown[]): number {
+    const validNotifications = notifications.filter((item): item is Notification => this.isNotification(item));
+    if (validNotifications.length > 0) {
+      this.writeNotifications(validNotifications);
+    }
+    return validNotifications.length;
+  }
+
   private writeNotifications(notifications: readonly Notification[]): void {
     this.notificationState.set(notifications);
     safeStorageSetItem(STORAGE_KEY, JSON.stringify(notifications));
@@ -64,12 +72,7 @@ export class NotificationStoreService {
     try {
       const parsed: unknown = JSON.parse(rawData);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.filter(
-          (item): item is Notification =>
-            typeof item === 'object' && item !== null &&
-            typeof item.id === 'number' && typeof item.title === 'string' &&
-            typeof item.type === 'string'
-        );
+        return parsed.filter((item): item is Notification => this.isNotification(item));
       }
     } catch {
       return this.generateFakeNotifications();
@@ -79,6 +82,28 @@ export class NotificationStoreService {
 
   private getNextNotificationId(): number {
     return this.notificationState().reduce((maxId, n) => Math.max(maxId, n.id), 0) + 1;
+  }
+
+  private isNotification(candidate: unknown): candidate is Notification {
+    if (!candidate || typeof candidate !== 'object') {
+      return false;
+    }
+
+    const typedNotification = candidate as Partial<Notification>;
+    const isValidType =
+      typedNotification.type === 'info' ||
+      typedNotification.type === 'success' ||
+      typedNotification.type === 'warning' ||
+      typedNotification.type === 'error';
+
+    return (
+      typeof typedNotification.id === 'number' &&
+      typeof typedNotification.title === 'string' &&
+      typeof typedNotification.message === 'string' &&
+      typeof typedNotification.date === 'string' &&
+      typeof typedNotification.read === 'boolean' &&
+      isValidType
+    );
   }
 
   private generateFakeNotifications(): readonly Notification[] {

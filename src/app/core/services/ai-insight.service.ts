@@ -20,7 +20,7 @@ class LocalMockInsightProvider implements AiInsightProvider {
     ].map(card => ({
       ...card,
       id: `ai-summary-${card.id}`,
-      tags: [...(card.tags ?? []), 'Local Mock'],
+      tags: [...(card.tags ?? []), '规则引擎'],
     }));
   }
 
@@ -92,15 +92,15 @@ export class AiInsightService {
   readonly statusLabel = computed(() => {
     const status = this.status();
     if (status === 'configured') {
-      return '已配置占位 Provider';
+      return '已启用服务配置';
     }
     if (status === 'offline') {
-      return '配置未完整';
+      return '配置待完善';
     }
     if (status === 'error') {
-      return '连接异常';
+      return '服务异常';
     }
-    return '未连接';
+    return '未启用';
   });
 
   readonly summaryCards = computed(() => this.provider.summarize(this.insightEngine.snapshot()));

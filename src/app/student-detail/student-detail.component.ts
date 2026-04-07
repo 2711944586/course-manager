@@ -8,6 +8,7 @@ import { STUDENT_GENDER_LABELS } from '../core/models/student.model';
 import { calculateAgeFromBirthDate } from '../core/utils/date-age.util';
 import { scoreToGrade, GRADE_LABELS } from '../core/utils/score-grade.util';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
+import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-student-detail',
@@ -39,13 +40,19 @@ export class StudentDetailComponent {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly studentStore: StudentStoreService,
+    private readonly confirmDialog: ConfirmDialogService,
   ) {
     this.studentId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
-  deleteStudent(): void {
+  async deleteStudent(): Promise<void> {
     const s = this.student();
-    if (s && confirm(`确定删除学生「${s.name}」？此操作不可撤销。`)) {
+    if (s && await this.confirmDialog.confirm({
+      title: '删除学生',
+      message: `确定删除学生「${s.name}」？此操作不可撤销。`,
+      confirmText: '确认删除',
+      tone: 'danger',
+    })) {
       this.studentStore.removeStudent(s.id);
       this.router.navigateByUrl('/students');
     }
