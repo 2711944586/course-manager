@@ -1,10 +1,17 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+import { buildApiUrl } from '../config/api.config';
 import { Course, CourseStatus, CourseUpsertInput } from '../models/course.model';
+import { extractHttpErrorMessage } from '../utils/http-error.util';
 import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.courses';
 const MIN_NAME_LENGTH = 2;
 const MIN_DESCRIPTION_LENGTH = 10;
+
+type CourseApiRecord = Course & { readonly teacherId?: number | null };
 
 const SEED_COURSES: readonly Course[] = [
   {
@@ -155,38 +162,69 @@ const SEED_COURSES: readonly Course[] = [
 
 @Injectable({ providedIn: 'root' })
 export class CourseStoreService {
+  private readonly http = inject(HttpClient);
+  private readonly coursesUrl = buildApiUrl('/courses');
   private readonly courseState = signal<readonly Course[]>(this.loadCourses());
 
   readonly courses = computed(() => this.courseState());
+
+  constructor() {
+    void this.refreshCourses();
+  }
 
   getCourseById(courseId: number): Course | undefined {
     return this.courseState().find(course => course.id === courseId);
   }
 
-  createCourse(input: CourseUpsertInput): Course {
+  async refreshCourses(): Promise<readonly Course[]> {
+    try {
+      const courses = await firstValueFrom(this.http.get<readonly CourseApiRecord[]>(this.coursesUrl));
+      const normalizedCourses = courses
+        .map(course => this.normalizeCourseRecord(course))
+        .filter((course): course is Course => course !== null);
+
+      this.writeCourses(normalizedCourses);
+
+      return normalizedCourses;
+    } catch (error) {
+      if (this.courseState().length > 0) {
+        return this.courseState();
+      }
+
+      throw new Error(extractHttpErrorMessage(error, '加载课程列表失败'));
+    }
+  }
+
+  async createCourse(input: CourseUpsertInput): Promise<Course> {
     const normalizedInput = this.normalizeInput(input);
-    const createdCourse: Course = {
-      id: this.getNextCourseId(),
-      updatedAt: new Date().toISOString(),
-      ...normalizedInput,
-    };
+    const createdCourse = this.normalizeCourseRecord(
+      await firstValueFrom(this.http.post<CourseApiRecord>(this.coursesUrl, this.toCourseRequestPayload(normalizedInput))),
+    );
+
+    if (!createdCourse) {
+      throw new Error('课程创建成功，但返回数据无效');
+    }
 
     this.writeCourses([createdCourse, ...this.courseState()]);
     return createdCourse;
   }
 
-  updateCourse(courseId: number, input: CourseUpsertInput): Course {
+  async updateCourse(courseId: number, input: CourseUpsertInput): Promise<Course> {
     const existingCourse = this.getCourseById(courseId);
     if (!existingCourse) {
       throw new Error('课程不存在，无法更新');
     }
 
     const normalizedInput = this.normalizeInput(input);
-    const updatedCourse: Course = {
-      ...existingCourse,
-      ...normalizedInput,
-      updatedAt: new Date().toISOString(),
-    };
+    const updatedCourse = this.normalizeCourseRecord(
+      await firstValueFrom(
+        this.http.put<CourseApiRecord>(`${this.coursesUrl}/${courseId}`, this.toCourseRequestPayload(normalizedInput)),
+      ),
+    );
+
+    if (!updatedCourse) {
+      throw new Error('课程更新成功，但返回数据无效');
+    }
 
     const nextCourses = this.courseState().map(course =>
       course.id === courseId ? updatedCourse : course,
@@ -196,16 +234,17 @@ export class CourseStoreService {
     return updatedCourse;
   }
 
-  removeCourse(courseId: number): void {
+  async removeCourse(courseId: number): Promise<void> {
     const nextCourses = this.courseState().filter(course => course.id !== courseId);
     if (nextCourses.length === this.courseState().length) {
       throw new Error('课程不存在，无法删除');
     }
 
+    await firstValueFrom(this.http.delete<void>(`${this.coursesUrl}/${courseId}`));
     this.writeCourses(nextCourses);
   }
 
-  updateProgress(courseId: number, nextProgress: number): Course {
+  async updateProgress(courseId: number, nextProgress: number): Promise<Course> {
     const targetCourse = this.getCourseById(courseId);
     if (!targetCourse) {
       throw new Error('课程不存在，无法更新进度');
@@ -214,19 +253,12 @@ export class CourseStoreService {
     const normalizedProgress = this.normalizeProgress(nextProgress);
     const updatedStatus = this.resolveStatusByProgress(targetCourse.status, normalizedProgress);
 
-    const updatedCourse: Course = {
+    return this.updateCourse(courseId, {
       ...targetCourse,
       progress: normalizedProgress,
       status: updatedStatus,
-      updatedAt: new Date().toISOString(),
-    };
-
-    const nextCourses = this.courseState().map(course =>
-      course.id === courseId ? updatedCourse : course,
-    );
-
-    this.writeCourses(nextCourses);
-    return updatedCourse;
+      teacherId: targetCourse.teacherId ?? null,
+    });
   }
 
   private writeCourses(courses: readonly Course[]): void {
@@ -243,7 +275,9 @@ export class CourseStoreService {
     try {
       const parsedData = JSON.parse(rawData) as unknown;
       if (Array.isArray(parsedData)) {
-        const validCourses = parsedData.filter(item => this.isCourse(item));
+        const validCourses = parsedData
+          .map(item => this.normalizeCourseRecord(item))
+          .filter((item): item is Course => item !== null);
         if (validCourses.length > 0) {
           return validCourses;
         }
@@ -269,7 +303,7 @@ export class CourseStoreService {
       throw new Error('课程名称至少需要 2 个字符');
     }
 
-    if (!normalizedInstructor) {
+    if (!normalizedInstructor && input.teacherId === null) {
       throw new Error('授课教师不能为空');
     }
 
@@ -287,6 +321,7 @@ export class CourseStoreService {
 
     return {
       name: normalizedName,
+      teacherId: input.teacherId ?? null,
       instructor: normalizedInstructor,
       schedule: normalizedSchedule,
       description: normalizedDescription,
@@ -359,6 +394,45 @@ export class CourseStoreService {
       typeof typedCourse.updatedAt === 'string' &&
       isValidStatus
     );
+  }
+
+  private normalizeCourseRecord(candidate: unknown): Course | null {
+    if (!this.isCourse(candidate)) {
+      return null;
+    }
+
+    const typedCourse = candidate as CourseApiRecord;
+    return {
+      id: typedCourse.id,
+      name: typedCourse.name,
+      teacherId:
+        typeof typedCourse.teacherId === 'number' && Number.isFinite(typedCourse.teacherId)
+          ? typedCourse.teacherId
+          : typedCourse.teacherId === null
+            ? null
+            : null,
+      instructor: typedCourse.instructor,
+      schedule: typedCourse.schedule,
+      description: typedCourse.description,
+      progress: typedCourse.progress,
+      students: typedCourse.students,
+      status: typedCourse.status,
+      icon: typedCourse.icon,
+      updatedAt: typedCourse.updatedAt,
+    };
+  }
+
+  private toCourseRequestPayload(input: Omit<Course, 'id' | 'updatedAt'>): Record<string, unknown> {
+    return {
+      name: input.name,
+      teacherId: input.teacherId ?? null,
+      instructor: input.instructor,
+      schedule: input.schedule,
+      description: input.description,
+      progress: input.progress,
+      status: input.status,
+      icon: input.icon,
+    };
   }
 
   importAll(courses: unknown[]): number {

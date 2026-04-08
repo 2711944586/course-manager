@@ -14,11 +14,10 @@ class CourseBase(CamelModel):
     status: str
     icon: str
     teacher_id: Optional[int] = None
-    updated_at: datetime
 
 
 class CourseCreate(CourseBase):
-    pass
+    instructor: Optional[str] = None
 
 
 class CourseUpdate(CamelModel):
@@ -29,10 +28,11 @@ class CourseUpdate(CamelModel):
     status: Optional[str] = None
     icon: Optional[str] = None
     teacher_id: Optional[int] = None
-    updated_at: Optional[datetime] = None
+    instructor: Optional[str] = None
 
 
 class CourseRead(CourseBase):
     id: int
+    updated_at: datetime
     instructor: str
     students: int

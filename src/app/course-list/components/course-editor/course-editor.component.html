@@ -18,9 +18,13 @@
 
       <mat-form-field appearance="outline">
         <mat-label>授课教师</mat-label>
-        <input matInput formControlName="instructor" />
-        @if (isInvalid('instructor')) {
-          <mat-error>{{ getErrorMessage('instructor') }}</mat-error>
+        <mat-select formControlName="teacherId">
+          @for (teacher of teachers(); track teacher.id) {
+            <mat-option [value]="teacher.id">{{ teacher.name }} · {{ teacher.department }}</mat-option>
+          }
+        </mat-select>
+        @if (isInvalid('teacherId')) {
+          <mat-error>{{ getErrorMessage('teacherId') }}</mat-error>
         }
       </mat-form-field>
 

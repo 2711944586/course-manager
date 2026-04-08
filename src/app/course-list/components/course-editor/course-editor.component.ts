@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,11 +11,12 @@ import {
   CourseStatus,
   CourseUpsertInput,
 } from '../../../core/models/course.model';
+import { TeacherStoreService } from '../../../core/services/teacher-store.service';
 
 type CourseEditorMode = 'create' | 'edit';
 type CourseFormControlName =
   | 'name'
-  | 'instructor'
+  | 'teacherId'
   | 'schedule'
   | 'description'
   | 'progress'
@@ -38,6 +39,8 @@ type CourseFormControlName =
   styleUrl: './course-editor.component.scss',
 })
 export class CourseEditorComponent {
+  private readonly teacherStore = inject(TeacherStoreService);
+
   @Input({ required: true }) mode: CourseEditorMode = 'create';
   @Input() set course(value: Course | null) {
     this.patchForm(value);
@@ -56,10 +59,11 @@ export class CourseEditorComponent {
     { value: 'psychology', label: '洞察' },
     { value: 'memory', label: '系统' },
   ] as const;
+  readonly teachers = this.teacherStore.teachers;
 
   readonly form = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    instructor: ['', [Validators.required]],
+    teacherId: [null as number | null, [Validators.required]],
     schedule: ['', [Validators.required]],
     description: ['', [Validators.required, Validators.minLength(10)]],
     progress: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -77,9 +81,11 @@ export class CourseEditorComponent {
     }
 
     const rawValue = this.form.getRawValue();
+    const selectedTeacher = rawValue.teacherId !== null ? this.teacherStore.getTeacherById(rawValue.teacherId) : undefined;
     const payload: CourseUpsertInput = {
       name: rawValue.name.trim(),
-      instructor: rawValue.instructor.trim(),
+      teacherId: rawValue.teacherId,
+      instructor: selectedTeacher?.name ?? '',
       schedule: rawValue.schedule.trim(),
       description: rawValue.description.trim(),
       progress: Number(rawValue.progress),
@@ -122,7 +128,7 @@ export class CourseEditorComponent {
       this.form.reset(
         {
           name: '',
-          instructor: '',
+          teacherId: null,
           schedule: '',
           description: '',
           progress: 0,
@@ -138,7 +144,7 @@ export class CourseEditorComponent {
     this.form.reset(
       {
         name: course.name,
-        instructor: course.instructor,
+        teacherId: course.teacherId ?? this.resolveTeacherIdByName(course.instructor),
         schedule: course.schedule,
         description: course.description,
         progress: course.progress,
@@ -148,5 +154,14 @@ export class CourseEditorComponent {
       },
       { emitEvent: false },
     );
+  }
+
+  private resolveTeacherIdByName(instructor: string): number | null {
+    const normalizedInstructor = instructor.trim();
+    if (!normalizedInstructor) {
+      return null;
+    }
+
+    return this.teacherStore.teachers().find(teacher => teacher.name === normalizedInstructor)?.id ?? null;
   }
 }

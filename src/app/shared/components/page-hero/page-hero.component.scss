@@ -7,27 +7,17 @@
   overflow: hidden;
   padding: 30px 30px 26px;
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 90%, transparent), color-mix(in srgb, var(--bg-surface-low) 88%, transparent)),
-    radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.16), transparent 38%),
-    radial-gradient(circle at 0% 100%, rgba(94, 234, 212, 0.12), transparent 32%);
+  background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  box-shadow:
-    var(--shadow-md),
-    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 86%, transparent);
-  backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-sm);
 
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(120deg, color-mix(in srgb, var(--surface-sheen) 68%, transparent), transparent 34%),
-      radial-gradient(ellipse 56% 74% at 100% 0%, var(--accent-primary-container), transparent 60%),
-      linear-gradient(90deg, transparent 0, transparent 18%, var(--premium-grid-line) 18%, transparent 18.8%) 0 0 / 16px 16px;
+    inset: auto 30px 0 30px;
+    height: 1px;
+    background: var(--border-subtle);
     pointer-events: none;
-    opacity: 0.95;
   }
 
   &::after {
@@ -37,8 +27,8 @@
     width: 84px;
     height: 3px;
     border-radius: 999px;
-    background: var(--gradient-primary);
-    box-shadow: 0 0 22px color-mix(in srgb, var(--accent-primary) 34%, transparent);
+    background: var(--accent-primary);
+    box-shadow: none;
   }
 }
 
@@ -87,11 +77,7 @@ p {
 
 :host-context(body.app-theme-light) {
   .hero-banner {
-    background:
-      radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.12), transparent 38%),
-      radial-gradient(circle at 0% 100%, rgba(15, 118, 110, 0.08), transparent 34%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 248, 252, 0.96));
-    box-shadow: 0 20px 46px rgba(15, 23, 32, 0.08);
+    box-shadow: 0 16px 34px rgba(15, 23, 32, 0.06);
   }
 }
 

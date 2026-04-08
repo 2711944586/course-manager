@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
+import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
+import { UiNotice } from '../shared/models/ui-notice.model';
 import {
   ENROLLMENT_PRIORITY_OPTIONS,
   ENROLLMENT_STATUS_OPTIONS,
@@ -22,7 +24,7 @@ import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 @Component({
   selector: 'app-enrollments',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, InlineNoticeComponent, DatePipe],
   templateUrl: './enrollments.component.html',
   styleUrl: './enrollments.component.scss',
 })
@@ -37,6 +39,7 @@ export class EnrollmentsComponent {
   readonly selectedWorkflowStatus = signal<'all' | EnrollmentWorkflowStatus>('all');
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
+  readonly notice = signal<UiNotice | null>(null);
 
   readonly statusOptions = ENROLLMENT_STATUS_OPTIONS;
   readonly workflowOptions = ENROLLMENT_WORKFLOW_OPTIONS;
@@ -126,8 +129,20 @@ export class EnrollmentsComponent {
     });
 
     if (confirmed) {
-      this.store.removeEnrollment(enrollment.id);
+      try {
+        await this.store.removeEnrollment(enrollment.id);
+        this.notice.set({ type: 'success', text: '选课记录已删除。' });
+      } catch (error) {
+        this.notice.set({
+          type: 'error',
+          text: error instanceof Error ? error.message : '删除选课记录失败，请稍后重试。',
+        });
+      }
     }
+  }
+
+  closeNotice(): void {
+    this.notice.set(null);
   }
 
   getStatusLabel(status: EnrollmentStatus): string {

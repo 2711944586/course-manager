@@ -1,5 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
 import { ActivityLogService } from './activity-log.service';
+import { buildApiUrl } from '../config/api.config';
 import {
   Enrollment,
   EnrollmentPriority,
@@ -9,18 +13,44 @@ import {
 } from '../models/enrollment.model';
 import { StudentStoreService } from './student-store.service';
 import { CourseStoreService } from './course-store.service';
+import { extractHttpErrorMessage } from '../utils/http-error.util';
 import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.enrollments';
 
 @Injectable({ providedIn: 'root' })
 export class EnrollmentStoreService {
+  private readonly http = inject(HttpClient);
   private readonly studentStore = inject(StudentStoreService);
   private readonly courseStore = inject(CourseStoreService);
   private readonly activityLog = inject(ActivityLogService);
+  private readonly enrollmentsUrl = buildApiUrl('/enrollments');
   private readonly enrollmentState = signal<readonly Enrollment[]>(this.loadEnrollments());
 
   readonly enrollments = computed(() => this.enrollmentState());
+
+  constructor() {
+    void this.refreshEnrollments();
+  }
+
+  async refreshEnrollments(): Promise<readonly Enrollment[]> {
+    try {
+      const enrollments = await firstValueFrom(this.http.get<readonly Enrollment[]>(this.enrollmentsUrl));
+      const normalizedEnrollments = enrollments
+        .map(item => this.hydrateEnrollment(item))
+        .filter((item): item is Enrollment => item !== null);
+
+      this.writeEnrollments(normalizedEnrollments);
+
+      return normalizedEnrollments;
+    } catch (error) {
+      if (this.enrollmentState().length > 0) {
+        return this.enrollmentState();
+      }
+
+      throw new Error(extractHttpErrorMessage(error, '加载选课记录失败'));
+    }
+  }
 
   getEnrollmentById(enrollmentId: number): Enrollment | undefined {
     return this.enrollmentState().find(enr => enr.id === enrollmentId);
@@ -34,7 +64,7 @@ export class EnrollmentStoreService {
     return this.enrollmentState().filter(enr => enr.courseId === courseId);
   }
 
-  createEnrollment(input: EnrollmentUpsertInput): Enrollment {
+  async createEnrollment(input: EnrollmentUpsertInput): Promise<Enrollment> {
     const student = this.studentStore.getStudentById(input.studentId);
     if (!student) {
       throw new Error('学生不存在，无法创建选课记录');
@@ -48,19 +78,17 @@ export class EnrollmentStoreService {
     const now = new Date();
     const normalizedInput = this.normalizeInput(input, now, course.students);
 
-    const createdEnrollment: Enrollment = {
-      id: this.getNextEnrollmentId(),
-      updatedAt: now.toISOString(),
-      enrollDate: now.toISOString(),
-      ...normalizedInput,
-    };
+    const createdEnrollment = await firstValueFrom(
+      this.http.post<Enrollment>(this.enrollmentsUrl, normalizedInput),
+    );
 
     this.writeEnrollments([createdEnrollment, ...this.enrollmentState()]);
+    await this.courseStore.refreshCourses();
     this.activityLog.log('create', 'enrollment', '选课记录', `${student.name} 选修 ${course.name}`);
     return createdEnrollment;
   }
 
-  updateEnrollment(enrollmentId: number, input: EnrollmentUpsertInput): Enrollment {
+  async updateEnrollment(enrollmentId: number, input: EnrollmentUpsertInput): Promise<Enrollment> {
     const existingEnrollment = this.getEnrollmentById(enrollmentId);
     if (!existingEnrollment) {
       throw new Error('选课记录不存在，无法更新');
@@ -79,29 +107,30 @@ export class EnrollmentStoreService {
     const now = new Date();
     const normalizedInput = this.normalizeInput(input, now, course.students, existingEnrollment);
 
-    const updatedEnrollment: Enrollment = {
-      ...existingEnrollment,
-      ...normalizedInput,
-      updatedAt: now.toISOString(),
-    };
+    const updatedEnrollment = await firstValueFrom(
+      this.http.put<Enrollment>(`${this.enrollmentsUrl}/${enrollmentId}`, normalizedInput),
+    );
 
     const nextEnrollments = this.enrollmentState().map(enr =>
       enr.id === enrollmentId ? updatedEnrollment : enr,
     );
 
     this.writeEnrollments(nextEnrollments);
+    await this.courseStore.refreshCourses();
     this.activityLog.log('update', 'enrollment', '选课记录', `${student.name} / ${course.name} 记录已更新`);
     return updatedEnrollment;
   }
 
-  removeEnrollment(enrollmentId: number): void {
+  async removeEnrollment(enrollmentId: number): Promise<void> {
     const existingEnrollment = this.getEnrollmentById(enrollmentId);
     if (!existingEnrollment) {
       throw new Error('选课记录不存在，无法删除');
     }
 
+    await firstValueFrom(this.http.delete<void>(`${this.enrollmentsUrl}/${enrollmentId}`));
     const nextEnrollments = this.enrollmentState().filter(enr => enr.id !== enrollmentId);
     this.writeEnrollments(nextEnrollments);
+    await this.courseStore.refreshCourses();
     const student = this.studentStore.getStudentById(existingEnrollment.studentId);
     const course = this.courseStore.getCourseById(existingEnrollment.courseId);
     this.activityLog.log(

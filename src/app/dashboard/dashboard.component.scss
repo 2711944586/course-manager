@@ -182,7 +182,7 @@
     bottom: 6px;
     left: 19px;
     width: 1px;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--accent-primary) 28%, transparent), color-mix(in srgb, var(--border-subtle) 84%, transparent));
+    background: color-mix(in srgb, var(--accent-primary) 22%, var(--border-subtle));
     pointer-events: none;
   }
 }
@@ -214,11 +214,7 @@
 }
 
 .action-card-primary {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--accent-primary-container) 78%, var(--bg-surface) 22%),
-    color-mix(in srgb, var(--bg-surface-low) 84%, var(--accent-primary-container) 16%)
-  );
+  background: color-mix(in srgb, var(--accent-primary-container) 34%, var(--bg-surface));
   border-color: color-mix(in srgb, var(--accent-primary) 18%, var(--border-default));
 }
 
@@ -323,7 +319,7 @@
 }
 
 .severity-critical {
-  border-color: rgba(251, 113, 133, 0.28);
+  border-color: color-mix(in srgb, var(--accent-danger) 32%, transparent);
 }
 
 .severity-risk {

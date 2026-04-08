@@ -68,7 +68,7 @@ export class StudentEditComponent {
     }));
   }
 
-  save(): void {
+  async save(): Promise<void> {
     const d = this.draft();
     if (!d.name.trim() || !d.studentNo.trim() || !d.birthDate) {
       this.notice.set({ type: 'error', text: '请填写所有必填字段。' });
@@ -77,11 +77,11 @@ export class StudentEditComponent {
 
     try {
       if (this.studentId) {
-        this.studentStore.updateStudent(this.studentId, d);
+        await this.studentStore.updateStudent(this.studentId, d);
         this.notice.set({ type: 'success', text: '学生信息已更新。' });
         setTimeout(() => this.router.navigateByUrl(`/students/detail/${this.studentId}`), 600);
       } else {
-        const created = this.studentStore.createStudent(d);
+        const created = await this.studentStore.createStudent(d);
         this.notice.set({ type: 'success', text: '学生创建成功。' });
         setTimeout(() => this.router.navigateByUrl(`/students/detail/${created.id}`), 600);
       }

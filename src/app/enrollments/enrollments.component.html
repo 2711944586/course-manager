@@ -6,6 +6,10 @@
     icon="fact_check"
   />
 
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
   <section class="overview-grid animate-fade-up">
     <article class="overview-card surface-card">
       <span>记录总量</span>

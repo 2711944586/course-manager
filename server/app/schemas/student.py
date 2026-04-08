@@ -13,7 +13,6 @@ class StudentBase(CamelModel):
     class_id: Optional[str] = None
     birth_date: date
     score: int
-    updated_at: datetime
 
 
 class StudentCreate(StudentBase):
@@ -27,9 +26,9 @@ class StudentUpdate(CamelModel):
     class_id: Optional[str] = None
     birth_date: Optional[date] = None
     score: Optional[int] = None
-    updated_at: Optional[datetime] = None
 
 
 class StudentRead(StudentBase):
     id: int
+    updated_at: datetime
     className: Optional[str] = None  # Mapped classroom name

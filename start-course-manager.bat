@@ -39,16 +39,20 @@ if errorlevel 1 (
 echo [初始化] ✓ 数据库迁移完成
 
 :: ── 检查种子数据 ──
-if not exist "server\data\aurora.db" (
-  echo [初始化] 未检测到数据库，正在导入种子数据...
+echo [初始化] 检查数据库基础数据...
+"%PYTHON_EXE%" server\scripts\check_seed_needed.py
+if errorlevel 2 (
+  echo [初始化] ⚠  无法判断数据库是否需要导入种子，后续将继续启动。
+) else if errorlevel 1 (
+  echo [初始化] ✓ 数据库已包含基础数据
+) else (
+  echo [初始化] 检测到数据库为空，正在导入标准种子数据...
   "%PYTHON_EXE%" server\scripts\import_seed.py
   if errorlevel 1 (
     echo [初始化] ⚠  种子数据导入失败，请检查 scripts/seed/output/ 目录。
   ) else (
     echo [初始化] ✓ 种子数据导入完成
   )
-) else (
-  echo [初始化] ✓ 数据库文件已存在
 )
 
 :: ── 启动后端 (后台) ──

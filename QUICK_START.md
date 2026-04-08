@@ -4,7 +4,7 @@
 
 **只需双击运行文件即可：**
 
-```
+```bat
 start-course-manager.bat
 ```
 
@@ -15,30 +15,36 @@ start-course-manager.bat
 启动脚本会自动执行以下步骤：
 
 ### 第一步：环境检查（初始化）
+
 - ✓ 检查 Python 环境（.\.conda\python.exe）
 - ✓ 检查 Node.js 和 npm
 
 ### 第二步：数据准备（初始化）
+
 - ✓ 运行数据库迁移（Alembic）
-- ✓ 导入初始数据（如需要）
+- ✓ 检查核心表是否处于首次初始化状态
+- ✓ 仅在数据库未初始化或核心表全部为空时导入标准种子数据
 
 ### 第三步：服务启动（启动中）
-- ✓ 启动后端 API（http://127.0.0.1:8000）
+
+- ✓ 启动后端 API（<http://127.0.0.1:8000>）
 - ✓ 等待后端就绪（端口检测）
-- ✓ 启动前端开发服务器（http://127.0.0.1:4200）
+- ✓ 启动前端开发服务器（默认 `4200`，若占用会自动切到 `4201-4219`）
 - ✓ 自动打开浏览器
 
 ### 第四步：服务停止（关闭中）
-- 关闭脚本窗口时，自动停止所有服务
+
+- 当前端进程正常退出时，脚本会自动停止后台后端
+- 若直接强制关闭批处理窗口，清理逻辑不一定能完整执行
 
 ## 🐛 问题排查
 
 | 问题 | 解决方案 |
-|------|--------|
-| npm 未找到 | 安装 Node.js 18+ LTS（https://nodejs.org/） |
+| --- | --- |
+| npm 未找到 | 安装 Node.js 18+ LTS（<https://nodejs.org/>） |
 | Python 环境缺失 | 直接启动前端：`npm run start` |
 | 8000 端口被占用 | 关闭占用该端口的应用，或手动运行后端：`cd server && uvicorn app.main:app --port 9000` |
-| 前端依赖错误 | 清除缓存：`rm -r node_modules package-lock.json && npm install` |
+| 前端依赖错误 | 在 PowerShell 中执行：`Remove-Item -Recurse -Force node_modules, package-lock.json` 后再运行 `npm install` |
 
 ## 📋 环境要求
 
@@ -48,9 +54,9 @@ start-course-manager.bat
 
 ## 🔗 服务地址
 
-- **前端**: http://127.0.0.1:4200
-- **后端 API**: http://127.0.0.1:8000
-- **Swagger 文档**: http://127.0.0.1:8000/docs
+- **前端**: 默认 <http://127.0.0.1:4200>（若端口被占用，请以前端终端输出地址为准）
+- **后端 API**: <http://127.0.0.1:8000>
+- **Swagger 文档**: <http://127.0.0.1:8000/api/v1/docs>
 
 ---
 

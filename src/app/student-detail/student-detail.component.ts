@@ -54,8 +54,8 @@ export class StudentDetailComponent {
       confirmText: '确认删除',
       tone: 'danger',
     })) {
-      this.studentStore.removeStudent(s.id);
-      this.router.navigateByUrl('/students');
+      await this.studentStore.removeStudent(s.id);
+      await this.router.navigateByUrl('/students');
     }
   }
 }

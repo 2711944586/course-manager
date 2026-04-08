@@ -110,7 +110,7 @@ export class EnrollmentEditComponent {
     this.draft.update(prev => ({ ...prev, [field]: value }));
   }
 
-  save(): void {
+  async save(): Promise<void> {
     const d = this.draft();
     if (!d.studentId || !d.courseId) {
       this.notice.set({ type: 'error', text: '请选择学生和课程。' });
@@ -130,10 +130,10 @@ export class EnrollmentEditComponent {
 
     try {
       if (this.enrollmentId) {
-        this.enrollmentStore.updateEnrollment(this.enrollmentId, payload);
+        await this.enrollmentStore.updateEnrollment(this.enrollmentId, payload);
         this.notice.set({ type: 'success', text: '选课记录已更新。' });
       } else {
-        this.enrollmentStore.createEnrollment(payload);
+        await this.enrollmentStore.createEnrollment(payload);
         this.notice.set({ type: 'success', text: '选课记录创建成功。' });
       }
       setTimeout(() => this.router.navigateByUrl('/enrollments'), 600);

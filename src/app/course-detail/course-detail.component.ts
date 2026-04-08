@@ -9,6 +9,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { map } from 'rxjs';
 import { COURSE_STATUS_LABELS, CourseStatus, CourseUpsertInput } from '../core/models/course.model';
 import { CourseStoreService } from '../core/services/course-store.service';
+import { EnrollmentStoreService } from '../core/services/enrollment-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { scoreToGrade } from '../core/utils/score-grade.util';
 import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
@@ -40,18 +41,18 @@ export class CourseDetailComponent {
     const c = this.course();
     if (!c) return [];
 
-    const allStudents = this.studentStore.students();
-    const totalCourses = Math.max(this.courseStore.courses().length, 1);
-    return allStudents
-      .filter(s => s.id % totalCourses === (c.id - 1) % totalCourses)
-      .slice(0, c.students)
-      .map(s => ({ ...s, grade: scoreToGrade(s.score) }));
+    return this.enrollmentStore
+      .getEnrollmentsByCourse(c.id)
+      .map(enrollment => this.studentStore.getStudentById(enrollment.studentId))
+      .filter((student): student is NonNullable<typeof student> => Boolean(student))
+      .map(student => ({ ...student, grade: scoreToGrade(student.score) }));
   });
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly courseStore: CourseStoreService,
+    private readonly enrollmentStore: EnrollmentStoreService,
     private readonly studentStore: StudentStoreService,
     private readonly confirmDialog: ConfirmDialogService,
   ) {
@@ -78,7 +79,7 @@ export class CourseDetailComponent {
     this.progressDraft.update(currentProgress => this.clampProgress(currentProgress + delta));
   }
 
-  saveProgress(): void {
+  async saveProgress(): Promise<void> {
     const selectedCourse = this.course();
     if (!selectedCourse) {
       this.notice.set({ type: 'error', text: '课程不存在，无法保存进度。' });
@@ -86,14 +87,14 @@ export class CourseDetailComponent {
     }
 
     try {
-      this.courseStore.updateProgress(selectedCourse.id, this.progressDraft());
+      await this.courseStore.updateProgress(selectedCourse.id, this.progressDraft());
       this.notice.set({ type: 'success', text: '课程进度已保存。' });
     } catch (error) {
       this.notice.set({ type: 'error', text: this.extractErrorMessage(error) });
     }
   }
 
-  changeStatus(status: CourseStatus): void {
+  async changeStatus(status: CourseStatus): Promise<void> {
     const selectedCourse = this.course();
     if (!selectedCourse) {
       this.notice.set({ type: 'error', text: '课程不存在，无法修改状态。' });
@@ -109,6 +110,7 @@ export class CourseDetailComponent {
 
     const payload: CourseUpsertInput = {
       name: selectedCourse.name,
+      teacherId: selectedCourse.teacherId ?? null,
       instructor: selectedCourse.instructor,
       schedule: selectedCourse.schedule,
       description: selectedCourse.description,
@@ -119,7 +121,7 @@ export class CourseDetailComponent {
     };
 
     try {
-      this.courseStore.updateCourse(selectedCourse.id, payload);
+      await this.courseStore.updateCourse(selectedCourse.id, payload);
       this.progressDraft.set(nextProgress);
       this.notice.set({ type: 'success', text: '课程状态已更新。' });
     } catch (error) {
@@ -145,7 +147,7 @@ export class CourseDetailComponent {
     }
 
     try {
-      this.courseStore.removeCourse(selectedCourse.id);
+      await this.courseStore.removeCourse(selectedCourse.id);
       void this.router.navigate(['/courses']);
     } catch (error) {
       this.notice.set({ type: 'error', text: this.extractErrorMessage(error) });

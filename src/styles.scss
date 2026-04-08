@@ -59,9 +59,9 @@ body.app-theme-light {
   --bg-tooltip: #0f172a;
   --text-tooltip: #f8fafc;
   --bg-tint: rgba(59, 130, 246, 0.04);
-  --bg-glass: rgba(255, 255, 255, 0.65);
-  --bg-glass-hover: rgba(255, 255, 255, 0.8);
-  --bg-glass-active: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --bg-glass-hover: rgba(255, 255, 255, 0.96);
+  --bg-glass-active: #ffffff;
 
   --border-default: #e2e8f0;
   --border-subtle: rgba(226, 232, 240, 0.6);
@@ -74,33 +74,33 @@ body.app-theme-light {
   --text-tertiary: #64748b;
   --text-on-accent: #ffffff;
 
-  --accent-primary: #3b82f6; // Vibrant Blue
-  --accent-primary-hover: #2563eb;
-  --accent-primary-container: rgba(59, 130, 246, 0.12);
-  --accent-primary-text: #2563eb;
+  --accent-primary: #355c8a;
+  --accent-primary-hover: #27486d;
+  --accent-primary-container: rgba(53, 92, 138, 0.12);
+  --accent-primary-text: #27486d;
   --accent-success: #10b981;
   --accent-success-container: rgba(16, 185, 129, 0.14);
-  --accent-warning: #f59e0b;
-  --accent-warning-container: rgba(245, 158, 11, 0.14);
-  --accent-error: #ef4444;
-  --accent-error-container: rgba(239, 68, 68, 0.12);
+  --accent-warning: #a07b43;
+  --accent-warning-container: rgba(160, 123, 67, 0.14);
+  --accent-error: #8f6b3c;
+  --accent-error-container: rgba(143, 107, 60, 0.14);
   --accent-info: #0ea5e9;
   --accent-info-container: rgba(14, 165, 233, 0.12);
-  --accent-secondary: #8b5cf6; // Indigo/Purple
-  --accent-secondary-container: rgba(139, 92, 246, 0.12);
-  --accent-grade-d: #f59e0b;
-  --accent-grade-d-container: rgba(245, 158, 11, 0.14);
-  --accent-grade-f: #ef4444;
-  --accent-grade-f-container: rgba(239, 68, 68, 0.12);
-  --accent-danger: #ef4444;
+  --accent-secondary: #5b7083;
+  --accent-secondary-container: rgba(91, 112, 131, 0.12);
+  --accent-grade-d: #a07b43;
+  --accent-grade-d-container: rgba(160, 123, 67, 0.14);
+  --accent-grade-f: #8f6b3c;
+  --accent-grade-f-container: rgba(143, 107, 60, 0.14);
+  --accent-danger: #8f6b3c;
 
   --chart-indigo: #4f46e5;
-  --chart-violet: #8b5cf6;
-  --chart-amber: #f59e0b;
-  --chart-red: #ef4444;
+  --chart-violet: #68829a;
+  --chart-amber: #a07b43;
+  --chart-red: #8f6b3c;
   --chart-emerald: #10b981;
-  --chart-pink: #ec4899;
-  --chart-blue: #3b82f6;
+  --chart-pink: #7c8895;
+  --chart-blue: #355c8a;
   --chart-lime: #84cc16;
   --chart-orange: #f97316;
 
@@ -113,7 +113,7 @@ body.app-theme-light {
   --accent-red: var(--accent-error);
   --accent-cyan: var(--accent-secondary);
 
-  --gradient-primary: linear-gradient(180deg, #3b82f6, #2563eb);
+  --gradient-primary: var(--accent-primary);
   --gradient-card-indicator: #e2e8f0;
   --topbar-accent-line: transparent;
   --app-shell-background: var(--bg-base);
@@ -154,6 +154,8 @@ body.app-theme-light {
   --command-card-icon-bg: rgba(59, 130, 246, 0.1);
   --command-card-icon-color: #3b82f6;
   --command-card-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05);
+  --bg-level-2: #f4f7fa;
+  --line-height-base: 1.55;
 
   --radius-xs: 6px;
   --radius-sm: 8px;
@@ -193,9 +195,9 @@ body.app-theme-dark {
   --bg-tooltip: #f8fafc;
   --text-tooltip: #09090b;
   --bg-tint: rgba(59, 130, 246, 0.06);
-  --bg-glass: rgba(24, 24, 27, 0.65);
-  --bg-glass-hover: rgba(24, 24, 27, 0.8);
-  --bg-glass-active: rgba(24, 24, 27, 0.9);
+  --bg-glass: rgba(24, 24, 27, 0.92);
+  --bg-glass-hover: rgba(31, 41, 55, 0.95);
+  --bg-glass-active: rgba(39, 39, 42, 0.96);
 
   --border-default: rgba(255, 255, 255, 0.08);
   --border-subtle: rgba(255, 255, 255, 0.04);
@@ -208,33 +210,33 @@ body.app-theme-dark {
   --text-tertiary: #71717a;
   --text-on-accent: #ffffff;
 
-  --accent-primary: #3b82f6; // Vibrant Blue
-  --accent-primary-hover: #60a5fa;
-  --accent-primary-container: rgba(59, 130, 246, 0.16);
-  --accent-primary-text: #60a5fa;
+  --accent-primary: #6e8cb1;
+  --accent-primary-hover: #8aa4c2;
+  --accent-primary-container: rgba(110, 140, 177, 0.16);
+  --accent-primary-text: #b2c5da;
   --accent-success: #10b981;
   --accent-success-container: rgba(16, 185, 129, 0.16);
-  --accent-warning: #f59e0b;
-  --accent-warning-container: rgba(245, 158, 11, 0.16);
-  --accent-error: #ef4444;
-  --accent-error-container: rgba(239, 68, 68, 0.16);
+  --accent-warning: #b18d58;
+  --accent-warning-container: rgba(177, 141, 88, 0.18);
+  --accent-error: #b08a57;
+  --accent-error-container: rgba(176, 138, 87, 0.18);
   --accent-info: #0ea5e9;
   --accent-info-container: rgba(14, 165, 233, 0.16);
-  --accent-secondary: #8b5cf6; // Indigo/Purple
-  --accent-secondary-container: rgba(139, 92, 246, 0.16);
-  --accent-grade-d: #f59e0b;
-  --accent-grade-d-container: rgba(245, 158, 11, 0.16);
-  --accent-grade-f: #ef4444;
-  --accent-grade-f-container: rgba(239, 68, 68, 0.16);
-  --accent-danger: #ef4444;
+  --accent-secondary: #7c8fa1;
+  --accent-secondary-container: rgba(124, 143, 161, 0.16);
+  --accent-grade-d: #b18d58;
+  --accent-grade-d-container: rgba(177, 141, 88, 0.18);
+  --accent-grade-f: #b08a57;
+  --accent-grade-f-container: rgba(176, 138, 87, 0.18);
+  --accent-danger: #b08a57;
 
   --chart-indigo: #818cf8;
-  --chart-violet: #a78bfa;
-  --chart-amber: #fbbf24;
-  --chart-red: #f87171;
+  --chart-violet: #8ea2b8;
+  --chart-amber: #c9a46c;
+  --chart-red: #b08a57;
   --chart-emerald: #34d399;
-  --chart-pink: #f472b6;
-  --chart-blue: #60a5fa;
+  --chart-pink: #8f9aa8;
+  --chart-blue: #8aa4c2;
   --chart-lime: #a3e635;
   --chart-orange: #fb923c;
 
@@ -247,7 +249,7 @@ body.app-theme-dark {
   --accent-red: var(--accent-error);
   --accent-cyan: var(--accent-secondary);
 
-  --gradient-primary: linear-gradient(180deg, #3b82f6, #2563eb);
+  --gradient-primary: var(--accent-primary);
   --gradient-card-indicator: #27272a;
   --topbar-accent-line: transparent;
   --app-shell-background: var(--bg-base);
@@ -288,6 +290,8 @@ body.app-theme-dark {
   --command-card-icon-bg: rgba(59, 130, 246, 0.15);
   --command-card-icon-color: #60a5fa;
   --command-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  --bg-level-2: #13161c;
+  --line-height-base: 1.55;
 
   --radius-xs: 6px;
   --radius-sm: 8px;
@@ -363,14 +367,14 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--scrollbar-thumb), color-mix(in srgb, var(--scrollbar-thumb) 68%, transparent));
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--scrollbar-thumb-hover), color-mix(in srgb, var(--scrollbar-thumb-hover) 68%, transparent));
+  background: var(--scrollbar-thumb-hover);
   background-clip: padding-box;
 }
 
@@ -457,9 +461,6 @@ body::after {
   box-shadow: var(--shadow-sm) !important;
   color: var(--text-primary) !important;
   transition: box-shadow 0.2s var(--easing-smooth), border-color 0.2s var(--easing-smooth), transform 0.2s var(--easing-smooth);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
   &:hover {
     box-shadow: var(--shadow-md) !important;
     border-color: var(--border-strong) !important;
@@ -492,8 +493,6 @@ body::after {
 
 .mat-mdc-text-field-wrapper {
   background: var(--shell-input) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transition: background-color 0.2s var(--easing-smooth), box-shadow 0.2s var(--easing-smooth) !important;
 }
@@ -828,11 +827,8 @@ a,
 
 .confirm-dialog-panel .mat-mdc-dialog-container {
   padding: 20px !important;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 98%, transparent), color-mix(in srgb, var(--bg-surface-low) 92%, transparent)) !important;
-  box-shadow:
-    var(--shadow-xl),
-    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 82%, transparent) !important;
+  background: var(--bg-elevated) !important;
+  box-shadow: var(--shadow-xl) !important;
 }
 
 .confirm-dialog-panel .mat-mdc-dialog-surface {
@@ -859,8 +855,8 @@ a,
 
 .glass-panel {
   background: var(--bg-glass);
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg);
   transition: background 0.25s var(--easing-smooth), border-color 0.25s var(--easing-smooth), box-shadow 0.25s var(--easing-smooth);
@@ -873,29 +869,16 @@ a,
 }
 
 .surface-card {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 94%, transparent), color-mix(in srgb, var(--bg-surface-low) 76%, transparent));
+  background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
   position: relative;
   isolation: isolate;
   transition: box-shadow 0.25s var(--easing-smooth), border-color 0.25s var(--easing-smooth), transform 0.25s var(--easing-smooth);
 
   &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background:
-      linear-gradient(130deg, color-mix(in srgb, var(--surface-sheen) 50%, transparent), transparent 34%),
-      radial-gradient(circle at 100% 0, var(--surface-orb), transparent 42%),
-      radial-gradient(circle at 0 100%, var(--surface-orb-secondary), transparent 38%);
-    opacity: 0.6;
-    z-index: -1;
+    content: none;
   }
 
   &:hover {

@@ -382,15 +382,15 @@ export class StudentsComponent implements OnInit, OnDestroy {
     this.editingStudentId.set(null);
   }
 
-  saveStudent(payload: StudentUpsertInput): void {
+  async saveStudent(payload: StudentUpsertInput): Promise<void> {
     try {
       const currentEditingStudentId = this.editingStudentId();
 
       if (currentEditingStudentId !== null) {
-        this.studentStore.updateStudent(currentEditingStudentId, payload);
+        await this.studentStore.updateStudent(currentEditingStudentId, payload);
         this.notice.set({ type: 'success', text: '学生信息已更新。' });
       } else {
-        this.studentStore.createStudent(payload);
+        await this.studentStore.createStudent(payload);
         this.notice.set({ type: 'success', text: '学生创建成功。' });
       }
 
@@ -418,7 +418,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.studentStore.removeStudent(studentId);
+      await this.studentStore.removeStudent(studentId);
       if (this.editingStudentId() === studentId) {
         this.cancelEdit();
       }
@@ -522,7 +522,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
     });
     if (!confirmed) return;
 
-    const count = this.studentStore.removeMany(ids);
+    const count = await this.studentStore.removeMany(ids);
     this.selectedStudentIds.set([]);
     this.notice.set({ type: 'success', text: `已批量删除 ${count} 名学生。` });
   }

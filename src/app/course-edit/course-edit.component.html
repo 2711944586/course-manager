@@ -32,9 +32,11 @@
             <label>授课教师 <span class="required">*</span></label>
             <div class="input-wrap">
               <mat-icon class="field-icon">person</mat-icon>
-              <input type="text" placeholder="教师姓名"
-                [ngModel]="draft().instructor"
-                (ngModelChange)="updateField('instructor', $event)" />
+              <select [ngModel]="draft().teacherId" (ngModelChange)="updateField('teacherId', $event)">
+                @for (teacher of teachers(); track teacher.id) {
+                  <option [value]="teacher.id">{{ teacher.name }} · {{ teacher.department }}</option>
+                }
+              </select>
             </div>
           </div>
           <div class="form-field">

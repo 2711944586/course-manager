@@ -1,8 +1,11 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { Observable, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, from, mergeMap, throwError, timer } from 'rxjs';
 import { Student, StudentGender, StudentUpsertInput } from '../models/student.model';
+import { buildApiUrl } from '../config/api.config';
+import { extractHttpErrorMessage } from '../utils/http-error.util';
 import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
+import { firstValueFrom } from 'rxjs';
 
 const STORAGE_KEY = 'aurora.course-manager.students';
 const DEFAULT_FAKE_COUNT = 120;
@@ -18,21 +21,42 @@ export interface StudentLoadOptions {
 
 @Injectable({ providedIn: 'root' })
 export class StudentStoreService {
+  private readonly http = inject(HttpClient);
+  private readonly studentsUrl = buildApiUrl('/students');
   private readonly studentState = signal<readonly Student[]>(this.loadStudents());
 
   readonly students = computed(() => this.studentState());
+
+  constructor() {
+    void this.refreshStudents();
+  }
+
+  async refreshStudents(): Promise<readonly Student[]> {
+    try {
+      const students = await firstValueFrom(this.http.get<readonly Student[]>(this.studentsUrl));
+      const validStudents = students.filter((item): item is Student => this.isStudent(item));
+      this.writeStudents(validStudents);
+      return validStudents;
+    } catch (error) {
+      if (this.studentState().length > 0) {
+        return this.studentState();
+      }
+
+      throw new Error(extractHttpErrorMessage(error, '学生数据加载失败，请检查网络后重试。'));
+    }
+  }
 
   loadStudents$(options: StudentLoadOptions = {}): Observable<readonly Student[]> {
     const normalizedDelay = Math.max(120, Math.min(3000, Math.round(options.delayMs ?? 900)));
     const shouldFail = options.shouldFail ?? false;
 
     return timer(normalizedDelay).pipe(
-      map(() => {
+      mergeMap(() => {
         if (shouldFail) {
-          throw new Error('学生数据加载失败，请检查网络后重试。');
+          return throwError(() => new Error('学生数据加载失败，请检查网络后重试。'));
         }
 
-        return [...this.studentState()];
+        return from(this.refreshStudents());
       }),
     );
   }
@@ -41,21 +65,17 @@ export class StudentStoreService {
     return this.studentState().find(student => student.id === studentId);
   }
 
-  createStudent(input: StudentUpsertInput): Student {
+  async createStudent(input: StudentUpsertInput): Promise<Student> {
     const normalizedInput = this.normalizeInput(input);
     this.ensureStudentNoUnique(normalizedInput.studentNo);
 
-    const createdStudent: Student = {
-      id: this.getNextStudentId(),
-      updatedAt: new Date().toISOString(),
-      ...normalizedInput,
-    };
+    const createdStudent = await firstValueFrom(this.http.post<Student>(this.studentsUrl, normalizedInput));
 
     this.writeStudents([createdStudent, ...this.studentState()]);
     return createdStudent;
   }
 
-  updateStudent(studentId: number, input: StudentUpsertInput): Student {
+  async updateStudent(studentId: number, input: StudentUpsertInput): Promise<Student> {
     const existingStudent = this.getStudentById(studentId);
     if (!existingStudent) {
       throw new Error('学生不存在，无法更新');
@@ -64,11 +84,9 @@ export class StudentStoreService {
     const normalizedInput = this.normalizeInput(input, existingStudent.classId);
     this.ensureStudentNoUnique(normalizedInput.studentNo, studentId);
 
-    const updatedStudent: Student = {
-      ...existingStudent,
-      ...normalizedInput,
-      updatedAt: new Date().toISOString(),
-    };
+    const updatedStudent = await firstValueFrom(
+      this.http.put<Student>(`${this.studentsUrl}/${studentId}`, normalizedInput),
+    );
 
     const nextStudents = this.studentState().map(student =>
       student.id === studentId ? updatedStudent : student,
@@ -78,21 +96,29 @@ export class StudentStoreService {
     return updatedStudent;
   }
 
-  removeStudent(studentId: number): void {
+  async removeStudent(studentId: number): Promise<void> {
     const nextStudents = this.studentState().filter(student => student.id !== studentId);
     if (nextStudents.length === this.studentState().length) {
       throw new Error('学生不存在，无法删除');
     }
 
+    await firstValueFrom(this.http.delete<void>(`${this.studentsUrl}/${studentId}`));
     this.writeStudents(nextStudents);
   }
 
-  removeMany(ids: readonly number[]): number {
+  async removeMany(ids: readonly number[]): Promise<number> {
     const idSet = new Set(ids);
     const before = this.studentState();
     const after = before.filter(s => !idSet.has(s.id));
     const removed = before.length - after.length;
     if (removed > 0) {
+      for (const id of ids) {
+        if (!before.some(student => student.id === id)) {
+          continue;
+        }
+
+        await firstValueFrom(this.http.delete<void>(`${this.studentsUrl}/${id}`));
+      }
       this.writeStudents(after);
     }
     return removed;

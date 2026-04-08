@@ -1,9 +1,10 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CourseStoreService } from '../core/services/course-store.service';
+import { TeacherStoreService } from '../core/services/teacher-store.service';
 import { COURSE_STATUS_OPTIONS, CourseUpsertInput } from '../core/models/course.model';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
@@ -34,12 +35,13 @@ export class CourseEditComponent {
     { value: 'translate', label: '语言' },
   ];
   readonly notice = signal<UiNotice | null>(null);
+  readonly teachers = this.teacherStore.teachers;
 
   readonly isCreateMode: boolean;
   private readonly courseId: number | null;
 
   readonly draft = signal<CourseUpsertInput>({
-    name: '', instructor: '', schedule: '', description: '',
+    name: '', teacherId: null, instructor: '', schedule: '', description: '',
     progress: 0, students: 0, status: 'planned', icon: 'menu_book',
   });
 
@@ -57,6 +59,7 @@ export class CourseEditComponent {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly courseStore: CourseStoreService,
+    private readonly teacherStore: TeacherStoreService,
   ) {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.isCreateMode = !idParam;
@@ -67,6 +70,7 @@ export class CourseEditComponent {
       if (existing) {
         this.draft.set({
           name: existing.name,
+          teacherId: existing.teacherId ?? this.resolveTeacherIdByName(existing.instructor),
           instructor: existing.instructor,
           schedule: existing.schedule,
           description: existing.description,
@@ -77,16 +81,47 @@ export class CourseEditComponent {
         });
       }
     }
+
+    effect(
+      () => {
+        if (!this.isCreateMode) {
+          return;
+        }
+
+        const firstTeacher = this.teachers()[0];
+        if (!firstTeacher || this.draft().teacherId !== null) {
+          return;
+        }
+
+        this.draft.update(prev => ({
+          ...prev,
+          teacherId: firstTeacher.id,
+          instructor: firstTeacher.name,
+        }));
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   updateField(field: keyof CourseUpsertInput, value: string | number): void {
+    if (field === 'teacherId') {
+      const teacherId = Number(value);
+      const teacher = this.teacherStore.getTeacherById(teacherId);
+      this.draft.update(prev => ({
+        ...prev,
+        teacherId: Number.isFinite(teacherId) ? teacherId : null,
+        instructor: teacher?.name ?? '',
+      }));
+      return;
+    }
+
     this.draft.update(prev => ({
       ...prev,
       [field]: (field === 'progress' || field === 'students') ? Number(value) : value,
     }));
   }
 
-  save(): void {
+  async save(): Promise<void> {
     const d = this.draft();
     if (!d.name.trim() || !d.instructor.trim()) {
       this.notice.set({ type: 'error', text: '请填写课程名称和教师。' });
@@ -99,11 +134,11 @@ export class CourseEditComponent {
 
     try {
       if (this.courseId) {
-        this.courseStore.updateCourse(this.courseId, d);
+        await this.courseStore.updateCourse(this.courseId, d);
         this.notice.set({ type: 'success', text: '课程信息已更新。' });
         setTimeout(() => this.router.navigateByUrl(`/courses/detail/${this.courseId}`), 600);
       } else {
-        const created = this.courseStore.createCourse(d);
+        const created = await this.courseStore.createCourse(d);
         this.notice.set({ type: 'success', text: '课程创建成功。' });
         setTimeout(() => this.router.navigateByUrl(`/courses/detail/${created.id}`), 600);
       }
@@ -114,5 +149,14 @@ export class CourseEditComponent {
 
   closeNotice(): void {
     this.notice.set(null);
+  }
+
+  private resolveTeacherIdByName(instructor: string): number | null {
+    const normalizedInstructor = instructor.trim();
+    if (!normalizedInstructor) {
+      return null;
+    }
+
+    return this.teacherStore.teachers().find(teacher => teacher.name === normalizedInstructor)?.id ?? null;
   }
 }

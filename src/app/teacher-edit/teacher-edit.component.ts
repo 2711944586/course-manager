@@ -98,7 +98,7 @@ export class TeacherEditComponent {
     this.draft.update(prev => ({ ...prev, [field]: value }));
   }
 
-  save(): void {
+  async save(): Promise<void> {
     const d = this.draft();
     if (!d.name.trim() || !d.employeeNo.trim()) {
       this.notice.set({ type: 'error', text: '请填写工号和姓名。' });
@@ -122,11 +122,11 @@ export class TeacherEditComponent {
 
     try {
       if (this.teacherId) {
-        this.teacherStore.updateTeacher(this.teacherId, payload);
+        await this.teacherStore.updateTeacher(this.teacherId, payload);
         this.notice.set({ type: 'success', text: '教师信息已更新。' });
         setTimeout(() => this.router.navigateByUrl('/teachers'), 600);
       } else {
-        this.teacherStore.createTeacher(payload);
+        await this.teacherStore.createTeacher(payload);
         this.notice.set({ type: 'success', text: '教师创建成功。' });
         setTimeout(() => this.router.navigateByUrl('/teachers'), 600);
       }

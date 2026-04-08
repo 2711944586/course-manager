@@ -3,7 +3,7 @@
 一个基于 Angular 17 + Angular Material + FastAPI 的课程管理系统。  
 当前版本延续 `Aurora Night Deck` 工作台风格：顶部 `Command Strip`、底部悬浮 `Dock`、亮暗双主题玻璃壳层，并已经完成前后端分离的第一阶段落地。
 
-当前仓库不再只是“纯前端演示”：`server/` 下的 Python FastAPI 服务已接入真实 HTTP 接口、SQLite 持久化、Alembic 迁移与标准种子数据；前端 Students 页面已经通过 HTTP 获取班级资源并显示学生所属班级。
+当前仓库不再只是“纯前端演示”：`server/` 下的 Python FastAPI 服务已接入真实 HTTP 接口、SQLite 持久化、Alembic 迁移与标准种子数据；前端 `Classes / Teachers / Courses / Students / Enrollments` 已切到 API-backed store，开始以数据库为主数据源。
 
 仓库地址：<https://github.com/2711944586/course-manager>
 
@@ -20,13 +20,17 @@
 
 ## 界面预览
 
-> 截图放置在 `docs/screenshots/` 目录下。首次运行后通过浏览器截图补充。
+<!-- screenshots:start -->
+
+> 截图由 `npm run screenshots:readme` 自动生成，输出到 `docs/screenshots/`。
 
 | 页面 | 暗色主题 | 亮色主题 |
-| ------ | ---------- | ---------- |
+| --- | --- | --- |
 | Dashboard | ![Dashboard Dark](docs/screenshots/dashboard-dark.png) | ![Dashboard Light](docs/screenshots/dashboard-light.png) |
 | Students | ![Students Dark](docs/screenshots/students-dark.png) | ![Students Light](docs/screenshots/students-light.png) |
 | Schedule | ![Schedule Dark](docs/screenshots/schedule-dark.png) | ![Schedule Light](docs/screenshots/schedule-light.png) |
+
+<!-- screenshots:end -->
 
 ## Fullstack 升级进展
 
@@ -34,15 +38,15 @@
 - Python 后端骨架：`server/`
 - 已完成 FastAPI 入口、配置基线、数据库 session 基线、`/api/v1/health` 健康检查、Alembic 迁移与最小 pytest 样例
 - 已新增 `classes` 资源、学生 `classId` 关联字段、标准 seed 导入脚本与 SQLite 数据库初始化流程
-- Students 页面已通过 HTTP 拉取班级列表，并在卡片、表格、导出 CSV 与详情预览中显示班级名称
-- 当前前端仍处于“本地 store + API 资源逐步迁移”的过渡阶段，后续会继续把课程、教师、选课等模块迁移为 API 驱动
+- `Classes / Teachers / Courses / Students / Enrollments` 已接入真实 API，并通过 store 信号层向页面分发数据库数据
+- `Analytics / Notifications / Backup Restore / Activity Log` 仍保留前端本地逻辑，作为后续服务端化阶段
 
-## 班级能力（本轮新增）
+### 核心实体联调现状
 
-- 后端提供 `GET /api/v1/classes`、`GET /api/v1/classes/{id}`、`POST /api/v1/classes`、`DELETE /api/v1/classes/{id}`
-- 学生模型新增 `classId`，旧本地数据会在加载时自动补齐默认班级
-- Students 页面一次性拉取全部班级后建立 `classId -> className` 映射，避免重复请求
-- 删除仍有关联学生的班级时，后端会返回 `409`，防止脏数据
+- 后端提供 `classes / teachers / courses / students / enrollments / analytics / health` 路由
+- 前端核心实体通过 API-backed store 读取、创建、更新、删除数据；页面层仍保留 Signals 消费方式
+- 课程详情页已改为基于真实选课关系显示学生列表，不再使用伪造取模关联
+- 教师与课程编辑流程已切换为真实教师档案选择，避免把教师姓名自由文本直接撞进数据库
 
 ## 技术栈
 
@@ -50,7 +54,7 @@
 - Angular Material
 - Standalone Components
 - Signals
-- localStorage 持久化
+- localStorage 缓存 + Signals
 - FastAPI
 - SQLAlchemy + Alembic
 - SQLite（开发环境）
@@ -76,7 +80,7 @@
 3. 前端依赖安装与开发服务器启动（`http://127.0.0.1:4200`）
 4. 自动打开浏览器
 
-关闭窗口即可停止前后端服务。
+建议通过让脚本正常退出来停止服务；如果直接强制关闭批处理窗口，不保证总能完整执行清理逻辑。
 
 ### 仅启动前端
 
@@ -91,7 +95,7 @@ npm run start
 npm run start:open
 ```
 
-开发脚本会自动寻找空闲端口，不再强依赖 `4200`。启动后以终端输出的地址为准。
+开发脚本会自动寻找 `4200-4219` 间的空闲端口；后端默认已放行该区间的本地 CORS。启动后以前端终端输出地址为准。
 
 ### 启动完整前后端联调
 
@@ -107,6 +111,7 @@ npm run start:open
 npm run start          # 自动选择可用端口启动开发服务器
 npm run start:open     # 自动选择可用端口并打开浏览器
 npm run start:raw      # 直接用 4200 启动 ng serve
+npm run screenshots:readme  # 先自动探测本地 dev server，再生成最新明暗主题截图
 npm run build          # 生产构建
 npm run test           # Karma 测试
 npm run test:headless  # Headless 测试
@@ -174,8 +179,9 @@ npm run test:headless  # Headless 测试
 
 ## 数据与存储
 
-- 班级资源当前存储在后端 SQLite 数据库中
-- 学生、课程、教师、选课等主体数据当前仍以 `localStorage` 为主
+- 班级、教师、课程、学生、选课主体数据当前以后端 SQLite 数据库为主，前端保留本地缓存作为启动兜底
+- `start-course-manager.bat` 仅会在核心表全部为空或数据库尚未初始化时自动导入标准种子，避免部分空表场景误重置现有数据
+- `Analytics / Notifications / Backup Restore / Activity Log` 当前仍以前端本地状态为主
 - Settings 页可导出 JSON 备份
 - Settings 页可重置课程、学生、教师、选课、活动日志、通知与最近工作区
 - 项目内置标准种子课程、教师、学生与班级数据
@@ -211,7 +217,7 @@ src/
 
 ## 说明
 
-- 当前仓库处于渐进式前后端分离阶段：班级资源已走真实 API，其余主体资源将逐步迁移
+- 当前仓库处于渐进式前后端分离阶段：核心实体已走真实 API，洞察/通知/备份恢复仍在后续阶段
 - 分析相关能力当前仍以前端计算与接口预留为主，不会默认发起外部模型请求
 - 后端实施说明见 `server/README.md`
 - 根目录 `.env` 为本地开发配置文件，不纳入版本控制

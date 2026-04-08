@@ -16,25 +16,14 @@
   gap: 12px;
   padding: 20px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-glass);
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px) saturate(1.6);
-  backdrop-filter: blur(12px) saturate(1.6);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
   cursor: pointer;
-  box-shadow:
-    var(--shadow-xs),
-    inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 78%, transparent);
+  box-shadow: var(--shadow-xs);
   transition: transform 0.28s var(--easing-smooth), box-shadow 0.28s var(--easing-smooth), border-color 0.28s var(--easing-smooth), background-color 0.28s var(--easing-smooth);
 
   &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(130deg, color-mix(in srgb, var(--surface-sheen) 20%, transparent), transparent 30%),
-      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-primary) 5%, transparent), transparent 42%);
-    pointer-events: none;
-    opacity: 0.85;
+    content: none;
   }
 
   &::after {
@@ -44,15 +33,15 @@
     width: 84px;
     height: 2px;
     border-radius: 999px;
-    background: var(--gradient-card-indicator);
+    background: color-mix(in srgb, var(--accent-primary) 78%, white);
     opacity: 0.8;
   }
 
   &:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--border-glass-hover);
-    background: var(--bg-glass-hover);
-    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+    background: var(--bg-surface);
+    transform: translateY(-2px);
   }
 
   &[data-status='completed'] .icon-wrap {
@@ -148,10 +137,10 @@
   color: var(--text-secondary);
   font-size: 0.86rem;
   line-height: 1.6;
-  display: box;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
   line-clamp: 3;
-  line-clamp: 3;
-  box-orient: vertical;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 

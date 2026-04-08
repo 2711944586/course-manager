@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
+import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
+import { UiNotice } from '../shared/models/ui-notice.model';
 import {
   TEACHER_STATUS_OPTIONS,
   Teacher,
@@ -16,7 +18,7 @@ import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, InlineNoticeComponent, DatePipe],
   templateUrl: './teachers.component.html',
   styleUrl: './teachers.component.scss',
 })
@@ -29,6 +31,7 @@ export class TeachersComponent {
   readonly selectedStatus = signal<'all' | TeacherStatus>('all');
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
+  readonly notice = signal<UiNotice | null>(null);
 
   readonly teachers = this.store.teachers;
   readonly statusOptions = TEACHER_STATUS_OPTIONS;
@@ -119,8 +122,20 @@ export class TeachersComponent {
     });
 
     if (confirmed) {
-      this.store.removeTeacher(teacher.id);
+      try {
+        await this.store.removeTeacher(teacher.id);
+        this.notice.set({ type: 'success', text: `教师 ${teacher.name} 已删除。` });
+      } catch (error) {
+        this.notice.set({
+          type: 'error',
+          text: error instanceof Error ? error.message : '删除教师失败，请稍后重试。',
+        });
+      }
     }
+  }
+
+  closeNotice(): void {
+    this.notice.set(null);
   }
 
   getLoadPercent(teacher: Teacher): number {

@@ -248,10 +248,10 @@ export class CourseListComponent {
       }
 
       if (currentEditingCourseId !== null) {
-        this.courseStore.updateCourse(currentEditingCourseId, payload);
+        await this.courseStore.updateCourse(currentEditingCourseId, payload);
         this.notice.set({ type: 'success', text: '课程信息已更新。' });
       } else {
-        this.courseStore.createCourse(payload);
+        await this.courseStore.createCourse(payload);
         this.notice.set({ type: 'success', text: '课程创建成功。' });
       }
 
@@ -279,7 +279,7 @@ export class CourseListComponent {
     }
 
     try {
-      this.courseStore.removeCourse(courseId);
+      await this.courseStore.removeCourse(courseId);
       if (this.editingCourseId() === courseId) {
         this.cancelEdit();
       }

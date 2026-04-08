@@ -6,6 +6,10 @@
     icon="fact_check"
   />
 
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
   <div class="mode-toggle animate-fade-up">
     <a class="btn-outline" matRipple [routerLink]="'/enrollments/edit/' + e.id">
       <mat-icon>edit_note</mat-icon>

@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,17 +8,20 @@ import { TeacherStoreService } from '../core/services/teacher-store.service';
 import { TEACHER_STATUS_OPTIONS, TeacherStatus } from '../core/models/teacher.model';
 import { PageHeroComponent } from '../shared/components/page-hero/page-hero.component';
 import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
+import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
+import { UiNotice } from '../shared/models/ui-notice.model';
 
 @Component({
   selector: 'app-teacher-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, MatRippleModule, PageHeroComponent],
+  imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, MatRippleModule, PageHeroComponent, InlineNoticeComponent],
   templateUrl: './teacher-detail.component.html',
   styleUrl: './teacher-detail.component.scss',
 })
 export class TeacherDetailComponent {
   private readonly teacherId: number;
   private readonly statusOptions = TEACHER_STATUS_OPTIONS;
+  readonly notice = signal<UiNotice | null>(null);
 
   readonly teacher = computed(() => this.teacherStore.getTeacherById(this.teacherId));
 
@@ -57,8 +60,19 @@ export class TeacherDetailComponent {
       confirmText: '确认删除',
       tone: 'danger',
     })) {
-      this.teacherStore.removeTeacher(t.id);
-      this.router.navigateByUrl('/teachers');
+      try {
+        await this.teacherStore.removeTeacher(t.id);
+        await this.router.navigateByUrl('/teachers');
+      } catch (error) {
+        this.notice.set({
+          type: 'error',
+          text: error instanceof Error ? error.message : '删除教师失败，请稍后重试。',
+        });
+      }
     }
+  }
+
+  closeNotice(): void {
+    this.notice.set(null);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,8 @@ import { EnrollmentStoreService } from '../core/services/enrollment-store.servic
 import { CourseStoreService } from '../core/services/course-store.service';
 import { StudentStoreService } from '../core/services/student-store.service';
 import { ConfirmDialogService } from '../core/services/confirm-dialog.service';
+import { InlineNoticeComponent } from '../shared/components/inline-notice/inline-notice.component';
+import { UiNotice } from '../shared/models/ui-notice.model';
 import {
   ENROLLMENT_STATUS_OPTIONS,
   ENROLLMENT_WORKFLOW_OPTIONS,
@@ -19,7 +21,7 @@ import {
 @Component({
   selector: 'app-enrollment-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, DatePipe],
+  imports: [CommonModule, RouterLink, MatIconModule, MatRippleModule, PageHeroComponent, InlineNoticeComponent, DatePipe],
   templateUrl: './enrollment-detail.component.html',
   styleUrl: './enrollment-detail.component.scss',
 })
@@ -30,6 +32,7 @@ export class EnrollmentDetailComponent {
   private readonly courseStore = inject(CourseStoreService);
   private readonly studentStore = inject(StudentStoreService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  readonly notice = signal<UiNotice | null>(null);
 
   private readonly enrollmentId = toSignal(
     this.route.paramMap.pipe(map(params => Number(params.get('id')))),
@@ -80,7 +83,18 @@ export class EnrollmentDetailComponent {
       tone: 'danger',
     });
     if (!confirmed) return;
-    this.enrollmentStore.removeEnrollment(e.id);
-    this.router.navigate(['/enrollments']);
+    try {
+      await this.enrollmentStore.removeEnrollment(e.id);
+      await this.router.navigate(['/enrollments']);
+    } catch (error) {
+      this.notice.set({
+        type: 'error',
+        text: error instanceof Error ? error.message : '删除选课记录失败，请稍后重试。',
+      });
+    }
+  }
+
+  closeNotice(): void {
+    this.notice.set(null);
   }
 }

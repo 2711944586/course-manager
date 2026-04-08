@@ -54,14 +54,12 @@
   align-items: center;
   gap: 16px;
   padding: 14px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 24px;
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
   background: var(--shell-surface);
-  box-shadow:
-    var(--shell-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: var(--shell-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .route-identity {
@@ -78,11 +76,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--accent-primary-container) 10%, transparent), transparent);
-  border: 1px solid color-mix(in srgb, var(--accent-primary) 16%, transparent);
+  background: var(--accent-primary-container);
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 22%, transparent);
   color: var(--accent-primary);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface-sheen) 76%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
   mat-icon {
     font-size: 22px;
@@ -213,8 +210,8 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   z-index: 1200;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   overflow: hidden;
   animation: fade-up 0.22s var(--easing-decel) both;
 }
@@ -381,13 +378,13 @@
   display: flex;
   flex-direction: column;
   background: var(--shell-surface-strong);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--border-default);
   border-radius: 18px;
   box-shadow: var(--shell-shadow-strong);
   z-index: 1200;
   overflow: hidden;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: fade-up 0.22s var(--easing-decel) both;
 }
 
@@ -396,8 +393,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface-low);
 
   h3 {
     margin: 0;
@@ -527,10 +524,10 @@
   z-index: 1200;
   border-radius: 24px;
   background: var(--shell-surface-strong);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid var(--border-default);
   box-shadow: var(--shell-panel-shadow);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: fade-up 0.24s var(--easing-decel) both;
 }
 

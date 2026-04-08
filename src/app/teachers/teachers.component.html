@@ -6,6 +6,10 @@
     icon="school"
   />
 
+  @if (notice(); as msg) {
+    <app-inline-notice class="animate-fade-up delay-1" [notice]="msg" (closeRequested)="closeNotice()" />
+  }
+
   <section class="overview-grid animate-fade-up">
     <article class="overview-card surface-card">
       <span>教师总量</span>

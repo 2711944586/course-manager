@@ -3,6 +3,7 @@ export type CourseStatus = 'planned' | 'active' | 'completed';
 export interface Course {
   readonly id: number;
   readonly name: string;
+  readonly teacherId?: number | null;
   readonly instructor: string;
   readonly schedule: string;
   readonly description: string;
@@ -15,6 +16,7 @@ export interface Course {
 
 export interface CourseUpsertInput {
   readonly name: string;
+  readonly teacherId?: number | null;
   readonly instructor: string;
   readonly schedule: string;
   readonly description: string;

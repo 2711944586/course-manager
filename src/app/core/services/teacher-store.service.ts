@@ -1,6 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
 import { ActivityLogService } from './activity-log.service';
+import { CourseStoreService } from './course-store.service';
+import { buildApiUrl } from '../config/api.config';
 import { Teacher, TeacherStatus, TeacherUpsertInput } from '../models/teacher.model';
+import { extractHttpErrorMessage } from '../utils/http-error.util';
 import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
 
 const STORAGE_KEY = 'aurora.course-manager.teachers';
@@ -10,32 +16,50 @@ const EMPLOYEE_NO_REGEX = /^T\d{5,}$/;
 
 @Injectable({ providedIn: 'root' })
 export class TeacherStoreService {
+  private readonly http = inject(HttpClient);
   private readonly activityLog = inject(ActivityLogService);
+  private readonly courseStore = inject(CourseStoreService);
+  private readonly teachersUrl = buildApiUrl('/teachers');
   private readonly teacherState = signal<readonly Teacher[]>(this.loadTeachers());
 
   readonly teachers = computed(() => this.teacherState());
+
+  constructor() {
+    void this.refreshTeachers();
+  }
 
   getTeacherById(teacherId: number): Teacher | undefined {
     return this.teacherState().find(teacher => teacher.id === teacherId);
   }
 
-  createTeacher(input: TeacherUpsertInput): Teacher {
+  async refreshTeachers(): Promise<readonly Teacher[]> {
+    try {
+      const teachers = await firstValueFrom(this.http.get<readonly Teacher[]>(this.teachersUrl));
+      const normalizedTeachers = this.normalizeTeacherList(teachers);
+      this.writeTeachers(normalizedTeachers);
+      return normalizedTeachers;
+    } catch (error) {
+      if (this.teacherState().length > 0) {
+        return this.teacherState();
+      }
+
+      throw new Error(extractHttpErrorMessage(error, '加载教师列表失败'));
+    }
+  }
+
+  async createTeacher(input: TeacherUpsertInput): Promise<Teacher> {
     const normalizedInput = this.normalizeInput(input);
     this.ensureEmployeeNoUnique(normalizedInput.employeeNo);
 
-    const createdTeacher: Teacher = {
-      id: this.getNextTeacherId(),
-      updatedAt: new Date().toISOString(),
-      lastReviewAt: new Date().toISOString(),
-      ...normalizedInput,
-    };
+    const createdTeacher = await firstValueFrom(this.http.post<Teacher>(this.teachersUrl, normalizedInput));
 
     this.writeTeachers([createdTeacher, ...this.teacherState()]);
+    await this.courseStore.refreshCourses();
     this.activityLog.log('create', 'teacher', createdTeacher.name, `新增教师档案：${createdTeacher.employeeNo}`);
     return createdTeacher;
   }
 
-  updateTeacher(teacherId: number, input: TeacherUpsertInput): Teacher {
+  async updateTeacher(teacherId: number, input: TeacherUpsertInput): Promise<Teacher> {
     const existingTeacher = this.getTeacherById(teacherId);
     if (!existingTeacher) {
       throw new Error('教师不存在，无法更新');
@@ -44,33 +68,30 @@ export class TeacherStoreService {
     const normalizedInput = this.normalizeInput(input);
     this.ensureEmployeeNoUnique(normalizedInput.employeeNo, teacherId);
 
-    const updatedTeacher: Teacher = {
-      ...existingTeacher,
-      ...normalizedInput,
-      lastReviewAt:
-        normalizedInput.status === 'active' || normalizedInput.currentWeeklyHours !== existingTeacher.currentWeeklyHours
-          ? new Date().toISOString()
-          : existingTeacher.lastReviewAt,
-      updatedAt: new Date().toISOString(),
-    };
+    const updatedTeacher = await firstValueFrom(
+      this.http.put<Teacher>(`${this.teachersUrl}/${teacherId}`, normalizedInput),
+    );
 
     const nextTeachers = this.teacherState().map(teacher =>
       teacher.id === teacherId ? updatedTeacher : teacher,
     );
 
     this.writeTeachers(nextTeachers);
+    await this.courseStore.refreshCourses();
     this.activityLog.log('update', 'teacher', updatedTeacher.name, `更新教师档案：${updatedTeacher.employeeNo}`);
     return updatedTeacher;
   }
 
-  removeTeacher(teacherId: number): void {
+  async removeTeacher(teacherId: number): Promise<void> {
     const targetTeacher = this.getTeacherById(teacherId);
     if (!targetTeacher) {
       throw new Error('教师不存在，无法删除');
     }
 
+    await firstValueFrom(this.http.delete<void>(`${this.teachersUrl}/${teacherId}`));
     const nextTeachers = this.teacherState().filter(teacher => teacher.id !== teacherId);
     this.writeTeachers(nextTeachers);
+    await this.courseStore.refreshCourses();
     this.activityLog.log('delete', 'teacher', targetTeacher.name, `删除教师档案：${targetTeacher.employeeNo}`);
   }
 
@@ -126,6 +147,12 @@ export class TeacherStoreService {
 
   private getNextTeacherId(): number {
     return this.teacherState().reduce((maxId, teacher) => Math.max(maxId, teacher.id), 0) + 1;
+  }
+
+  private normalizeTeacherList(teachers: readonly Teacher[]): readonly Teacher[] {
+    return teachers
+      .map((teacher, index) => this.hydrateTeacher(teacher, index))
+      .filter((teacher): teacher is Teacher => teacher !== null);
   }
 
   private generateFakeTeachers(count: number): readonly Teacher[] {

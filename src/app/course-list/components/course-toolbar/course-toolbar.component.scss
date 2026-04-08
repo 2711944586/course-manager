@@ -17,9 +17,6 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-
   &::before {
     content: '';
     position: absolute;
@@ -31,15 +28,7 @@
   }
 
   &::after {
-    content: '';
-    position: absolute;
-    top: -48px;
-    right: -24px;
-    width: 180px;
-    height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--accent-secondary) 16%, transparent), transparent 68%);
-    pointer-events: none;
+    content: none;
   }
 }
 
@@ -58,13 +47,13 @@
   padding: 12px;
   border-radius: 16px;
   border: 1px solid transparent;
-  background: color-mix(in srgb, var(--bg-surface-low) 72%, transparent);
+  background: var(--bg-surface-low);
   transition: border-color 0.2s var(--easing-smooth), background-color 0.2s var(--easing-smooth), box-shadow 0.2s var(--easing-smooth);
 
   &:focus-within {
     border-color: color-mix(in srgb, var(--accent-primary) 20%, transparent);
-    background: color-mix(in srgb, var(--bg-surface-low) 88%, transparent);
-    box-shadow: 0 14px 28px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+    background: var(--bg-surface);
+    box-shadow: 0 10px 20px color-mix(in srgb, var(--accent-primary) 8%, transparent);
   }
 }
 

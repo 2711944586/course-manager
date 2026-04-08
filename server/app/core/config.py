@@ -28,6 +28,10 @@ class Settings(BaseSettings):
         default="http://127.0.0.1:4200,http://localhost:4200",
         alias="AURORA_CORS_ORIGINS",
     )
+    cors_origin_regex: str = Field(
+        default=r"^https?://(127\.0\.0\.1|localhost):42\d{2}$",
+        alias="AURORA_CORS_ORIGIN_REGEX",
+    )
     jwt_secret: str = Field(default="CHANGE_ME_TO_A_LONG_RANDOM_SECRET", alias="AURORA_JWT_SECRET")
     jwt_expire_minutes: int = Field(default=120, alias="AURORA_JWT_EXPIRE_MINUTES")
 

@@ -1,6 +1,10 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+import { extractHttpErrorMessage } from '../utils/http-error.util';
 import { SchoolClass, SchoolClassCreateInput } from '../models/class.model';
 import { safeStorageGetItem, safeStorageSetItem } from '../utils/safe-storage.util';
+import { ClassService } from './class.service';
 
 const STORAGE_KEY = 'aurora.course-manager.classes';
 
@@ -15,9 +19,14 @@ const SEED_CLASSES: readonly SchoolClass[] = [
 
 @Injectable({ providedIn: 'root' })
 export class ClassStoreService {
+  private readonly classService = inject(ClassService);
   private readonly classState = signal<readonly SchoolClass[]>(this.loadClasses());
 
   readonly classes = computed(() => this.classState());
+
+  constructor() {
+    void this.refreshClasses();
+  }
 
   getClassById(classId: string): SchoolClass | undefined {
     return this.classState().find(c => c.id === classId);
@@ -28,21 +37,44 @@ export class ClassStoreService {
     return this.getClassById(classId)?.className ?? classId;
   }
 
-  addClass(input: SchoolClassCreateInput): SchoolClass {
+  async refreshClasses(): Promise<readonly SchoolClass[]> {
+    try {
+      const classes = await firstValueFrom(this.classService.getClasses());
+      const normalized = this.normalizeClasses(classes);
+      this.writeClasses(normalized);
+      return normalized;
+    } catch (error) {
+      if (this.classState().length > 0) {
+        return this.classState();
+      }
+
+      throw new Error(extractHttpErrorMessage(error, '加载班级列表失败'));
+    }
+  }
+
+  async addClass(input: SchoolClassCreateInput): Promise<SchoolClass> {
     const existing = this.getClassById(input.id);
     if (existing) {
       throw new Error(`班级 ${input.id} 已存在`);
     }
-    const created: SchoolClass = { id: input.id.trim(), className: input.className.trim() };
-    this.writeClasses([...this.classState(), created]);
+
+    const created = await firstValueFrom(
+      this.classService.addClass({
+        id: input.id.trim(),
+        className: input.className.trim(),
+      }),
+    );
+    this.writeClasses([...this.classState().filter(item => item.id !== created.id), created]);
     return created;
   }
 
-  removeClass(classId: string): void {
+  async removeClass(classId: string): Promise<void> {
     const next = this.classState().filter(c => c.id !== classId);
     if (next.length === this.classState().length) {
       throw new Error('班级不存在');
     }
+
+    await firstValueFrom(this.classService.deleteClass(classId));
     this.writeClasses(next);
   }
 
@@ -72,5 +104,14 @@ export class ClassStoreService {
     const seed = [...SEED_CLASSES];
     safeStorageSetItem(STORAGE_KEY, JSON.stringify(seed));
     return seed;
+  }
+
+  private normalizeClasses(classes: readonly SchoolClass[]): readonly SchoolClass[] {
+    return classes
+      .filter((schoolClass): schoolClass is SchoolClass => Boolean(schoolClass?.id && schoolClass.className))
+      .map(schoolClass => ({
+        id: schoolClass.id.trim(),
+        className: schoolClass.className.trim(),
+      }));
   }
 }

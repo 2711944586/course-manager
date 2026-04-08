@@ -21,8 +21,8 @@
   background: var(--dock-surface);
   border: 1px solid var(--dock-border);
   box-shadow: var(--dock-shadow);
-  backdrop-filter: blur(20px) saturate(1.4);
-  backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   pointer-events: auto;
   overflow: hidden;
   transform-origin: center bottom;
@@ -195,8 +195,8 @@
   &:hover {
     color: var(--text-primary);
     background: var(--dock-hover-bg);
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 12px 28px rgba(10, 18, 34, 0.35);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-md);
   }
 
   &.active {
@@ -215,7 +215,7 @@
   &:focus-visible {
     color: var(--text-primary);
     background: var(--dock-hover-bg);
-    transform: translateY(-8px) scale(1.05);
+    transform: translateY(-4px) scale(1.02);
   }
 }
 
