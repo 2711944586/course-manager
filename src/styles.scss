@@ -93,6 +93,39 @@ body.app-theme-light {
   --accent-grade-f: #8f6b3c;
   --accent-grade-f-container: rgba(143, 107, 60, 0.14);
   --accent-danger: #8f6b3c;
+  --button-primary-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-primary) 94%, #4b75aa),
+    color-mix(in srgb, var(--accent-primary-hover) 82%, var(--accent-secondary))
+  );
+  --button-primary-hover-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-primary-hover) 90%, #4b75aa),
+    color-mix(in srgb, var(--accent-primary) 74%, var(--accent-secondary))
+  );
+  --button-primary-border: color-mix(in srgb, var(--accent-primary-hover) 24%, transparent);
+  --button-primary-shadow:
+    0 14px 28px color-mix(in srgb, var(--accent-primary) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  --button-primary-shadow-hover:
+    0 18px 34px color-mix(in srgb, var(--accent-primary) 22%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  --button-outline-bg: color-mix(in srgb, var(--bg-surface) 96%, white);
+  --button-outline-border: color-mix(in srgb, var(--border-default) 92%, white);
+  --button-outline-hover-bg: color-mix(in srgb, var(--accent-primary-container) 24%, var(--bg-surface));
+  --button-outline-hover-border: color-mix(in srgb, var(--accent-primary) 18%, var(--border-strong));
+  --button-outline-shadow:
+    0 8px 20px color-mix(in srgb, var(--accent-primary) 6%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --button-danger-bg: linear-gradient(135deg, #d75a73, #ba3c5d);
+  --button-danger-hover-bg: linear-gradient(135deg, #c94c65, #a93251);
+  --button-danger-border: color-mix(in srgb, #9f2444 42%, transparent);
+  --button-danger-shadow:
+    0 16px 30px rgba(186, 60, 93, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  --button-danger-shadow-hover:
+    0 20px 36px rgba(169, 50, 81, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
 
   --chart-indigo: #4f46e5;
   --chart-violet: #68829a;
@@ -229,6 +262,39 @@ body.app-theme-dark {
   --accent-grade-f: #b08a57;
   --accent-grade-f-container: rgba(176, 138, 87, 0.18);
   --accent-danger: #b08a57;
+  --button-primary-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-primary) 88%, #9db8d6),
+    color-mix(in srgb, var(--accent-primary-hover) 74%, var(--accent-secondary))
+  );
+  --button-primary-hover-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-primary-hover) 92%, #b8cee5),
+    color-mix(in srgb, var(--accent-primary) 72%, var(--accent-secondary))
+  );
+  --button-primary-border: color-mix(in srgb, rgba(255, 255, 255, 0.24) 72%, var(--accent-primary));
+  --button-primary-shadow:
+    0 18px 32px rgba(71, 98, 130, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --button-primary-shadow-hover:
+    0 24px 40px rgba(82, 113, 148, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  --button-outline-bg: color-mix(in srgb, var(--bg-surface) 84%, var(--bg-elevated));
+  --button-outline-border: color-mix(in srgb, var(--border-default) 96%, rgba(255, 255, 255, 0.03));
+  --button-outline-hover-bg: color-mix(in srgb, var(--accent-primary-container) 34%, var(--bg-elevated));
+  --button-outline-hover-border: color-mix(in srgb, var(--accent-primary) 24%, rgba(255, 255, 255, 0.08));
+  --button-outline-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --button-danger-bg: linear-gradient(135deg, #d46b83, #b84f6b);
+  --button-danger-hover-bg: linear-gradient(135deg, #e07f96, #c45f79);
+  --button-danger-border: color-mix(in srgb, #f099ad 24%, rgba(255, 255, 255, 0.12));
+  --button-danger-shadow:
+    0 18px 34px rgba(184, 79, 107, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --button-danger-shadow-hover:
+    0 22px 40px rgba(196, 95, 121, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 
   --chart-indigo: #818cf8;
   --chart-violet: #8ea2b8;
@@ -585,22 +651,27 @@ body::after {
 }
 
 .mat-mdc-button, .mat-mdc-outlined-button {
-  border-radius: var(--radius-sm) !important;
-  font-weight: 500 !important;
+  border-radius: calc(var(--radius-sm) + 2px) !important;
+  font-weight: 600 !important;
   letter-spacing: 0.01em !important;
-  transition: all 0.2s var(--easing-smooth) !important;
+  transition:
+    transform 0.2s var(--easing-smooth),
+    box-shadow 0.2s var(--easing-smooth),
+    background-color 0.2s var(--easing-smooth),
+    border-color 0.2s var(--easing-smooth),
+    color 0.2s var(--easing-smooth) !important;
 }
 
 .mat-mdc-unelevated-button.mat-primary {
-  background: var(--accent-primary) !important;
+  background: var(--button-primary-bg) !important;
+  border: 1px solid var(--button-primary-border) !important;
   color: var(--text-on-accent) !important;
-  font-weight: 500 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s var(--easing-smooth) !important;
+  font-weight: 600 !important;
+  box-shadow: var(--button-primary-shadow) !important;
 
   &:hover {
-    background: var(--accent-primary-hover) !important;
-    box-shadow: var(--shadow-md);
+    background: var(--button-primary-hover-bg) !important;
+    box-shadow: var(--button-primary-shadow-hover) !important;
     transform: translateY(-1px);
   }
 
@@ -611,15 +682,16 @@ body::after {
 
 .mat-mdc-outlined-button:not(:disabled),
 .mat-mdc-stroked-button:not(:disabled) {
-  border-color: var(--border-default) !important;
+  background: var(--button-outline-bg) !important;
+  border-color: var(--button-outline-border) !important;
   color: var(--text-primary) !important;
-  transition: all 0.2s var(--easing-smooth) !important;
+  box-shadow: var(--button-outline-shadow) !important;
 
   &:hover {
-    border-color: var(--border-strong) !important;
-    background: var(--bg-hover) !important;
+    border-color: var(--button-outline-hover-border) !important;
+    background: var(--button-outline-hover-bg) !important;
     transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md) !important;
   }
 }
 
@@ -1122,23 +1194,46 @@ a,
 //  Button Design System
 // ══════════════════════════════════════════════════════════
 
-.btn, button.btn, a.btn {
+.btn,
+.btn-primary,
+.btn-outline,
+.btn-secondary,
+.btn-danger,
+.btn-ghost,
+button.btn,
+button.btn-primary,
+button.btn-outline,
+button.btn-secondary,
+button.btn-danger,
+button.btn-ghost,
+a.btn,
+a.btn-primary,
+a.btn-outline,
+a.btn-secondary,
+a.btn-danger,
+a.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 0 16px;
   height: 40px;
-  border-radius: var(--radius-sm);
+  border-radius: calc(var(--radius-sm) + 2px);
   font-family: $app-font-stack;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9rem;
   letter-spacing: 0.01em;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.25s var(--easing-smooth);
+  line-height: 1;
+  transition:
+    transform 0.22s var(--easing-smooth),
+    box-shadow 0.22s var(--easing-smooth),
+    background-color 0.22s var(--easing-smooth),
+    border-color 0.22s var(--easing-smooth),
+    color 0.22s var(--easing-smooth);
   user-select: none;
   white-space: nowrap;
   box-sizing: border-box;
@@ -1167,49 +1262,42 @@ a,
 }
 
 .btn-primary {
-  background: var(--accent-primary);
+  background: var(--button-primary-bg);
   color: var(--text-on-accent);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  border: none;
+  box-shadow: var(--button-primary-shadow);
+  border-color: var(--button-primary-border);
 
   &:hover:not(:disabled) {
-    background: var(--accent-primary-hover);
-    box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: var(--button-primary-hover-bg);
+    box-shadow: var(--button-primary-shadow-hover);
     transform: translateY(-1px);
   }
 }
 
 .btn-outline, .btn-secondary {
-  background: var(--bg-surface);
-  border-color: var(--border-default);
+  background: var(--button-outline-bg);
+  border-color: var(--button-outline-border);
   color: var(--text-primary);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--button-outline-shadow);
 
   &:hover:not(:disabled) {
-    background: var(--bg-hover);
-    border-color: var(--border-strong);
+    background: var(--button-outline-hover-bg);
+    border-color: var(--button-outline-hover-border);
     color: var(--text-primary);
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
   }
 }
 
 .btn-danger {
-  background: var(--accent-error);
+  background: var(--button-danger-bg);
   color: var(--text-on-accent);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border: none;
+  border-color: var(--button-danger-border);
+  box-shadow: var(--button-danger-shadow);
 
   &:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--accent-error) 85%, #000);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    background: var(--button-danger-hover-bg);
+    box-shadow: var(--button-danger-shadow-hover);
     transform: translateY(-1px);
   }
 }

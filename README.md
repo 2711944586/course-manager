@@ -23,12 +23,87 @@
 <!-- screenshots:start -->
 
 > 截图由 `npm run screenshots:readme` 自动生成，输出到 `docs/screenshots/`。
+> 每个模块均提供暗色 / 亮色主题截图与简要说明。
 
-| 页面 | 暗色主题 | 亮色主题 |
-| --- | --- | --- |
-| Dashboard | ![Dashboard Dark](docs/screenshots/dashboard-dark.png) | ![Dashboard Light](docs/screenshots/dashboard-light.png) |
-| Students | ![Students Dark](docs/screenshots/students-dark.png) | ![Students Light](docs/screenshots/students-light.png) |
-| Schedule | ![Schedule Dark](docs/screenshots/schedule-dark.png) | ![Schedule Light](docs/screenshots/schedule-light.png) |
+### Dashboard / Mission Control
+
+指标总览、风险雷达、推荐动作、运营时间线与最近工作区。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Dashboard Dark](docs/screenshots/dashboard-dark.png) | ![Dashboard Light](docs/screenshots/dashboard-light.png) |
+
+### Courses / 课程管理
+
+课程搜索、状态筛选、卡片工作台、详情预览与课程维护入口。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Courses Dark](docs/screenshots/courses-dark.png) | ![Courses Light](docs/screenshots/courses-light.png) |
+
+### Students / 学生管理
+
+学生搜索筛选、卡片/表格双视图、局部预览、批量操作与异常恢复演示。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Students Dark](docs/screenshots/students-dark.png) | ![Students Light](docs/screenshots/students-light.png) |
+
+### Teachers / 教师管理
+
+教师检索、排班负荷、档案编辑入口与教师工作负载概览。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Teachers Dark](docs/screenshots/teachers-dark.png) | ![Teachers Light](docs/screenshots/teachers-light.png) |
+
+### Enrollments / 选课与成绩
+
+选课关系、审批状态、成绩录入、待办队列与异常记录视图。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Enrollments Dark](docs/screenshots/enrollments-dark.png) | ![Enrollments Light](docs/screenshots/enrollments-light.png) |
+
+### Analytics / 数据分析
+
+概览、对比、趋势三类分析视图，以及风险与机会洞察。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Analytics Dark](docs/screenshots/analytics-dark.png) | ![Analytics Light](docs/screenshots/analytics-light.png) |
+
+### Reports / 数据报表
+
+课程、学生与完成率等多维统计报表与可视化摘要。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Reports Dark](docs/screenshots/reports-dark.png) | ![Reports Light](docs/screenshots/reports-light.png) |
+
+### Schedule / 教务日程
+
+按周排布课程日历、课时概览与课程详情弹层入口。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Schedule Dark](docs/screenshots/schedule-dark.png) | ![Schedule Light](docs/screenshots/schedule-light.png) |
+
+### Activity Log / 活动日志
+
+系统操作时间线、动作过滤器与审计留痕视图。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Activity Log Dark](docs/screenshots/activity-log-dark.png) | ![Activity Log Light](docs/screenshots/activity-log-light.png) |
+
+### Settings / 系统设置
+
+主题切换、数据管理、分析服务预设与系统信息展示。
+
+| 暗色主题 | 亮色主题 |
+| --- | --- |
+| ![Settings Dark](docs/screenshots/settings-dark.png) | ![Settings Light](docs/screenshots/settings-light.png) |
 
 <!-- screenshots:end -->
 
